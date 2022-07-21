@@ -351,6 +351,8 @@ async function collectComments(url, get_video, config, timeout = 1000, scrapeRep
 }
 
 
+module.exports.collectComments = collectComments;
+
 (async () => { //Main
 
   console.log("\n");
@@ -370,4 +372,4 @@ async function collectComments(url, get_video, config, timeout = 1000, scrapeRep
   let url = "https://www.youtube.com/watch?v=3fmzvB-Kq0s";
   await collectComments(url, get_video, config, 1000, true, Infinity, settings);
   
-})();
+});

@@ -3,15 +3,28 @@
   "version": "1.0.0",
   "description": "A CLI for scraping youtube comments",
   "main": "commentsAxios.js",
+  "bin": {
+    "comment-scraper": "entry.js"
+  },
+  "dependencies": {
+    "asynckit": "^0.4.0",
+    "axios": "^0.27.2",
+    "combined-stream": "^1.0.8",
+    "delayed-stream": "^1.0.0",
+    "follow-redirects": "^1.15.1",
+    "form-data": "^4.0.0",
+    "mime-db": "^1.52.0",
+    "mime-types": "^2.1.35"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "youtube",
-    "scraper",
+    "comments",
     "CLI",
-    "comments"
+    "scraper"
   ],
   "author": "adldtd",
-  "license": "MIT"
+  "license": "ISC"
 }
