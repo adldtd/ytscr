@@ -1,0 +1,17 @@
+{
+  "name": "comment-scraper",
+  "version": "1.0.0",
+  "description": "A CLI for scraping youtube comments",
+  "main": "commentsAxios.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "youtube",
+    "scraper",
+    "CLI",
+    "comments"
+  ],
+  "author": "adldtd",
+  "license": "MIT"
+}
