@@ -16,7 +16,7 @@ var config = {
     authority: "www.youtube.com",
     validateStatus: () => true
 };
-config.data = JSON.parse(fs.readFileSync("config_data.json")); //*****************USER AGENT COULD BE REMOVED
+config.data = JSON.parse(fs.readFileSync(__dirname + "/config_data.json")); //*****************USER AGENT COULD BE REMOVED
 
 
 /*
@@ -221,29 +221,29 @@ async function scrapeReplies(continuation_id, config, timeout, counter, limit, s
 //*********************************************************************************
 //Crunch a comment and return a simplified form
 //*********************************************************************************
-function getCommentData(innerComment, options = {}) { //Condenses a retrieved comment
+function getCommentData(innerComment, include = {}) { //Condenses a retrieved comment
 
   let singleComment = {};
 
-  if ("author" in options ? options.author : true)
+  if ("author" in include ? include.author : true)
     singleComment.author = innerComment.authorText.simpleText;
 
-  if ("text" in options ? options.text : true) {
+  if ("text" in include ? include.text : true) {
     singleComment.text = "";
     for (run in innerComment.contentText.runs)
     singleComment.text += innerComment.contentText.runs[run].text;
   }
 
-  if ("id" in options ? options.id : true)
+  if ("id" in include ? include.id : true)
     singleComment.id = innerComment.commentId;
 
-  if ("published" in options ? options.published : true) {
+  if ("published" in include ? include.published : true) {
     singleComment.published = "";
     for (run in innerComment.publishedTimeText.runs)
     singleComment.published += innerComment.publishedTimeText.runs[run].text;
   }
 
-  if ("votes" in options ? options.votes : true) {
+  if ("votes" in include ? include.votes : true) {
     if (innerComment.isLiked)
       singleComment.votes = innerComment.voteCount.simpleText;
     else
@@ -266,10 +266,17 @@ function commentMatches(singleComment, selectors) {
     let condition = selectors[s];
     if (condition.check !== "votes") {
 
+      let commentCheck = singleComment[condition.check];
+      let conditionMatch = condition.match;
+      if ("caseSensitive" in condition ? !condition.caseSensitive : true) {
+        commentCheck = commentCheck.toLowerCase();
+        conditionMatch = commentCheck.toLowerCase();
+      }
+
       if (condition.compare === "=") //Exact match needed
-        returnMatch = singleComment[condition.check] === condition.match;
+        returnMatch = commentCheck === conditionMatch;
       else
-        returnMatch = singleComment[condition.check].includes(condition.match);
+        returnMatch = commentCheck.includes(conditionMatch);
     }
     else {
       
@@ -359,7 +366,7 @@ module.exports.collectComments = collectComments;
 
   let settings = {
     save: false,
-      saveOnlyMatch: false,
+    saveOnlyMatch: false,
     logMatch: true,
     selectors: [
       {
