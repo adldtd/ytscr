@@ -5,6 +5,7 @@ const comment_scraper = require(__dirname + "/commentsAxios");
 
 (async () => { //Main
 
+  console.log("");
   let pack = CLI.cli(process.argv);
   let url = "";
   let destination = "";
@@ -14,8 +15,13 @@ const comment_scraper = require(__dirname + "/commentsAxios");
     url = pack[0];
     destination = pack[1];
     settings = pack[2];
-    console.log("No issues found");
   } else
     return;
+
+  //console.log(settings.selectors);
+  //return;
+
+  console.log("\n");
+  await comment_scraper.collectComments(url, destination, 1000, true, settings);
 
 })();

@@ -6,7 +6,8 @@ const fs = require("fs");
 *   save: -nosave, -NS
 *   saveOnlyMatch: -savefilter, -sf
 *   logMatch: -printfilter, -pf
-*   limitMatch: *********************************************************************************************
+*   limit: lim=, l=
+*   limitMatch: limfilter=, lf=
 *   selectors: filter=, f=
 *     : {}
 *       check: check=
@@ -66,30 +67,18 @@ function cli (args) {
 
       case "-nosave":
       case "-NS":
-        if (!inFilter) {
-          let compatible1 = "saveOnlyMatch" in settings ? !settings.saveOnlyMatch : true; //If save is false, then save only match has to be false
-          let compatible2 = (destination === "");
-          if (compatible1 && compatible2)
-            settings.save = false;
-          else {
-            if (!compatible1)
-              err = errorCodes(0, a);
-            if (!compatible2)
-              err = errorCodes(1, a);
-          }
-        } else
+        if (!inFilter)
+          settings.save = false;
+        else
           err = errorCodes(2, a);
         break;
 
 
       case "-savefilter":
       case "-sf":
-        if (!inFilter) {
-          if ("save" in settings ? settings.save : true)
-            settings.saveOnlyMatch = false;
-          else
-            err = errorCodes(0, a);
-        } else
+        if (!inFilter)
+          settings.saveOnlyMatch = true;
+        else
           err = errorCodes(2, a);
         break;
       
@@ -102,14 +91,48 @@ function cli (args) {
           err = errorCodes(2, a);
         break;
 
+      
+      case "lim":
+      case "l":
+        if (!inFilter) {
+          if (!isNaN(parseInt(v))) {
+            v = parseInt(v);
+            if (v > 0)
+              settings.limit = v;
+            else
+              err = errorCodes(15, a, v);
+          } else
+            err = errorCodes(16, a, v);
+        } else
+          err = errorCodes(2, a);
+        break;
+
+
+      case "limfilter":
+      case "lf":
+        if (!inFilter) {
+          if (!isNaN(parseInt(v))) {
+            v = parseInt(v);
+            if (v > 0)
+              settings.limitMatch = v;
+            else
+              err = errorCodes(15, a, v);
+          } else
+            err = errorCodes(16, a, v);
+        } else
+          err = errorCodes(2, a);
+        break;
+
 
       case "filter":
       case "f":
         if (!inFilter) {
           if (v in filterValidValues)
             inFilter = true;
-          else
+          else {
             err = errorCodes(3, a, v);
+            outputValidValues(a, filterValidValues);
+          }
         } else
           err = errorCodes(2, a);
         break;
@@ -122,8 +145,10 @@ function cli (args) {
               currentFilter.check = v;
             else
               err = errorCodes(5, a);
-          } else
+          } else {
             err = errorCodes(3, a, v);
+            outputValidValues(a, checkValidValues);
+          }
         } else
           err = errorCodes(4, a);
         break;
@@ -142,19 +167,16 @@ function cli (args) {
 
       case "compare":
         if (inFilter) {
-          if (v in compareValidValues) {
-            if (!("compare" in currentFilter))
-              currentFilter.compare = v;
-            else
-              err = errorCodes(5, a);
-          } else
-            err = errorCodes(3, a, v);
+          if (!("compare" in currentFilter)) //In order to reduce complexity, v is checked as a valid value at the end of the filter scope ("}")
+            currentFilter.compare = v;
+          else
+            err = errorCodes(5, a);
         } else
           err = errorCodes(4, a);
         break;
 
         
-      case "-casesensitive": //*******************The program ignores this prompt if entered alongside a "numerical" match like votes
+      case "-casesensitive": //The program ignores this prompt if entered alongside a "numerical" match like votes
       case "-cs":
         if (inFilter)
           currentFilter.caseSensitive = true;
@@ -178,8 +200,9 @@ function cli (args) {
             err = errorCodes(8, a, currentFilter.check);
             break;
           }
-          if (currentFilter.compare === "") {
+          if (!(currentFilter.compare in compareValidValues) || currentFilter.compare === "") {
             err = errorCodes(9, a, currentFilter.compare);
+            outputValidValues("compare", compareValidValues, {"":""});
             break;
           }
           if (isNaN(parseInt(currentFilter.match))) {
@@ -191,8 +214,9 @@ function cli (args) {
 
           if (!("compare" in currentFilter))
             currentFilter.compare = ""; //Default value
-          else if (currentFilter.compare !== "=" && currentFilter.compare !== "") {
+          else if (!(currentFilter.compare in compareValidValues) || (currentFilter.compare !== "=" && currentFilter.compare !== "")) {
             err = errorCodes(11, a, currentFilter.compare);
+            outputValidValues("compare", compareValidValues, {"<":"", ">":"", "<=":"", ">=":""});
             break;
           }
           
@@ -211,10 +235,15 @@ function cli (args) {
       
       case "ignore":
         if (!inFilter) {
-          if (!(v in usedFilterCheckValues))
-            settings.include[v] = false;
-          else
-            err = errorCodes(12, a, v);
+          if (v in includeValidValues) {
+            if (!(v in usedFilterCheckValues))
+              settings.include[v] = false;
+            else
+              err = errorCodes(12, a, v);
+          } else {
+            err = errorCodes(3, a, v);
+            outputValidValues(a, includeValidValues);
+          }
         } else
           err = errorCodes(2, a);
         break;
@@ -223,16 +252,13 @@ function cli (args) {
       case "dest":
       case "d":
         if (!inFilter) {
-          if ("save" in settings ? settings.save : true) {
-            if (fs.existsSync(v)) {
-              if (destination === "")
-                destination = v;
-              else
-                err = errorCodes(13, a);
-            } else
-              err = errorCodes(14, a);
+          if (fs.existsSync(v)) {
+            if (destination === "")
+              destination = v;
+            else
+              err = errorCodes(13, a);
           } else
-            err = errorCodes(1, a);
+            err = errorCodes(14, a);
         } else
           err = errorCodes(2, a);
         break;
@@ -256,8 +282,33 @@ function cli (args) {
 
   if (err)
     return -1;
-  else
-    return [url, destination, settings];
+
+
+  if (!("limit" in settings)) settings.limit = Number.POSITIVE_INFINITY;
+  if (!("limitMatch" in settings)) settings.limitMatch = Number.POSITIVE_INFINITY;
+
+  if (settings.save === false && settings.saveOnlyMatch === true) {
+    settings.saveOnlyMatch = false;
+    console.log("WARNING: Argument -savefilter conflicts with -nosave; no information will be saved.");
+  }
+  if (settings.save === false && destination !== "") {
+    destination = "";
+    console.log("WARNING: A destination is given but -nosave is present; no information will be saved.");
+  }
+  if ((settings.limit !== Number.POSITIVE_INFINITY && settings.limitMatch !== Number.POSITIVE_INFINITY) && settings.limit < settings.limitMatch) {
+    settings.limitMatch = settings.limit;
+    console.log("WARNING: Limit is lower than limitfilter; scraping will end before the filter limit can be reached.");
+  }
+
+  return [url, destination, settings];
+}
+
+
+function outputValidValues(arg, values = {}, ignore = {}) { //Gives the end user more information in case of an error
+  console.log("The valid values for argument \"" + arg + "\" are:");
+  for (valid in values) {
+    if (!(valid in ignore)) console.log("\t\"" + valid + "\"");
+  }
 }
 
 
@@ -271,13 +322,7 @@ function errorCodes(code, arg, value = "") {
     case -1: //Multiple inputs
       console.log("Error: Must specify only one input link");
       break;
-
-    case 0: //-nosave -savefilter conflict
-      console.log("Error: -nosave and -savefilter are incompatible");
-      break;
-    case 1: //Output -nosave conflict
-      console.log("Error: output and -nosave are incompatible")
-      break;
+    
     case 2: //Non-filter argument
       console.log("Error: Argument \"" + arg + "\" is invalid inside of a filter");
       break;
@@ -316,6 +361,12 @@ function errorCodes(code, arg, value = "") {
       break;
     case 14: //Invalid destination
       console.log("Error: Folder/file destination not found");
+      break;
+    case 15: //Value has to be non-zero natural
+      console.log("Error: Value \"" + value + "\" is required to be positive by argument \"" + arg + "\"");
+      break;
+    case 16: //Not a number
+      console.log("Error: Value \"" + value + "\" cannot be evaluated as an integer for argument \"" + arg + "\"");
       break;
 
     case 99: //Bad arg

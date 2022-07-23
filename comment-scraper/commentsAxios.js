@@ -3,21 +3,6 @@ const fs = require("fs");
 const process = require("node:process");
 const readline = require("readline");
 
-var get_video = { //These two configurations are to be changed around throughout the program's lifetime
-  method: "GET",
-  url: "__________",
-  authority: "www.youtube.com",
-  validateStatus: () => true
-};
-
-var config = {
-    method: "POST",
-    url: "__________",
-    authority: "www.youtube.com",
-    validateStatus: () => true
-};
-config.data = JSON.parse(fs.readFileSync(__dirname + "/config_data.json")); //*****************USER AGENT COULD BE REMOVED
-
 
 /*
 * Settings:
@@ -53,6 +38,8 @@ function clearLastLine() {
 //*********************************************************************************
 function initSettings(settings) {
 
+  if (!("limit" in settings)) settings.limit = Number.POSITIVE_INFINITY;
+  if (!("limitMatch" in settings)) settings.limitMatch = Number.POSITIVE_INFINITY;
   if (!("save" in settings)) settings.save = true;
   if (!("saveOnlyMatch" in settings)) settings.saveOnlyMatch = false;
   if (!("logMatch" in settings)) settings.logMatch = false;
@@ -65,12 +52,13 @@ function initSettings(settings) {
 //Scrapes Youtube comments using a "chain" of continuation ids provided by each
 //response
 //*********************************************************************************
-async function scrapeComments(continuation_id, config, timeout = 1000, scrapeRep = false, limit = Number.POSITIVE_INFINITY, settings = {}) {
+async function scrapeComments(continuation_id, config, timeout = 1000, scrapeRep = false, settings = {}) {
 
   initSettings(settings);
 
   let savedComments = [];
   let counter = 0;
+  let matchCounter = 0;
   let hasContinuation = true;
 
   while (hasContinuation) {
@@ -96,7 +84,7 @@ async function scrapeComments(continuation_id, config, timeout = 1000, scrapeRep
 
     for (c in comments) {
 
-      if (!(counter < limit)) {
+      if (counter >= settings.limit || matchCounter >= settings.limitMatch) {
         hasContinuation = false;
         break;
       }
@@ -116,27 +104,32 @@ async function scrapeComments(continuation_id, config, timeout = 1000, scrapeRep
 
       let singleComment = getCommentData(innerComment, settings.include);
       let match = commentMatches(singleComment, settings.selectors);
+      if (match) matchCounter++;
+
       if (settings.saveOnlyMatch && !match)
         singleComment = {};
+      else
+        counter++;
 
       if (scrapeRep && "replies" in comments[c].commentThreadRenderer) {
         let replies_continuation_id = comments[c].commentThreadRenderer.replies.commentRepliesRenderer.contents[0].continuationItemRenderer.continuationEndpoint.continuationCommand.token;
-        let pack = await scrapeReplies(replies_continuation_id, config, timeout, counter, limit, settings);
-        singleComment.replies = pack[1];
+        let pack = await scrapeReplies(replies_continuation_id, config, timeout, counter, matchCounter, settings);
+        
         counter = pack[0];
+        matchCounter = pack[1];
+        singleComment.replies = pack[2];
       }
 
       if (settings.saveOnlyMatch) {
         if (match)
           savedComments.push(singleComment);
-        else if ("replies" in singleComment && singleComment.replies.length > 0)
+        else if (scrapeRep && "replies" in singleComment && singleComment.replies.length > 0)
           savedComments.push(singleComment);
       } else if (settings.save)
         savedComments.push(singleComment);
 
       if (settings.logMatch && match)
         printComment(singleComment, config);
-      counter += 1;
     }
 
     clearLastLine();
@@ -152,7 +145,7 @@ async function scrapeComments(continuation_id, config, timeout = 1000, scrapeRep
 //Very similar to scrapeComments, but deals specifically with replies (which have
 //slightly different structures compared to comments)
 //*********************************************************************************
-async function scrapeReplies(continuation_id, config, timeout, counter, limit, settings) {
+async function scrapeReplies(continuation_id, config, timeout, counter, matchCounter, settings) {
 
   let savedComments = [];
   let hasContinuation = true;
@@ -167,7 +160,7 @@ async function scrapeReplies(continuation_id, config, timeout, counter, limit, s
 
     if (resp.status != 200) {
       console.log(resp.status + " " + resp.statusText);
-      return [counter, []];
+      return [counter, matchCounter, []];
     }
 
 
@@ -180,7 +173,7 @@ async function scrapeReplies(continuation_id, config, timeout, counter, limit, s
 
     for (c in comments) {
 
-      if (!(counter < limit)) {
+      if (counter >= settings.limit || matchCounter >= settings.limitMatch) {
         hasContinuation = false;
         break;
       }
@@ -199,6 +192,7 @@ async function scrapeReplies(continuation_id, config, timeout, counter, limit, s
 
       let singleComment = getCommentData(innerComment);
       let match = commentMatches(singleComment, settings.selectors);
+      if (match) matchCounter++;
       
       if (settings.save) {
         if (!settings.saveOnlyMatch || match)
@@ -206,14 +200,15 @@ async function scrapeReplies(continuation_id, config, timeout, counter, limit, s
       }
       if (settings.logMatch && match)
         printComment(singleComment, config);
-      counter += 1;
+
+      counter++;
     }
 
     clearLastLine();
     console.log("Comments scraped: " + counter);
   }
 
-  return [counter, savedComments];
+  return [counter, matchCounter, savedComments];
 
 }
 
@@ -244,7 +239,7 @@ function getCommentData(innerComment, include = {}) { //Condenses a retrieved co
   }
 
   if ("votes" in include ? include.votes : true) {
-    if (innerComment.isLiked)
+    if ("voteCount" in innerComment)
       singleComment.votes = innerComment.voteCount.simpleText;
     else
       singleComment.votes = "0";
@@ -270,7 +265,7 @@ function commentMatches(singleComment, selectors) {
       let conditionMatch = condition.match;
       if ("caseSensitive" in condition ? !condition.caseSensitive : true) {
         commentCheck = commentCheck.toLowerCase();
-        conditionMatch = commentCheck.toLowerCase();
+        conditionMatch = conditionMatch.toLowerCase();
       }
 
       if (condition.compare === "=") //Exact match needed
@@ -328,7 +323,24 @@ function printComment(singleComment, config) {
 //*********************************************************************************
 //Main entry function; retrieves a video and then scrapes it
 //*********************************************************************************
-async function collectComments(url, get_video, config, timeout = 1000, scrapeRep = false, limit = Number.POSITIVE_INFINITY, settings = {}) {
+async function collectComments(url, destination, timeout = 1000, scrapeRep = false, settings = {}) {
+
+
+  let get_video = {
+    method: "GET",
+    url: "__________",
+    authority: "www.youtube.com",
+    validateStatus: () => true
+  };
+  
+  let config = {
+      method: "POST",
+      url: "__________",
+      authority: "www.youtube.com",
+      validateStatus: () => true
+  };
+  config.data = JSON.parse(fs.readFileSync(__dirname + "/config_data.json")); //*****************USER AGENT COULD BE REMOVED
+
 
   get_video.url = url;
   config.data.context.client.originalUrl = url;
@@ -338,10 +350,12 @@ async function collectComments(url, get_video, config, timeout = 1000, scrapeRep
 
   if (resp.status !== 200) {
     console.log(resp.status + " " + resp.statusText);
+    console.log("No comments found. No save made.");
     return;
   }
   if (resp.data.includes("Comments are turned off.")) {
-    console.log("Comments are turned off.");
+    console.log("Error: Comments are turned off.");
+    console.log("No comments found. No save made.");
     return;
   }
 
@@ -352,9 +366,21 @@ async function collectComments(url, get_video, config, timeout = 1000, scrapeRep
   config.url = commentUrl;
   config.data.continuation = continuation_id;
   
-  let savedComments = await scrapeComments(continuation_id, config, timeout, scrapeRep, limit, settings);
-  if (savedComments.length > 0)
-    fs.writeFileSync("comments_" + url.split("v=", 2)[1] + ".json", JSON.stringify(savedComments, null, 2));
+  let savedComments = await scrapeComments(continuation_id, config, timeout, scrapeRep, settings);
+  if (savedComments.length > 0) {
+    let filename = "comments_" + url.split("v=", 2)[1] + ".json";
+    if (destination === "")
+      destination = __dirname + "/" + filename;
+    else
+      destination = destination + "/" + filename;
+
+    fs.writeFileSync(destination, JSON.stringify(savedComments, null, 2));
+    console.log("Saved as " + destination);
+  }
+  else {
+    if (settings.save)
+      console.log("No comments found. No save made.");
+  }
 }
 
 
@@ -377,6 +403,6 @@ module.exports.collectComments = collectComments;
     ]
   };
   let url = "https://www.youtube.com/watch?v=3fmzvB-Kq0s";
-  await collectComments(url, get_video, config, 1000, true, Infinity, settings);
+  await collectComments(url, "", 1000, true, settings);
   
 });
