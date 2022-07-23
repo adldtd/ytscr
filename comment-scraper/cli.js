@@ -6,6 +6,8 @@ const fs = require("fs");
 *   save: -nosave, -NS
 *   saveOnlyMatch: -savefilter, -sf
 *   logMatch: -printfilter, -pf
+*   useReplies: -noreply, -NR
+*   replyFiltering: -nrf ***Enters a mode where the filter ignores replies ONLY IF the recipient comment matches the filter
 *   limit: lim=, l=
 *   limitMatch: limfilter=, lf=
 *   selectors: filter=, f=
@@ -87,6 +89,23 @@ function cli (args) {
       case "-pf":
         if (!inFilter)
           settings.logMatch = true;
+        else
+          err = errorCodes(2, a);
+        break;
+
+      
+      case "-noreply":
+      case "-NR":
+        if (!inFilter)
+          settings.useReplies = false;
+        else
+          err = errorCodes(2, a);
+        break;
+
+      
+      case "-nrf":
+        if (!inFilter)
+          settings.replyFiltering = false;
         else
           err = errorCodes(2, a);
         break;
@@ -284,6 +303,11 @@ function cli (args) {
     return -1;
 
 
+  if (!("save" in settings)) settings.save = true;
+  if (!("saveOnlyMatch" in settings)) settings.saveOnlyMatch = false;
+  if (!("useReplies" in settings)) settings.useReplies = true;
+  if (!("replyFiltering" in settings)) settings.replyFiltering = true;
+  if (!("logMatch" in settings)) settings.logMatch = false;
   if (!("limit" in settings)) settings.limit = Number.POSITIVE_INFINITY;
   if (!("limitMatch" in settings)) settings.limitMatch = Number.POSITIVE_INFINITY;
 
@@ -299,6 +323,17 @@ function cli (args) {
     settings.limitMatch = settings.limit;
     console.log("WARNING: Limit is lower than limitfilter; scraping will end before the filter limit can be reached.");
   }
+
+  if (!settings.logMatch && !settings.save)
+    console.log("WARNING: Scraped information will neither be saved nor displayed on-screen.");
+  if (settings.logMatch && settings.selectors.length === 0)
+    console.log("WARNING: Argument -printfilter is given, but no filters are applied; all comments will be printed on-screen.");
+  if (settings.limitMatch !== Number.POSITIVE_INFINITY && settings.selectors.length === 0)
+    console.log("WARNING: Argument limfilter is given, but no filters are applied; limitfilter will be treated as the normal filter.");
+  if (!settings.useReplies && !settings.replyFiltering)
+    console.log("WARNING: Argument -noreply conflicts with -nrf; no replies will be scraped.");
+  if (!settings.replyFiltering && settings.selectors.length === 0 && settings.limitMatch !== Number.POSITIVE_INFINITY)
+    console.log("WARNING: -nrf mode enabled, but no filters set; thus all replies will not be counted up to limitfilter.");
 
   return [url, destination, settings];
 }

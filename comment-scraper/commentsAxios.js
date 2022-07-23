@@ -52,7 +52,7 @@ function initSettings(settings) {
 //Scrapes Youtube comments using a "chain" of continuation ids provided by each
 //response
 //*********************************************************************************
-async function scrapeComments(continuation_id, config, timeout = 1000, scrapeRep = false, settings = {}) {
+async function scrapeComments(continuation_id, config, timeout = 1000, settings = {}) {
 
   initSettings(settings);
 
@@ -108,22 +108,34 @@ async function scrapeComments(continuation_id, config, timeout = 1000, scrapeRep
 
       if (settings.saveOnlyMatch && !match)
         singleComment = {};
-      else
-        counter++;
+      
+      counter++;
 
-      if (scrapeRep && "replies" in comments[c].commentThreadRenderer) {
+      if (settings.useReplies && "replies" in comments[c].commentThreadRenderer) {
+
+        let oldSelectors = settings.selectors; let oldMatchCounter = matchCounter;
+        if (!settings.replyFiltering && match) {
+          settings.selectors = [];
+          matchCounter = Number.NEGATIVE_INFINITY;
+        }
+
         let replies_continuation_id = comments[c].commentThreadRenderer.replies.commentRepliesRenderer.contents[0].continuationItemRenderer.continuationEndpoint.continuationCommand.token;
         let pack = await scrapeReplies(replies_continuation_id, config, timeout, counter, matchCounter, settings);
         
         counter = pack[0];
         matchCounter = pack[1];
         singleComment.replies = pack[2];
+
+        if (!settings.replyFiltering && match) {
+          settings.selectors = oldSelectors;
+          matchCounter = oldMatchCounter; //Any matches made in replies are ignored in NRF mode
+        }
       }
 
       if (settings.saveOnlyMatch) {
         if (match)
           savedComments.push(singleComment);
-        else if (scrapeRep && "replies" in singleComment && singleComment.replies.length > 0)
+        else if (settings.useReplies && "replies" in singleComment && singleComment.replies.length > 0)
           savedComments.push(singleComment);
       } else if (settings.save)
         savedComments.push(singleComment);
@@ -199,7 +211,7 @@ async function scrapeReplies(continuation_id, config, timeout, counter, matchCou
           savedComments.push(singleComment);
       }
       if (settings.logMatch && match)
-        printComment(singleComment, config);
+        printReply(singleComment, config);
 
       counter++;
     }
@@ -319,11 +331,25 @@ function printComment(singleComment, config) {
 }
 
 
+function printReply(singleComment, config) {
+
+  clearLastLine();
+  console.log("\t-------------------------------------------------------------------");
+  for (att in singleComment) {
+    if (att === "id")
+      console.log("\tlink: " + config.data.context.client.originalUrl + "&lc=" + singleComment[att]);
+    else
+      console.log("\t" + att + ": " + singleComment[att]);
+  }
+  console.log("\t-------------------------------------------------------------------\n\n");
+}
+
+
 
 //*********************************************************************************
 //Main entry function; retrieves a video and then scrapes it
 //*********************************************************************************
-async function collectComments(url, destination, timeout = 1000, scrapeRep = false, settings = {}) {
+async function collectComments(url, destination, timeout = 1000, settings = {}) {
 
 
   let get_video = {
@@ -366,7 +392,7 @@ async function collectComments(url, destination, timeout = 1000, scrapeRep = fal
   config.url = commentUrl;
   config.data.continuation = continuation_id;
   
-  let savedComments = await scrapeComments(continuation_id, config, timeout, scrapeRep, settings);
+  let savedComments = await scrapeComments(continuation_id, config, timeout, settings);
   if (savedComments.length > 0) {
     let filename = "comments_" + url.split("v=", 2)[1] + ".json";
     if (destination === "")
@@ -403,6 +429,6 @@ module.exports.collectComments = collectComments;
     ]
   };
   let url = "https://www.youtube.com/watch?v=3fmzvB-Kq0s";
-  await collectComments(url, "", 1000, true, settings);
+  await collectComments(url, "", 1000, settings);
   
 });
