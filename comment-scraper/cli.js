@@ -1,5 +1,164 @@
 const fs = require("fs");
 
+
+var url = "";
+var destination = "";
+var settings = {selectors: [], include: {}};
+
+
+const cmd = {
+
+  "i": {redirect: "input"},
+  "input":
+  {
+    aliases: ["i"],
+    simpleDescription: "A YouTube video link",
+    description: "Specifies the video link from where to scrape comments.",
+    examples: ["input=https://www.youtube.com/watch?v=jNQXAC9IVRw", "i=www.youtube.com/watch?v=jNQXAC9IVRw"]
+  },
+
+  "-NS": {redirect: "-nosave"},
+  "-nosave":
+  {
+    aliases: ["-NS"],
+    simpleDescription: "Disables file saves",
+    description: "When present, prevents the scraper from saving the scraped content."
+  },
+
+  "-sf": {redirect: "-savefilter"},
+  "-savefilter":
+  {
+    aliases: ["-sf"],
+    simpleDescription: "Only saves filter matches",
+    description: "A flag that restricts the scraper to saving a comment ONLY IF it matches the user given " +
+    "filters. If no filters are specified, then every comment will be saved (as usual)."
+  },
+
+  "-pf": {redirect: "-printfilter"},
+  "-printfilter":
+  {
+    aliases: ["-pf"],
+    simpleDescription: "Prints out filter matches",
+    description: "A flag that causes the scraper to print comments which match given filters."
+  },
+
+  "-NR": {redirect: "-noreply"},
+  "-noreply":
+  {
+    aliases: ["-NR"],
+    simpleDescription: "Stops the program from considering replies",
+    description: "When present, the program will not collect/print any replies to a comment."
+  },
+
+  "-nrf":
+  {
+    simpleDescription: "Enters a special mode where replies are unfiltered",
+    description: "As standard, the scraper applies filters to both comments and replies. When this flag is " +
+    "present, however, if the program \"matches\" a comment, it will automatically match all of its replies. " +
+    "If the comment fails the filter, it will still try to match its replies, one by one. This flag may " +
+    "be useful when searching for questions - as well as answers - on a YouTube video."
+  },
+
+  "l": {redirect: "lim"},
+  "lim":
+  {
+    aliases: ["l"],
+    simpleDescription: "Limits the amount of comments scraped",
+    description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
+    "as a positive integer. If this argument is not present, the scraper will not stop until all comments are " +
+    "retrieved. NOTE: The value entered limits the scraper based on how many comments were checked, " +
+    "not how many matched the filters (see limfilter).",
+    examples: ["lim=100", "l=27"]
+  },
+
+  "lf": {redirect: "limfilter"},
+  "limfilter":
+  {
+    aliases: ["lf"],
+    simpleDescription: "Limits the amount of \"matching\" comments",
+    description: "An argument which stops the scraper once enough match the filters. Should be defined as a " +
+    "positive integer. If this is not defined, the scraper will preform matches without a threshold. NOTE: " +
+    "If flag -nrf is present, all replies that are automatically matched will NOT be counted as such.",
+    examples: ["limfilter=50", "lf=5"]
+  },
+
+  "f": {redirect: "filter"},
+  "filter":
+  {
+    aliases: ["f"],
+    simpleDescription: "Used to filter comments based on attributes",
+    description: "Begins a \"filter object,\" where arguments define the filter's attributes. A filter's first " +
+    "argument is always an opening bracket \"{\", and is later ended by a closing bracket. An indefinite amount " +
+    "of filter objects can be created, each with different attributes and properties, to narrow down a search.",
+    validValues: {"{": ""},
+    examples: ["filter={"]
+  },
+
+  "check":
+  {
+    simpleDescription: "Filter arg; defines which attribute to check",
+    description: "Used exclusively in a filter object; the value entered is the attribute to inspect and filter. " +
+    "Values that are listed as \"num\" are numerical; in that case \"match\" must be defined as an integer.",
+    validValues: {"author": "str", "text": "str", "published": "str", "votes": "num"},
+    examples: ["check=text", "check=votes"]
+  },
+
+  "match":
+  {
+    simpleDescription: "Filter arg; either a string or number to compare",
+    description: "Used exclusively in a filter object; the value entered is what to filter the \"check\" value " +
+    "by. If check is of str type, the value entered can be any string, but if check is of num type, the value " +
+    "must be a valid integer.",
+    examples: ["match=\"Song?\"", "match=75"]
+  },
+
+  "compare":
+  {
+    simpleDescription: "Filter arg; how to compare the \"match\" value",
+    description: "Used exclusively in a filter object; the value entered specifies how the actual value will be " +
+    "compared with the match one. Str and num \"check\" values have different valid values. NOTE: By default, " +
+    "not calling the argument will result in a compare value of \"\", meaning, for a num value, compare must be" +
+    "defined.",
+    validValues: {"":"", "=":"", "<":"", ">":"", "<=":"", ">=":""},
+    examples: ["compare=\"=\"", "compare=", "compare=>="]
+  },
+
+  "-cs": {redirect: "-casesensitive"},
+  "-casesensitive":
+  {
+    aliases: ["-cs"],
+    simpleDescription: "Filter arg; does not ignore case if present",
+    description: "Used exclusively in a filter object; a flag that specifies whether the case in a string is " +
+    "taken into account during filtering. NOTE: This will do nothing if \"check\" is a num value."
+  },
+
+  "}":
+  {
+
+  },
+
+  "ignore":
+  {
+    simpleDescription: "Specifies a comment attribute to ignore",
+    description: "Removes a comment attribute from \"consideration\" while scraping. This means that the " +
+    "attribute will not be saved, printed, and cannot be filtered during execution. May be defined an " +
+    "indefinite amount of times, each with a different attribute.",
+    validValues: {"author":"", "text":"", "id":"", "published":"", "votes":""},
+    examples: ["ignore=\"id\"", "ignore=text"]
+  },
+
+  "d": {redirect: "dest"},
+  "dest":
+  {
+    aliases: ["d"],
+    simpleDescription: "The folder where to save scraped comments",
+    description: "Specifies the folder where the saved comments are placed. The directory must exist and must be " +
+    "accessible by the scraper. By default, the script will place the file in its residing directory.",
+    examples: ["dest=\"C:/Users\"", "d=D:/MyFiles"]
+  }
+
+};
+
 /*
 * Settings:
 *   url: input=, i=
@@ -27,16 +186,18 @@ const includeValidValues = {"author":"", "text":"", "id":"", "published":"", "vo
 
 
 function cli (args) {
-  
-  let url = "";
-  let destination = "";
-  let settings = {selectors: [], include: {}};
 
-  let usedFilterCheckValues = {}; //Used to track collisions with ignore
-  
-  let inFilter = false;
-  let currentFilter = {};
-  let err = false;
+  url = "";
+  destination = "";
+  settings = {selectors: [], include: {}};
+
+  let currentState = //Used to pass CLI tracking variables to individual CLI functions
+  {
+    usedFilterCheckValues: {}, //Used to track collisions with ignore
+    inFilter: false,
+    currentFilter: {},
+    err: false //Stops the CLI if made true
+  };
 
   for (let i = 2; i < args.length; i++) {
 
@@ -54,250 +215,250 @@ function cli (args) {
 
       case "input":
       case "i":
-        if (!inFilter) {
+        if (!currentState.inFilter) {
           if (url === "") {
             if (v.substring(0, 32) === "https://www.youtube.com/watch?v=" || v.substring(0, 24) === "www.youtube.com/watch?v=") {
               url = v;
             } else
-              err = errorCodes(-2, a, v);
+              currentState.err = errorCodes(-2, a, v);
           } else
-            err = errorCodes(-1, a);
+            currentState.err = errorCodes(-1, a);
         } else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
 
 
       case "-nosave":
       case "-NS":
-        if (!inFilter)
+        if (!currentState.inFilter)
           settings.save = false;
         else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
 
 
       case "-savefilter":
       case "-sf":
-        if (!inFilter)
+        if (!currentState.inFilter)
           settings.saveOnlyMatch = true;
         else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
       
 
       case "-printfilter":
       case "-pf":
-        if (!inFilter)
+        if (!currentState.inFilter)
           settings.logMatch = true;
         else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
 
       
       case "-noreply":
       case "-NR":
-        if (!inFilter)
+        if (!currentState.inFilter)
           settings.useReplies = false;
         else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
 
       
       case "-nrf":
-        if (!inFilter)
+        if (!currentState.inFilter)
           settings.replyFiltering = false;
         else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
 
       
       case "lim":
       case "l":
-        if (!inFilter) {
+        if (!currentState.inFilter) {
           if (!isNaN(parseInt(v))) {
             v = parseInt(v);
             if (v > 0)
               settings.limit = v;
             else
-              err = errorCodes(15, a, v);
+              currentState.err = errorCodes(15, a, v);
           } else
-            err = errorCodes(16, a, v);
+            currentState.err = errorCodes(16, a, v);
         } else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
 
 
       case "limfilter":
       case "lf":
-        if (!inFilter) {
+        if (!currentState.inFilter) {
           if (!isNaN(parseInt(v))) {
             v = parseInt(v);
             if (v > 0)
               settings.limitMatch = v;
             else
-              err = errorCodes(15, a, v);
+              currentState.err = errorCodes(15, a, v);
           } else
-            err = errorCodes(16, a, v);
+            currentState.err = errorCodes(16, a, v);
         } else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
 
 
       case "filter":
       case "f":
-        if (!inFilter) {
+        if (!currentState.inFilter) {
           if (v in filterValidValues)
-            inFilter = true;
+            currentState.inFilter = true;
           else {
-            err = errorCodes(3, a, v);
+            currentState.err = errorCodes(3, a, v);
             outputValidValues(a, filterValidValues);
           }
         } else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
 
 
       case "check":
-        if (inFilter) {
+        if (currentState.inFilter) {
           if (v in checkValidValues) {
-            if (!("check" in currentFilter))
-              currentFilter.check = v;
+            if (!("check" in currentState.currentFilter))
+              currentState.currentFilter.check = v;
             else
-              err = errorCodes(5, a);
+              currentState.err = errorCodes(5, a);
           } else {
-            err = errorCodes(3, a, v);
+            currentState.err = errorCodes(3, a, v);
             outputValidValues(a, checkValidValues);
           }
         } else
-          err = errorCodes(4, a);
+          currentState.err = errorCodes(4, a);
         break;
 
 
       case "match":
-        if (inFilter) {
-          if (!("match" in currentFilter))
-            currentFilter.match = v;
+        if (currentState.inFilter) {
+          if (!("match" in currentState.currentFilter))
+            currentState.currentFilter.match = v;
           else
-            err = errorCodes(5, a);
+            currentState.err = errorCodes(5, a);
         } else
-          err = errorCodes(4, a);
+          currentState.err = errorCodes(4, a);
         break;
 
 
       case "compare":
-        if (inFilter) {
-          if (!("compare" in currentFilter)) //In order to reduce complexity, v is checked as a valid value at the end of the filter scope ("}")
-            currentFilter.compare = v;
+        if (currentState.inFilter) {
+          if (!("compare" in currentState.currentFilter)) //In order to reduce complexity, v is checked as a valid value at the end of the filter scope ("}")
+            currentState.currentFilter.compare = v;
           else
-            err = errorCodes(5, a);
+            currentState.err = errorCodes(5, a);
         } else
-          err = errorCodes(4, a);
+          currentState.err = errorCodes(4, a);
         break;
 
         
       case "-casesensitive": //The program ignores this prompt if entered alongside a "numerical" match like votes
       case "-cs":
-        if (inFilter)
-          currentFilter.caseSensitive = true;
+        if (currentState.inFilter)
+          currentState.currentFilter.caseSensitive = true;
         else
-          err = errorCodes(4, a);
+          currentState.err = errorCodes(4, a);
         break;
 
 
       case "}": //Ends a filter scope
-        if (!inFilter) {
-          err = errorCodes(6, a);
+        if (!currentState.inFilter) {
+          currentState.err = errorCodes(6, a);
           break;
         }
-        if (!("check" in currentFilter) || !("match" in currentFilter)) {
-          err = errorCodes(7, a);
+        if (!("check" in currentState.currentFilter) || !("match" in currentState.currentFilter)) {
+          currentState.err = errorCodes(7, a);
           break;
         }
-        if (checkValidValues[currentFilter.check] === "num") {
+        if (checkValidValues[currentState.currentFilter.check] === "num") {
 
-          if (!("compare" in currentFilter)) {
-            err = errorCodes(8, a, currentFilter.check);
+          if (!("compare" in currentState.currentFilter)) {
+            currentState.err = errorCodes(8, a, currentState.currentFilter.check);
             break;
           }
-          if (!(currentFilter.compare in compareValidValues) || currentFilter.compare === "") {
-            err = errorCodes(9, a, currentFilter.compare);
+          if (!(currentState.currentFilter.compare in compareValidValues) || currentState.currentFilter.compare === "") {
+            currentState.err = errorCodes(9, a, currentState.currentFilter.compare);
             outputValidValues("compare", compareValidValues, {"":""});
             break;
           }
-          if (isNaN(parseInt(currentFilter.match))) {
-            err = errorCodes(10, a, currentFilter.match);
+          if (isNaN(parseInt(currentState.currentFilter.match))) {
+            currentState.err = errorCodes(10, a, currentState.currentFilter.match);
             break;
           }
 
-        } else if (checkValidValues[currentFilter.check] === "str") {
+        } else if (checkValidValues[currentState.currentFilter.check] === "str") {
 
-          if (!("compare" in currentFilter))
-            currentFilter.compare = ""; //Default value
-          else if (!(currentFilter.compare in compareValidValues) || (currentFilter.compare !== "=" && currentFilter.compare !== "")) {
-            err = errorCodes(11, a, currentFilter.compare);
+          if (!("compare" in currentState.currentFilter))
+            currentState.currentFilter.compare = ""; //Default value
+          else if (!(currentState.currentFilter.compare in compareValidValues) || (currentState.currentFilter.compare !== "=" && currentState.currentFilter.compare !== "")) {
+            currentState.err = errorCodes(11, a, currentState.currentFilter.compare);
             outputValidValues("compare", compareValidValues, {"<":"", ">":"", "<=":"", ">=":""});
             break;
           }
           
         }
-        if (currentFilter.check in settings.include && !settings.include[currentFilter.check]) {
-          err = errorCodes(12, a, currentFilter.check);
+        if (currentState.currentFilter.check in settings.include && !settings.include[currentState.currentFilter.check]) {
+          currentState.err = errorCodes(12, a, currentState.currentFilter.check);
           break;
         }
 
-        usedFilterCheckValues[currentFilter.check] = "";
-        settings.selectors.push(currentFilter);
-        currentFilter = {compare: ""};
-        inFilter = false;
+        currentState.usedFilterCheckValues[currentState.currentFilter.check] = "";
+        settings.selectors.push(currentState.currentFilter);
+        currentState.currentFilter = {};
+        currentState.inFilter = false;
         break;
       
       
       case "ignore":
-        if (!inFilter) {
+        if (!currentState.inFilter) {
           if (v in includeValidValues) {
-            if (!(v in usedFilterCheckValues))
+            if (!(v in currentState.usedFilterCheckValues))
               settings.include[v] = false;
             else
-              err = errorCodes(12, a, v);
+              currentState.err = errorCodes(12, a, v);
           } else {
-            err = errorCodes(3, a, v);
+            currentState.err = errorCodes(3, a, v);
             outputValidValues(a, includeValidValues);
           }
         } else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
       
       
       case "dest":
       case "d":
-        if (!inFilter) {
+        if (!currentState.inFilter) {
           if (fs.existsSync(v)) {
             if (destination === "")
               destination = v;
             else
-              err = errorCodes(13, a);
+              currentState.err = errorCodes(13, a);
           } else
-            err = errorCodes(14, a);
+            currentState.err = errorCodes(14, a);
         } else
-          err = errorCodes(2, a);
+          currentState.err = errorCodes(2, a);
         break;
 
       
       default: //Matches no commands
-        err = errorCodes(99, a);
+        currentState.err = errorCodes(99, a);
 
     }
 
 
-    if (err)
+    if (currentState.err)
       return -1;
 
   }
 
   if (url === "")
-    err = errorCodes(100, "");
-  if (inFilter)
-    err = errorCodes(101, "");
+    currentState.err = errorCodes(100, "");
+  if (currentState.inFilter)
+    currentState.err = errorCodes(101, "");
 
   if (err)
     return -1;
