@@ -2,6 +2,14 @@ const fs = require("fs");
 
 
 
+const helpCall = function (a, v, currentState, i) {
+  if (i === 2) {
+    currentState.helpCMD = true;
+  } else
+    currentState.err = errorCodes(50, a);
+}
+
+
 const inputCall = function (a, v, currentState) {
 
   if (!currentState.inFilter) {
@@ -245,10 +253,20 @@ var settings = {selectors: [], include: {}};
 
 const cmd = {
 
+  "help":
+  {
+    aliases: ["help"],
+    simpleDescription: "Displays argument information",
+    description: "A command which takes in an argument name as the next input. By specifiying a valid argument, " +
+    "the program will print info, as well as the usability of that arg.",
+    examples: ["help input", "help -nrf"],
+    call: helpCall
+  },
+
   "i": {redirect: "input"},
   "input":
   {
-    aliases: ["i"],
+    aliases: ["input", "i"],
     simpleDescription: "A YouTube video link",
     description: "Specifies the video link from where to scrape comments.",
     examples: ["input=https://www.youtube.com/watch?v=jNQXAC9IVRw", "i=www.youtube.com/watch?v=jNQXAC9IVRw"],
@@ -258,7 +276,7 @@ const cmd = {
   "-NS": {redirect: "-nosave"},
   "-nosave":
   {
-    aliases: ["-NS"],
+    aliases: ["-nosave", "-NS"],
     simpleDescription: "Disables file saves",
     description: "When present, prevents the scraper from saving the scraped content.",
     call: nosaveCall
@@ -267,7 +285,7 @@ const cmd = {
   "-sf": {redirect: "-savefilter"},
   "-savefilter":
   {
-    aliases: ["-sf"],
+    aliases: ["-savefilter", "-sf"],
     simpleDescription: "Only saves filter matches",
     description: "A flag that restricts the scraper to saving a comment ONLY IF it matches the user given " +
     "filters. If no filters are specified, then every comment will be saved (as usual).",
@@ -277,7 +295,7 @@ const cmd = {
   "-pf": {redirect: "-printfilter"},
   "-printfilter":
   {
-    aliases: ["-pf"],
+    aliases: ["-printfilter", "-pf"],
     simpleDescription: "Prints out filter matches",
     description: "A flag that causes the scraper to print comments which match given filters.",
     call: printfilterCall
@@ -286,7 +304,7 @@ const cmd = {
   "-NR": {redirect: "-noreply"},
   "-noreply":
   {
-    aliases: ["-NR"],
+    aliases: ["-noreply", "-NR"],
     simpleDescription: "Stops the program from considering replies",
     description: "When present, the program will not collect/print any replies to a comment.",
     call: noreplyCall
@@ -294,6 +312,7 @@ const cmd = {
 
   "-nrf":
   {
+    aliases: ["-nrf"],
     simpleDescription: "Enters a special mode where replies are unfiltered",
     description: "As standard, the scraper applies filters to both comments and replies. When this flag is " +
     "present, however, if the program \"matches\" a comment, it will automatically match all of its replies. " +
@@ -305,7 +324,7 @@ const cmd = {
   "l": {redirect: "lim"},
   "lim":
   {
-    aliases: ["l"],
+    aliases: ["lim", "l"],
     simpleDescription: "Limits the amount of comments scraped",
     description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
     "as a positive integer. If this argument is not present, the scraper will not stop until all comments are " +
@@ -318,7 +337,7 @@ const cmd = {
   "lf": {redirect: "limfilter"},
   "limfilter":
   {
-    aliases: ["lf"],
+    aliases: ["limfilter", "lf"],
     simpleDescription: "Limits the amount of \"matching\" comments",
     description: "An argument which stops the scraper once enough match the filters. Should be defined as a " +
     "positive integer. If this is not defined, the scraper will preform matches without a threshold. NOTE: " +
@@ -330,10 +349,10 @@ const cmd = {
   "f": {redirect: "filter"},
   "filter":
   {
-    aliases: ["f"],
+    aliases: ["filter", "f"],
     simpleDescription: "Used to filter comments based on attributes",
     description: "Begins a \"filter object,\" where arguments define the filter's attributes. A filter's first " +
-    "argument is always an opening bracket \"{\", and is later ended by a closing bracket. An indefinite amount " +
+    "argument is always an opening bracket, and is later ended by a closing bracket. An indefinite amount " +
     "of filter objects can be created, each with different attributes and properties, to narrow down a search.",
     validValues: {"{": ""},
     examples: ["filter={"],
@@ -342,6 +361,7 @@ const cmd = {
 
   "check":
   {
+    aliases: ["check"],
     simpleDescription: "Filter arg; defines which attribute to check",
     description: "Used exclusively in a filter object; the value entered is the attribute to inspect and filter. " +
     "Values that are listed as \"num\" are numerical; in that case \"match\" must be defined as an integer.",
@@ -352,6 +372,7 @@ const cmd = {
 
   "match":
   {
+    aliases: ["match"],
     simpleDescription: "Filter arg; either a string or number to compare",
     description: "Used exclusively in a filter object; the value entered is what to filter the \"check\" value " +
     "by. If check is of str type, the value entered can be any string, but if check is of num type, the value " +
@@ -362,10 +383,11 @@ const cmd = {
 
   "compare":
   {
+    aliases: ["compare"],
     simpleDescription: "Filter arg; how to compare the \"match\" value",
     description: "Used exclusively in a filter object; the value entered specifies how the actual value will be " +
     "compared with the match one. Str and num \"check\" values have different valid values. NOTE: By default, " +
-    "not calling the argument will result in a compare value of \"\", meaning, for a num value, compare must be" +
+    "not calling the argument will result in a compare value of \"\", meaning, for a num value, compare must be " +
     "defined.",
     validValues: {"":"", "=":"", "<":"", ">":"", "<=":"", ">=":""},
     examples: ["compare=\"=\"", "compare=", "compare=>="],
@@ -389,6 +411,7 @@ const cmd = {
 
   "ignore":
   {
+    aliases: ["ignore"],
     simpleDescription: "Specifies a comment attribute to ignore",
     description: "Removes a comment attribute from \"consideration\" while scraping. This means that the " +
     "attribute will not be saved, printed, and cannot be filtered during execution. May be defined an " +
@@ -401,7 +424,7 @@ const cmd = {
   "d": {redirect: "dest"},
   "dest":
   {
-    aliases: ["d"],
+    aliases: ["dest", "d"],
     simpleDescription: "The folder where to save scraped comments",
     description: "Specifies the folder where the saved comments are placed. The directory must exist and must be " +
     "accessible by the scraper. By default, the script will place the file in its residing directory.",
@@ -443,6 +466,7 @@ function cli (args) {
     usedFilterCheckValues: {}, //Used to track collisions with ignore
     inFilter: false,
     currentFilter: {},
+    helpCMD: false,
     err: false //Stops the CLI if made true
   };
 
@@ -462,13 +486,36 @@ function cli (args) {
       if ("redirect" in commandObject)
         commandObject = cmd[commandObject.redirect];
 
-      commandObject.call(a, v, currentState);
+      if (currentState.helpCMD) {
+
+        if (i === args.length - 1) { //Expected for there to be either 0 or 1 inputs to the help command
+          if ("description" in commandObject) {
+            outputHelp(a, commandObject);
+            currentState.helpCMD = false;
+            return -1;
+          } else
+            currentState.err = errorCodes(99, a);
+        } else
+          currentState.err = errorCodes(51, "help");
+
+      } else {
+        if (a !== "help")
+          commandObject.call(a, v, currentState);
+        else
+          commandObject.call(a, v, currentState, i);
+      }
+
     } else
       currentState.err = errorCodes(99, a);
 
     if (currentState.err)
       return -1;
 
+  }
+
+  if (currentState.helpCMD) {
+    outputHelpAll();
+    return -1;
   }
 
   if (url === "")
@@ -519,7 +566,70 @@ function cli (args) {
 function outputValidValues(arg, values = {}, ignore = {}) { //Gives the end user more information in case of an error
   console.log("The valid values for argument \"" + arg + "\" are:");
   for (valid in values) {
-    if (!(valid in ignore)) console.log("\t\"" + valid + "\"");
+    if (!(valid in ignore)) {
+      if (values[valid] === "")
+        console.log("\t\"" + valid + "\"");
+      else
+        console.log("\t\"" + valid + "\" (" + values[valid] + ")");
+    }
+  }
+}
+
+
+function outputHelp(arg, commandObject) {
+
+  let ali = "NAMES: " + commandObject.aliases[0];
+  for (let i = 1; i < commandObject.aliases.length; i++)
+    ali += ", " + commandObject.aliases[i];
+  console.log(ali);
+  
+  console.log(commandObject.description);
+
+  if ("validValues" in commandObject) {
+    if (commandObject.aliases[0] !== "compare") { //Special case
+      console.log("");
+      outputValidValues(commandObject.aliases[0], commandObject.validValues);
+    } else {
+      console.log("\nThe valid values for argument \"compare\" (str) are:");
+      for (valid in {"":"", "=":""})
+        console.log("\t\"" + valid + "\"");
+
+      console.log("\nThe valid values for argument \"compare\" (num) are:");
+      for (valid in commandObject.validValues) {
+        if (valid !== "")
+          console.log("\t\"" + valid + "\"");
+      }
+    }
+  }
+
+  if ("examples" in commandObject) {
+    console.log("\nExamples:");
+    for (e in commandObject.examples)
+      console.log(commandObject.examples[e]);
+  }
+}
+
+
+function outputHelpAll() {
+  let buffer_space = 25; //The buffer space "names" get before the simple description is printer
+
+  for (c in cmd) {
+    if ("simpleDescription" in cmd[c]) {
+      
+      let names = cmd[c].aliases[0];
+      for (let i = 1; i < cmd[c].aliases.length; i++)
+        names += ", " + cmd[c].aliases[i];
+
+      let spaces = "";
+      let numSpaces = buffer_space - names.length;
+      if (numSpaces > 0)
+        spaces = " ".repeat(numSpaces);
+      else
+        spaces = " ";
+
+      console.log(names + spaces + cmd[c].simpleDescription); //One tab is about 8 spaces
+
+    }
   }
 }
 
@@ -579,6 +689,13 @@ function errorCodes(code, arg, value = "") {
       break;
     case 16: //Not a number
       console.log("Error: Value \"" + value + "\" cannot be evaluated as an integer for argument \"" + arg + "\"");
+      break;
+
+    case 50: //Starting command
+      console.log("Error: Command \"" + arg + "\" must be specified at the start of the call");
+      break;
+    case 51: //Extra args
+      console.log("Error: Extraneous arguments for command \"" + arg + "\"");
       break;
 
     case 99: //Bad arg
