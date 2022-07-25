@@ -25,26 +25,9 @@ const readline = require("readline");
 */
 
 
-//https://stackoverflow.com/a/65863081
 function clearLastLine() {
-  readline.moveCursor(process.stdout, 0, -1);
+  readline.moveCursor(process.stdout, 0, -1); //https://stackoverflow.com/a/65863081
   readline.clearLine(process.stdout, 1); //Only works if cursor was on a newline before the function
-}
-
-
-//*********************************************************************************
-//Fills in any incomplete/blank settings with their default values for the scraper
-//to work with
-//*********************************************************************************
-function initSettings(settings) {
-
-  if (!("limit" in settings)) settings.limit = Number.POSITIVE_INFINITY;
-  if (!("limitMatch" in settings)) settings.limitMatch = Number.POSITIVE_INFINITY;
-  if (!("save" in settings)) settings.save = true;
-  if (!("saveOnlyMatch" in settings)) settings.saveOnlyMatch = false;
-  if (!("logMatch" in settings)) settings.logMatch = false;
-  if (!("selectors" in settings)) settings.selectors = [];
-  if (!("include" in settings)) settings.include = {};
 }
 
 
@@ -53,8 +36,6 @@ function initSettings(settings) {
 //response
 //*********************************************************************************
 async function scrapeComments(continuation_id, config, timeout = 1000, settings = {}) {
-
-  initSettings(settings);
 
   let savedComments = [];
   let counter = 0;
@@ -287,7 +268,7 @@ function commentMatches(singleComment, selectors) {
     }
     else {
       
-      let commentCheck = parseInt(singleComment[condition.check]);
+      let commentCheck = votesToNum(singleComment["votes"]);
       switch (condition.compare) {
         case "<":
           returnMatch = commentCheck < condition.match;
@@ -311,6 +292,24 @@ function commentMatches(singleComment, selectors) {
   }
 
   return returnMatch;
+}
+
+
+//*********************************************************************************
+//Converts a votes string into a numerical value
+//*********************************************************************************
+function votesToNum(voteCount) {
+  
+  let chr = voteCount.charAt(voteCount.length - 1);
+
+  if (chr === "B")
+    return parseFloat(voteCount.substring(0, voteCount.length - 1)) * 1000000000;
+  if (chr === "M")
+    return parseFloat(voteCount.substring(0, voteCount.length - 1)) * 1000000;
+  if (chr === "K")
+    return parseFloat(voteCount.substring(0, voteCount.length - 1)) * 1000;
+  
+  return parseInt(voteCount);
 }
 
 
@@ -350,7 +349,6 @@ function printReply(singleComment, config) {
 //Main entry function; retrieves a video and then scrapes it
 //*********************************************************************************
 async function collectComments(url, destination, timeout = 1000, settings = {}) {
-
 
   let get_video = {
     method: "GET",
@@ -411,24 +409,3 @@ async function collectComments(url, destination, timeout = 1000, settings = {}) 
 
 
 module.exports.collectComments = collectComments;
-
-(async () => { //Main
-
-  console.log("\n");
-
-  let settings = {
-    save: false,
-    saveOnlyMatch: false,
-    logMatch: true,
-    selectors: [
-      {
-        check: "author",
-        match: "Z",
-        compare: ""
-      }
-    ]
-  };
-  let url = "https://www.youtube.com/watch?v=3fmzvB-Kq0s";
-  await collectComments(url, "", 1000, settings);
-  
-});
