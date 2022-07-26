@@ -89,6 +89,9 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
 
       if (settings.saveOnlyMatch && !match)
         singleComment = {};
+
+      if (settings.logMatch && match)
+        printComment(singleComment, config);
       
       counter++;
 
@@ -120,9 +123,6 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
           savedComments.push(singleComment);
       } else if (settings.save)
         savedComments.push(singleComment);
-
-      if (settings.logMatch && match)
-        printComment(singleComment, config);
     }
 
     clearLastLine();
@@ -183,7 +183,7 @@ async function scrapeReplies(continuation_id, config, timeout, counter, matchCou
       else
         continue;
 
-      let singleComment = getCommentData(innerComment);
+      let singleComment = getCommentData(innerComment, settings.include);
       let match = commentMatches(singleComment, settings.selectors);
       if (match) matchCounter++;
       
@@ -238,6 +238,14 @@ function getCommentData(innerComment, include = {}) { //Condenses a retrieved co
       singleComment.votes = "0";
   }
 
+  if ("picture" in include ? include.picture : true) {
+    let thumbnails = innerComment.authorThumbnail.thumbnails;
+    singleComment.picture = thumbnails[thumbnails.length - 1.].url; //Always goes for the biggest thumbnail
+  }
+
+  if ("channel" in include ? include.channel : true)
+    singleComment.channel = innerComment.authorEndpoint.browseEndpoint.browseId;
+
   return singleComment;
 }
 
@@ -263,7 +271,7 @@ function commentMatches(singleComment, selectors) {
 
       if (condition.compare === "=") //Exact match needed
         returnMatch = commentCheck === conditionMatch;
-      else
+      else if (condition.compare === "")
         returnMatch = commentCheck.includes(conditionMatch);
     }
     else {
@@ -282,8 +290,9 @@ function commentMatches(singleComment, selectors) {
         case ">=":
           returnMatch = commentCheck >= condition.match;
           break;
-        default:
+        case "=":
           returnMatch = commentCheck === condition.match;
+          break;
       }
     }
 
@@ -323,6 +332,8 @@ function printComment(singleComment, config) {
   for (att in singleComment) {
     if (att === "id")
       console.log("link: " + config.data.context.client.originalUrl + "&lc=" + singleComment[att]);
+    else if (att === "channel")
+      console.log("channel: " + "https://youtube.com/channel/" + singleComment[att]);
     else
       console.log(att + ": " + singleComment[att]);
   }
@@ -337,6 +348,8 @@ function printReply(singleComment, config) {
   for (att in singleComment) {
     if (att === "id")
       console.log("\tlink: " + config.data.context.client.originalUrl + "&lc=" + singleComment[att]);
+    else if (att === "channel")
+      console.log("\tchannel: " + "https://youtube.com/channel/" + singleComment[att]);
     else
       console.log("\t" + att + ": " + singleComment[att]);
   }
@@ -391,6 +404,8 @@ async function collectComments(url, destination, timeout = 1000, settings = {}) 
   config.data.continuation = continuation_id;
   
   let savedComments = await scrapeComments(continuation_id, config, timeout, settings);
+  console.log("Complete");
+
   if (savedComments.length > 0) {
     let filename = "comments_" + url.split("v=", 2)[1] + ".json";
     if (destination === "")

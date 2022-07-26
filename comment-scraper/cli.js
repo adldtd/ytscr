@@ -1,252 +1,6 @@
 const fs = require("fs");
 
 
-
-const helpCall = function (a, v, currentState, i) {
-  if (i === 2) {
-    currentState.helpCMD = true;
-  } else
-    currentState.err = errorCodes(50, a);
-}
-
-
-const inputCall = function (a, v, currentState) {
-
-  if (!currentState.inFilter) {
-    if (url === "") {
-      if (v.substring(0, 32) === "https://www.youtube.com/watch?v=" || v.substring(0, 24) === "www.youtube.com/watch?v=") {
-        url = v;
-      } else
-        currentState.err = errorCodes(-2, a, v);
-    } else
-      currentState.err = errorCodes(-1, a);
-  } else
-    currentState.err = errorCodes(2, a);
-}
-
-
-const nosaveCall = function (a, v, currentState) {
-  if (!currentState.inFilter)
-    settings.save = false;
-  else
-    currentState.err = errorCodes(2, a);
-}
-
-
-const savefilterCall = function (a, v, currentState) {
-  if (!currentState.inFilter)
-    settings.saveOnlyMatch = true;
-  else
-    currentState.err = errorCodes(2, a);
-}
-
-
-const printfilterCall = function (a, v, currentState) {
-  if (!currentState.inFilter)
-    settings.logMatch = true;
-  else
-    currentState.err = errorCodes(2, a);
-}
-
-
-const noreplyCall = function (a, v, currentState) {
-  if (!currentState.inFilter)
-    settings.useReplies = false;
-  else
-    currentState.err = errorCodes(2, a);
-}
-
-
-const nrfCall = function (a, v, currentState) {
-  if (!currentState.inFilter)
-    settings.replyFiltering = false;
-  else
-    currentState.err = errorCodes(2, a);
-}
-
-
-const limCall = function (a, v, currentState) {
-
-  if (!currentState.inFilter) {
-    if (!isNaN(parseInt(v))) {
-      v = parseInt(v);
-      if (v > 0)
-        settings.limit = v;
-      else
-        currentState.err = errorCodes(15, a, v);
-    } else
-      currentState.err = errorCodes(16, a, v);
-  } else
-    currentState.err = errorCodes(2, a);
-}
-
-
-const limfilterCall = function (a, v, currentState) {
-
-  if (!currentState.inFilter) {
-    if (!isNaN(parseInt(v))) {
-      v = parseInt(v);
-      if (v > 0)
-        settings.limitMatch = v;
-      else
-        currentState.err = errorCodes(15, a, v);
-    } else
-      currentState.err = errorCodes(16, a, v);
-  } else
-    currentState.err = errorCodes(2, a);
-}
-
-
-const filterCall = function (a, v, currentState) {
-
-  if (!currentState.inFilter) {
-    if (v in cmd.filter.validValues)
-      currentState.inFilter = true;
-    else {
-      currentState.err = errorCodes(3, a, v);
-      outputValidValues(a, cmd.filter.validValues);
-    }
-  } else
-    currentState.err = errorCodes(2, a);
-}
-
-
-const checkCall = function (a, v, currentState) {
-
-  if (currentState.inFilter) {
-    if (v in cmd.check.validValues) {
-      if (!("check" in currentState.currentFilter))
-        currentState.currentFilter.check = v;
-      else
-        currentState.err = errorCodes(5, a);
-    } else {
-      currentState.err = errorCodes(3, a, v);
-      outputValidValues(a, cmd.check.validValues);
-    }
-  } else
-    currentState.err = errorCodes(4, a);
-}
-
-
-const matchCall = function (a, v, currentState) {
-
-  if (currentState.inFilter) {
-    if (!("match" in currentState.currentFilter))
-      currentState.currentFilter.match = v;
-    else
-      currentState.err = errorCodes(5, a);
-  } else
-    currentState.err = errorCodes(4, a);
-}
-
-
-const compareCall = function (a, v, currentState) {
-  if (currentState.inFilter) {
-    if (!("compare" in currentState.currentFilter)) //In order to reduce complexity, v is checked as a valid value at the end of the filter scope ("}")
-      currentState.currentFilter.compare = v;
-    else
-      currentState.err = errorCodes(5, a);
-  } else
-    currentState.err = errorCodes(4, a);
-}
-
-
-const casesensitiveCall = function (a, v, currentState) {
-  if (currentState.inFilter)
-    currentState.currentFilter.caseSensitive = true;
-  else
-    currentState.err = errorCodes(4, a);
-}
-
-
-const closingbracketCall = function (a, v, currentState) {
-
-  if (!currentState.inFilter) {
-    currentState.err = errorCodes(6, a);
-    return;
-  }
-  if (!("check" in currentState.currentFilter) || !("match" in currentState.currentFilter)) {
-    currentState.err = errorCodes(7, a);
-    return;
-  }
-  if (!(currentState.currentFilter.check in cmd.check.validValues)) {
-    currentState.err = errorCodes(3, "check", currentState.currentFilter.check);
-    outputValidValues("check", cmd.check.validValues);
-    return;
-  }
-
-  if (cmd.check.validValues[currentState.currentFilter.check] === "num") {
-
-    if (!("compare" in currentState.currentFilter)) {
-      currentState.err = errorCodes(8, a, currentState.currentFilter.check);
-      return;
-    }
-    if (!(currentState.currentFilter.compare in cmd.compare.validValues) || currentState.currentFilter.compare === "") {
-      currentState.err = errorCodes(9, a, currentState.currentFilter.compare);
-      outputValidValues("compare", cmd.compare.validValues, {"":""});
-      return;
-    }
-    if (isNaN(parseInt(currentState.currentFilter.match))) {
-      currentState.err = errorCodes(10, a, currentState.currentFilter.match);
-      return;
-    }
-
-  } else if (cmd.check.validValues[currentState.currentFilter.check] === "str") {
-
-    if (!("compare" in currentState.currentFilter))
-      currentState.currentFilter.compare = ""; //Default value
-    else if (!(currentState.currentFilter.compare in cmd.compare.validValues) || (currentState.currentFilter.compare !== "=" && currentState.currentFilter.compare !== "")) {
-      currentState.err = errorCodes(11, a, currentState.currentFilter.compare);
-      outputValidValues("compare", cmd.compare.validValues, {"<":"", ">":"", "<=":"", ">=":""});
-      return;
-    }
-    
-  }
-  if (currentState.currentFilter.check in settings.include && !settings.include[currentState.currentFilter.check]) {
-    currentState.err = errorCodes(12, a, currentState.currentFilter.check);
-    return;
-  }
-
-  currentState.usedFilterCheckValues[currentState.currentFilter.check] = "";
-  settings.selectors.push(currentState.currentFilter);
-  currentState.currentFilter = {};
-  currentState.inFilter = false;
-}
-
-
-const ignoreCall = function (a, v, currentState) {
-
-  if (!currentState.inFilter) {
-    if (v in cmd.ignore.validValues) {
-      if (!(v in currentState.usedFilterCheckValues))
-        settings.include[v] = false;
-      else
-        currentState.err = errorCodes(12, a, v);
-    } else {
-      currentState.err = errorCodes(3, a, v);
-      outputValidValues(a, cmd.ignore.validValues);
-    }
-  } else
-    currentState.err = errorCodes(2, a);
-}
-
-
-const destCall = function (a, v, currentState) {
-
-  if (!currentState.inFilter) {
-    if (fs.existsSync(v)) {
-      if (destination === "")
-        destination = v;
-      else
-        currentState.err = errorCodes(13, a);
-    } else
-      currentState.err = errorCodes(14, a);
-  } else
-    currentState.err = errorCodes(2, a);
-}
-
-
-
 var url = "";
 var destination = "";
 var settings = {selectors: [], include: {}};
@@ -365,7 +119,7 @@ const cmd = {
     simpleDescription: "Filter arg; defines which attribute to check",
     description: "Used exclusively in a filter object; the value entered is the attribute to inspect and filter. " +
     "Values that are listed as \"num\" are numerical; in that case \"match\" must be defined as an integer.",
-    validValues: {"author": "str", "text": "str", "published": "str", "votes": "num"},
+    validValues: {"author": "str", "text": "str", "id": "str", "published": "str", "votes": "num", "picture": "str", "channel": "str"},
     examples: ["check=text", "check=votes"],
     call: checkCall
   },
@@ -416,7 +170,7 @@ const cmd = {
     description: "Removes a comment attribute from \"consideration\" while scraping. This means that the " +
     "attribute will not be saved, printed, and cannot be filtered during execution. May be defined an " +
     "indefinite amount of times, each with a different attribute.",
-    validValues: {"author":"", "text":"", "id":"", "published":"", "votes":""},
+    validValues: {"author":"", "text":"", "id":"", "published":"", "votes":"", "picture":"", "channel":""},
     examples: ["ignore=\"id\"", "ignore=text"],
     call: ignoreCall
   },
@@ -714,3 +468,247 @@ function errorCodes(code, arg, value = "") {
 }
 
 module.exports.cli = cli;
+
+
+function helpCall(a, v, currentState, i) {
+  if (i === 2) {
+    currentState.helpCMD = true;
+  } else
+    currentState.err = errorCodes(50, a);
+}
+
+
+function inputCall(a, v, currentState) {
+
+  if (!currentState.inFilter) {
+    if (url === "") {
+      if (v.substring(0, 32) === "https://www.youtube.com/watch?v=" || v.substring(0, 24) === "www.youtube.com/watch?v=") {
+        url = v;
+      } else
+        currentState.err = errorCodes(-2, a, v);
+    } else
+      currentState.err = errorCodes(-1, a);
+  } else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function nosaveCall(a, v, currentState) {
+  if (!currentState.inFilter)
+    settings.save = false;
+  else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function savefilterCall(a, v, currentState) {
+  if (!currentState.inFilter)
+    settings.saveOnlyMatch = true;
+  else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function printfilterCall(a, v, currentState) {
+  if (!currentState.inFilter)
+    settings.logMatch = true;
+  else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function noreplyCall(a, v, currentState) {
+  if (!currentState.inFilter)
+    settings.useReplies = false;
+  else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function nrfCall(a, v, currentState) {
+  if (!currentState.inFilter)
+    settings.replyFiltering = false;
+  else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function limCall(a, v, currentState) {
+
+  if (!currentState.inFilter) {
+    if (!isNaN(parseInt(v))) {
+      v = parseInt(v);
+      if (v > 0)
+        settings.limit = v;
+      else
+        currentState.err = errorCodes(15, a, v);
+    } else
+      currentState.err = errorCodes(16, a, v);
+  } else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function limfilterCall(a, v, currentState) {
+
+  if (!currentState.inFilter) {
+    if (!isNaN(parseInt(v))) {
+      v = parseInt(v);
+      if (v > 0)
+        settings.limitMatch = v;
+      else
+        currentState.err = errorCodes(15, a, v);
+    } else
+      currentState.err = errorCodes(16, a, v);
+  } else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function filterCall(a, v, currentState) {
+
+  if (!currentState.inFilter) {
+    if (v in cmd.filter.validValues)
+      currentState.inFilter = true;
+    else {
+      currentState.err = errorCodes(3, a, v);
+      outputValidValues(a, cmd.filter.validValues);
+    }
+  } else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function checkCall(a, v, currentState) {
+
+  if (currentState.inFilter) {
+    if (v in cmd.check.validValues) {
+      if (!("check" in currentState.currentFilter))
+        currentState.currentFilter.check = v;
+      else
+        currentState.err = errorCodes(5, a);
+    } else {
+      currentState.err = errorCodes(3, a, v);
+      outputValidValues(a, cmd.check.validValues);
+    }
+  } else
+    currentState.err = errorCodes(4, a);
+}
+
+
+function matchCall(a, v, currentState) {
+
+  if (currentState.inFilter) {
+    if (!("match" in currentState.currentFilter))
+      currentState.currentFilter.match = v;
+    else
+      currentState.err = errorCodes(5, a);
+  } else
+    currentState.err = errorCodes(4, a);
+}
+
+
+function compareCall(a, v, currentState) {
+  if (currentState.inFilter) {
+    if (!("compare" in currentState.currentFilter)) //In order to reduce complexity, v is checked as a valid value at the end of the filter scope ("}")
+      currentState.currentFilter.compare = v;
+    else
+      currentState.err = errorCodes(5, a);
+  } else
+    currentState.err = errorCodes(4, a);
+}
+
+
+function casesensitiveCall(a, v, currentState) {
+  if (currentState.inFilter)
+    currentState.currentFilter.caseSensitive = true;
+  else
+    currentState.err = errorCodes(4, a);
+}
+
+
+function closingbracketCall(a, v, currentState) {
+
+  if (!currentState.inFilter) {
+    currentState.err = errorCodes(6, a);
+    return;
+  }
+  if (!("check" in currentState.currentFilter) || !("match" in currentState.currentFilter)) {
+    currentState.err = errorCodes(7, a);
+    return;
+  }
+  if (!(currentState.currentFilter.check in cmd.check.validValues)) {
+    currentState.err = errorCodes(3, "check", currentState.currentFilter.check);
+    outputValidValues("check", cmd.check.validValues);
+    return;
+  }
+
+  if (cmd.check.validValues[currentState.currentFilter.check] === "num") {
+
+    if (!("compare" in currentState.currentFilter)) {
+      currentState.err = errorCodes(8, a, currentState.currentFilter.check);
+      return;
+    }
+    if (!(currentState.currentFilter.compare in cmd.compare.validValues) || currentState.currentFilter.compare === "") {
+      currentState.err = errorCodes(9, a, currentState.currentFilter.compare);
+      outputValidValues("compare", cmd.compare.validValues, {"":""});
+      return;
+    }
+    if (isNaN(parseInt(currentState.currentFilter.match))) {
+      currentState.err = errorCodes(10, a, currentState.currentFilter.match);
+      return;
+    }
+
+  } else if (cmd.check.validValues[currentState.currentFilter.check] === "str") {
+
+    if (!("compare" in currentState.currentFilter))
+      currentState.currentFilter.compare = ""; //Default value
+    else if (!(currentState.currentFilter.compare in cmd.compare.validValues) || (currentState.currentFilter.compare !== "=" && currentState.currentFilter.compare !== "")) {
+      currentState.err = errorCodes(11, a, currentState.currentFilter.compare);
+      outputValidValues("compare", cmd.compare.validValues, {"<":"", ">":"", "<=":"", ">=":""});
+      return;
+    }
+    
+  }
+  if (currentState.currentFilter.check in settings.include && !settings.include[currentState.currentFilter.check]) {
+    currentState.err = errorCodes(12, a, currentState.currentFilter.check);
+    return;
+  }
+
+  currentState.usedFilterCheckValues[currentState.currentFilter.check] = "";
+  settings.selectors.push(currentState.currentFilter);
+  currentState.currentFilter = {};
+  currentState.inFilter = false;
+}
+
+
+function ignoreCall(a, v, currentState) {
+
+  if (!currentState.inFilter) {
+    if (v in cmd.ignore.validValues) {
+      if (!(v in currentState.usedFilterCheckValues))
+        settings.include[v] = false;
+      else
+        currentState.err = errorCodes(12, a, v);
+    } else {
+      currentState.err = errorCodes(3, a, v);
+      outputValidValues(a, cmd.ignore.validValues);
+    }
+  } else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function destCall(a, v, currentState) {
+
+  if (!currentState.inFilter) {
+    if (fs.existsSync(v)) {
+      if (destination === "")
+        destination = v;
+      else
+        currentState.err = errorCodes(13, a);
+    } else
+      currentState.err = errorCodes(14, a);
+  } else
+    currentState.err = errorCodes(2, a);
+}
