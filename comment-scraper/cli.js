@@ -27,6 +27,16 @@ const cmd = {
     call: inputCall
   },
 
+  "-new": {redirect: "-newest"},
+  "-newest":
+  {
+    aliases: ["-newest", "-new"],
+    simpleDescription: "Searches newest comments first",
+    description: "Sets \"SORT BY\" to \"newest first.\" NOTE: Pinned comments will still appear at the top, " +
+    "regardless of date.",
+    call: newestCall
+  },
+
   "-NS": {redirect: "-nosave"},
   "-nosave":
   {
@@ -34,6 +44,16 @@ const cmd = {
     simpleDescription: "Disables file saves",
     description: "When present, prevents the scraper from saving the scraped content.",
     call: nosaveCall
+  },
+
+  "-np": {redirect: "-nopretty"},
+  "-nopretty":
+  {
+    aliases: ["-nopretty", "-np"],
+    simpleDescription: "Disables pretty printing",
+    description: "When present, this stops the scraper from nicely formatting the saved JSON. Tends to save a " +
+    "little bit of space.",
+    call: noprettyCall
   },
 
   "-sf": {redirect: "-savefilter"},
@@ -281,8 +301,10 @@ function cli (args) {
     return -1;
 
 
+  if (!("newestFirst" in settings)) settings.newestFirst = false;
   if (!("save" in settings)) settings.save = true;
   if (!("saveOnlyMatch" in settings)) settings.saveOnlyMatch = false;
+  if (!("prettyPrint" in settings)) settings.prettyPrint = true;
   if (!("useReplies" in settings)) settings.useReplies = true;
   if (!("replyFiltering" in settings)) settings.replyFiltering = true;
   if (!("logMatch" in settings)) settings.logMatch = false;
@@ -302,6 +324,8 @@ function cli (args) {
     console.log("WARNING: Limit is lower than limitfilter; scraping will end before the filter limit can be reached.");
   }
 
+  if (settings.save === false && settings.prettyPrint === false)
+    console.log("WARNING: Argument -nopretty conflicts with -nosave; no information will be saved.");
   if (!settings.logMatch && !settings.save)
     console.log("WARNING: Scraped information will neither be saved nor displayed on-screen.");
   if (settings.logMatch && settings.selectors.length === 0)
@@ -493,9 +517,25 @@ function inputCall(a, v, currentState) {
 }
 
 
+function newestCall(a, v, currentState) {
+  if (!currentState.inFilter)
+    settings.newestFirst = true;
+  else
+    currentState.err = errorCodes(2, a);
+}
+
+
 function nosaveCall(a, v, currentState) {
   if (!currentState.inFilter)
     settings.save = false;
+  else
+    currentState.err = errorCodes(2, a);
+}
+
+
+function noprettyCall(a, v, currentState) {
+  if (!currentState.inFilter)
+    settings.prettyPrint = false;
   else
     currentState.err = errorCodes(2, a);
 }

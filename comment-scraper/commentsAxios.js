@@ -57,9 +57,28 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
 
 
     let comments = resp.data.onResponseReceivedEndpoints;
-    if (comments.length > 1) //First batch of comments recieved
-      comments = comments[1].reloadContinuationItemsCommand.continuationItems;
-    else
+    if (comments.length > 1) { //First batch of comments recieved
+
+      if (settings.newestFirst) {
+
+        let newestSection = comments[0].reloadContinuationItemsCommand.continuationItems[0].commentsHeaderRenderer.sortMenu.sortFilterSubMenuRenderer.subMenuItems[1];
+        continuation_id = newestSection.serviceEndpoint.continuationCommand.token;
+        config.data.continuation = continuation_id;
+
+        await new Promise((resolve) => setTimeout(resolve, timeout));
+        resp = await axios(config);
+
+        if (resp.status != 200) {
+          console.log(resp.status + " " + resp.statusText);
+          return [];
+        }
+
+        comments = resp.data.onResponseReceivedEndpoints[1].reloadContinuationItemsCommand.continuationItems;
+
+      } else
+        comments = comments[1].reloadContinuationItemsCommand.continuationItems;
+
+    } else
       comments = comments[0].appendContinuationItemsAction.continuationItems;
 
 
@@ -413,7 +432,11 @@ async function collectComments(url, destination, timeout = 1000, settings = {}) 
     else
       destination = destination + "/" + filename;
 
-    fs.writeFileSync(destination, JSON.stringify(savedComments, null, 2));
+    if (settings.prettyPrint)
+      fs.writeFileSync(destination, JSON.stringify(savedComments, null, 2));
+    else
+      fs.writeFileSync(destination, JSON.stringify(savedComments));
+    
     console.log("Saved as " + destination);
   }
   else {
