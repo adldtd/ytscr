@@ -22,8 +22,9 @@ const cmd = {
   {
     aliases: ["input", "i"],
     simpleDescription: "A YouTube video link",
-    description: "Specifies the video link from where to scrape comments.",
-    examples: ["input=https://www.youtube.com/watch?v=jNQXAC9IVRw", "i=www.youtube.com/watch?v=jNQXAC9IVRw"],
+    description: "Specifies the video link from where to scrape comments. Can either be a normal YouTube link, " +
+    "a shorts link, a \"youtu.be\" link, or a video ID.",
+    examples: ["input=https://www.youtube.com/watch?v=jNQXAC9IVRw", "i=youtu.be/jNQXAC9IVRw", "i=jNQXAC9IVRw"],
     call: inputCall
   },
 
@@ -171,7 +172,7 @@ const cmd = {
   "-cs": {redirect: "-casesensitive"},
   "-casesensitive":
   {
-    aliases: ["-cs"],
+    aliases: ["-casesensitive, -cs"],
     simpleDescription: "Filter arg; does not ignore case if present",
     description: "Used exclusively in a filter object; a flag that specifies whether the case in a string is " +
     "taken into account during filtering. NOTE: This will do nothing if \"check\" is a num value.",
@@ -506,10 +507,18 @@ function inputCall(a, v, currentState) {
 
   if (!currentState.inFilter) {
     if (url === "") {
-      if (v.substring(0, 32) === "https://www.youtube.com/watch?v=" || v.substring(0, 24) === "www.youtube.com/watch?v=") {
+      
+      if (v.substring(0, 32) === "https://www.youtube.com/watch?v=" || v.substring(0, 24) === "www.youtube.com/watch?v=" || v.substring(0, 20) === "youtube.com/watch?v=") {
         url = v;
+      } else if (v.substring(0, 31) === "https://www.youtube.com/shorts/" || v.substring(0, 23) === "www.youtube.com/shorts/" || v.substring(0, 19) === "youtube.com/shorts/") {
+        url = "https://youtube.com/watch?v=" + v.split("shorts/", 2)[1]; //YouTube shorts are converted to videos this way
+      } else if (v.substring(0, 17) === "https://youtu.be/" || v.substring(0, 9) === "youtu.be/") {
+        url = "https://youtube.com/watch?v=" + v.split(".be/", 2)[1];
+      } else if (v.length === 11) { //Pure video ID
+        url = "https://youtube.com/watch?v=" + v;
       } else
         currentState.err = errorCodes(-2, a, v);
+        
     } else
       currentState.err = errorCodes(-1, a);
   } else
