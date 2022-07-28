@@ -405,15 +405,72 @@ async function collectComments(url, destination, timeout = 1000, settings = {}) 
   let resp = await axios(get_video);
 
   if (resp.status !== 200) {
-    console.log(resp.status + " " + resp.statusText);
-    console.log("No comments found. No save made.");
+    console.log("\n" + resp.status + " " + resp.statusText);
+    if (settings.save)
+      console.log("No comments found. No save made.");
+    else
+      console.log("No comments found.");
     return;
   }
-  if (resp.data.includes("Comments are turned off.")) {
-    console.log("Error: Comments are turned off.");
-    console.log("No comments found. No save made.");
+
+  let location = resp.data.indexOf("var ytInitialData = ");
+  if (location === -1) {
+    console.log("\nAn unexpected error occurred.");
+    if (settings.save)
+      console.log("No comments found. No save made.");
+    else
+      console.log("No comments found.");
     return;
   }
+
+  let initialData = JSON.parse(resp.data.substring(location + 20, resp.data.length).split(";</script><script nonce", 1)[0]);
+  initialData = initialData.contents.twoColumnWatchNextResults.results.results.contents;
+
+  if ("videoPrimaryInfoRenderer" in initialData[0]) {
+    let runs = initialData[0].videoPrimaryInfoRenderer.title.runs;
+    let title = "";
+    for (run in runs)
+      title += runs[run].text;
+    console.log("\n\"" + title + "\"");
+    console.log(initialData[0].videoPrimaryInfoRenderer.dateText.simpleText);
+  }
+
+  //console.log(initialData[initialData.length - 1].itemSectionRenderer.contents[0].backgroundPromoRenderer.title.runs[0].text); //Video does not exist
+  //console.log(initialData[initialData.length - 1].itemSectionRenderer.contents[0].messageRenderer.text.runs[0].text); //Comments turned off; Video unavailable
+  //console.log(initialData[initialData.length - 1].itemSectionRenderer.contents); //Has continuationEndpoint; exists
+  
+
+  let contents = initialData[initialData.length - 1].itemSectionRenderer.contents;
+  let requestError = false;
+  for (c in contents) {
+
+    if ("backgroundPromoRenderer" in contents[c]) {
+      console.log("\n" + contents[c].backgroundPromoRenderer.title.runs[0].text);
+      requestError = true;
+      break;
+    } else if ("messageRenderer" in contents[c]) {
+      console.log("\n" + contents[c].messageRenderer.text.runs[0].text);
+      requestError = true;
+      break;
+    } else if ("continuationItemRenderer" in contents[c])
+      continue;
+    else {
+      console.log(contents[c]);
+      console.log("\nAn unexpected error occurred.");
+      requestError = true;
+      break;
+    }
+  }
+
+  if (requestError) {
+    if (settings.save)
+      console.log("No comments found. No save made.");
+    else
+      console.log("No comments found.");
+    return;
+  } else
+    console.log("\n");
+  
 
   let inner_api_key = resp.data.split('"INNERTUBE_API_KEY":"', 2)[1].split('"')[0];
   let continuation_id = resp.data.split('"continuationCommand":{"token":"', 2)[1].split('"')[0];

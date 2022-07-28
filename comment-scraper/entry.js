@@ -21,7 +21,6 @@ const comment_scraper = require(__dirname + "/commentsAxios");
   //console.log(settings.selectors);
   //return;
 
-  console.log("\n");
   await comment_scraper.collectComments(url, destination, 1000, settings);
 
 })();
