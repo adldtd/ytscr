@@ -2,6 +2,7 @@ const axios = require("axios").default;
 const fs = require("fs");
 const process = require("node:process");
 const readline = require("readline");
+const path = require("path");
 
 
 /*
@@ -9,7 +10,7 @@ const readline = require("readline");
 *   save: boolean - whether to keep updating saved comments
 *   saveOnlyMatch: boolean - whether to save if element matches selectors; should be false if save is false
 *   logMatch: boolean - print out comment information if matched
-*   limitMatch: number - **********************************************************************************
+*   limitMatch: number - how many matches to take before stopping
 *   selectors: []
 *     : {}
 *       check: "author", "text", "published", "votes" - what element to check
@@ -395,7 +396,7 @@ async function collectComments(url, destination, timeout = 1000, settings = {}) 
       authority: "www.youtube.com",
       validateStatus: () => true
   };
-  config.data = JSON.parse(fs.readFileSync(__dirname + "/config_data.json")); //*****************USER AGENT COULD BE REMOVED
+  config.data = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "config_data.json")));
 
 
   get_video.url = url;
@@ -501,6 +502,7 @@ async function collectComments(url, destination, timeout = 1000, settings = {}) 
       console.log("No comments found. No save made.");
   }
 }
+
 
 
 module.exports.collectComments = collectComments;

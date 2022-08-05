@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const CLI = require(__dirname + "/cli");
-const comment_scraper = require(__dirname + "/commentsAxios");
+const CLI = require(__dirname + "/comments/cli");
+const comment_scraper = require(__dirname + "/comments/comment-scraper");
 
 (async () => { //Main
 
