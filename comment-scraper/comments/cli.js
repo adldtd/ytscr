@@ -6,6 +6,9 @@ const cmd = commands.cmd;
 const errorCodes = commands.errorCodes;
 
 
+//*********************************************************************************
+//Parser for the comments module
+//*********************************************************************************
 function cli(args) {
 
   let settings = {url: "", destination: "", timeout: 1000, selectors: [], include: {}};

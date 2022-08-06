@@ -1,5 +1,13 @@
 
+  /**************************************************/
+ /* Helper functions for all of the different CLIs */
+/**************************************************/
 
+
+//*********************************************************************************
+//Taking an argument as input, output the restricted values to enter (to be located
+//in the "validValues" section of cmd)
+//*********************************************************************************
 function outputValidValues(arg, values = {}, ignore = {}) { //Gives the end user more information in case of an error
   console.log("The valid values for argument \"" + arg + "\" are:");
   for (valid in values) {
@@ -13,6 +21,9 @@ function outputValidValues(arg, values = {}, ignore = {}) { //Gives the end user
 }
 
 
+//*********************************************************************************
+//Print an argument/command's aliases, its description, and other info
+//*********************************************************************************
 function outputHelp(arg, commandObject) {
 
   let ali = "NAMES: " + commandObject.aliases[0];
@@ -47,6 +58,9 @@ function outputHelp(arg, commandObject) {
 }
 
 
+//*********************************************************************************
+//Print a list of arguments/commands alongside their simple descriptions
+//*********************************************************************************
 function outputHelpAll(cmd) {
   let buffer_space = 25; //The buffer space "names" get before the simple description is printer
 

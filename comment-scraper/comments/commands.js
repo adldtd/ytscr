@@ -1,6 +1,10 @@
 const fs = require("fs");
 
 
+  /****************************************************************************/
+ /* Arguments + commands and corresponding functions for the comments module */
+/****************************************************************************/
+
 
 const cmd = {
 

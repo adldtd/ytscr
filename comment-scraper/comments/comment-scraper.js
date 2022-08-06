@@ -5,6 +5,11 @@ const readline = require("readline");
 const path = require("path");
 
 
+  /*************************************************/
+ /* The scraping function for the comments module */
+/*************************************************/
+
+
 /*
 * Settings:
 *   save: boolean - whether to keep updating saved comments

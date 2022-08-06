@@ -5,6 +5,11 @@ const comments = require(path.join(__dirname, "..", "comments", "cli"));
 const scrape_comments = require(path.join(__dirname, "..", "comments", "comment-scraper"));
 
 
+  /***********************************************************************/
+ /* The "entry level" commands; specify which part of YouTube to scrape */
+/***********************************************************************/
+
+
 const cmd = {
 
   "help": {
