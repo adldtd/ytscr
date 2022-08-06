@@ -1,8 +1,8 @@
-const helpers = require(__dirname + "/helpers");
+const path = require("path");
+const helpers = require(path.join(__dirname, "..", "helpers"));
 const commands = require(__dirname + "/commands");
 
 const cmd = commands.cmd;
-
 
 
 //*********************************************************************************
@@ -35,7 +35,7 @@ function cli(args) {
       }
       
     } else if (a in cmd) {
-      return cmd[a].cli(args); //Enters the appropriate parser
+      return [cmd[a].scrape, cmd[a].cli(args)]; //Enters the appropriate call function and parser
     } else {
       console.log("Error: Invalid command \"" + a + "\"; see \"help\" for all valid cmds");
       return -1;
@@ -46,5 +46,6 @@ function cli(args) {
     return -1;
   }
 }
+
 
 module.exports.cli = cli;

@@ -1,14 +1,14 @@
-const fs = require("fs");
+const path = require("path");
+const helpers = require(path.join(__dirname, "..", "helpers"));
 const commands = require(__dirname + "/commands");
 
 const cmd = commands.cmd;
 const errorCodes = commands.errorCodes;
 
 
+function cli(args) {
 
-function cli (args) {
-
-  let settings = {url: "", destination: "", selectors: [], include: {}};
+  let settings = {url: "", destination: "", timeout: 1000, selectors: [], include: {}};
 
   let currentState = //Used to pass CLI tracking variables to individual CLI functions
   {
@@ -39,7 +39,7 @@ function cli (args) {
 
         if (i === args.length - 1) { //Expected for there to be either 0 or 1 inputs to the help command
           if ("description" in commandObject) {
-            outputHelp(a, commandObject);
+            helpers.outputHelp(a, commandObject);
             currentState.helpCMD = false;
             return -1;
           } else
@@ -63,7 +63,7 @@ function cli (args) {
   }
 
   if (currentState.helpCMD) {
-    outputHelpAll();
+    helpers.outputHelpAll(cmd);
     return -1;
   }
 
@@ -112,80 +112,8 @@ function cli (args) {
   if (!settings.replyFiltering && settings.selectors.length === 0 && settings.limitMatch !== Number.POSITIVE_INFINITY)
     console.log("WARNING: -nrf mode enabled, but no filters set; thus all replies will not be counted up to limitfilter.");
 
-  return [settings.url, settings.destination, settings];
+  return settings;
 }
-
-
-function outputValidValues(arg, values = {}, ignore = {}) { //Gives the end user more information in case of an error
-  console.log("The valid values for argument \"" + arg + "\" are:");
-  for (valid in values) {
-    if (!(valid in ignore)) {
-      if (values[valid] === "")
-        console.log("\t\"" + valid + "\"");
-      else
-        console.log("\t\"" + valid + "\" (" + values[valid] + ")");
-    }
-  }
-}
-
-
-function outputHelp(arg, commandObject) {
-
-  let ali = "NAMES: " + commandObject.aliases[0];
-  for (let i = 1; i < commandObject.aliases.length; i++)
-    ali += ", " + commandObject.aliases[i];
-  console.log(ali);
-  
-  console.log(commandObject.description);
-
-  if ("validValues" in commandObject) {
-    if (commandObject.aliases[0] !== "compare") { //Special case
-      console.log("");
-      outputValidValues(commandObject.aliases[0], commandObject.validValues);
-    } else {
-      console.log("\nThe valid values for argument \"compare\" (str) are:");
-      for (valid in {"":"", "=":""})
-        console.log("\t\"" + valid + "\"");
-
-      console.log("\nThe valid values for argument \"compare\" (num) are:");
-      for (valid in commandObject.validValues) {
-        if (valid !== "")
-          console.log("\t\"" + valid + "\"");
-      }
-    }
-  }
-
-  if ("examples" in commandObject) {
-    console.log("\nExamples:");
-    for (e in commandObject.examples)
-      console.log(commandObject.examples[e]);
-  }
-}
-
-
-function outputHelpAll() {
-  let buffer_space = 25; //The buffer space "names" get before the simple description is printer
-
-  for (c in cmd) {
-    if ("simpleDescription" in cmd[c]) {
-      
-      let names = cmd[c].aliases[0];
-      for (let i = 1; i < cmd[c].aliases.length; i++)
-        names += ", " + cmd[c].aliases[i];
-
-      let spaces = "";
-      let numSpaces = buffer_space - names.length;
-      if (numSpaces > 0)
-        spaces = " ".repeat(numSpaces);
-      else
-        spaces = " ";
-
-      console.log(names + spaces + cmd[c].simpleDescription); //One tab is about 8 spaces
-
-    }
-  }
-}
-
 
 
 module.exports.cli = cli;

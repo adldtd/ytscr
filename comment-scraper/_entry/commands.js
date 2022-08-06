@@ -1,4 +1,9 @@
-const comments = require(__dirname + "/comments/cli");
+const path = require("path");
+
+const comments = require(path.join(__dirname, "..", "comments", "cli"));
+
+const scrape_comments = require(path.join(__dirname, "..", "comments", "comment-scraper"));
+
 
 const cmd = {
 
@@ -18,7 +23,8 @@ const cmd = {
     "comments help input\" for a more detailed description.) Records the author, the author id, the author " +
     "image, the comment text, the comment id, the date published, the votes, and the replies.",
     examples: ["comments i=https://www.youtube.com/watch?v=jNQXAC9IVRw"],
-    cli: comments.cli
+    cli: comments.cli,
+    scrape: scrape_comments.scrape
   }
 
 }

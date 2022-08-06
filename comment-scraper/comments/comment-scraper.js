@@ -381,7 +381,11 @@ function printReply(singleComment, config) {
 //*********************************************************************************
 //Main entry function; retrieves a video and then scrapes it
 //*********************************************************************************
-async function collectComments(url, destination, timeout = 1000, settings = {}) {
+async function collectComments(settings) {
+
+  let url = settings.url;
+  let destination = settings.destination;
+  let timeout = settings.timeout;
 
   let get_video = {
     method: "GET",
@@ -502,7 +506,6 @@ async function collectComments(url, destination, timeout = 1000, settings = {}) 
       console.log("No comments found. No save made.");
   }
 }
-
 
 
 module.exports.scrape = collectComments;

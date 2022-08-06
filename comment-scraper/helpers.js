@@ -1,4 +1,18 @@
 
+
+function outputValidValues(arg, values = {}, ignore = {}) { //Gives the end user more information in case of an error
+  console.log("The valid values for argument \"" + arg + "\" are:");
+  for (valid in values) {
+    if (!(valid in ignore)) {
+      if (values[valid] === "")
+        console.log("\t\"" + valid + "\"");
+      else
+        console.log("\t\"" + valid + "\" (" + values[valid] + ")");
+    }
+  }
+}
+
+
 function outputHelp(arg, commandObject) {
 
   let ali = "NAMES: " + commandObject.aliases[0];
@@ -57,6 +71,6 @@ function outputHelpAll(cmd) {
 }
 
 
-
+module.exports.outputValidValues = outputValidValues;
 module.exports.outputHelp = outputHelp;
 module.exports.outputHelpAll = outputHelpAll;
