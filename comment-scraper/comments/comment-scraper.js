@@ -505,4 +505,4 @@ async function collectComments(url, destination, timeout = 1000, settings = {}) 
 
 
 
-module.exports.collectComments = collectComments;
+module.exports.scrape = collectComments;

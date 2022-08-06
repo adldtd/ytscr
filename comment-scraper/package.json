@@ -2,9 +2,9 @@
   "name": "comment-scraper",
   "version": "1.0.0",
   "description": "A CLI for scraping youtube comments",
-  "main": "commentsAxios.js",
+  "main": "comment-scraper.js",
   "bin": {
-    "comment-scraper": "entry.js"
+    "ytscr": "entry.js"
   },
   "dependencies": {
     "asynckit": "^0.4.0",

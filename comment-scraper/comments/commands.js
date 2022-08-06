@@ -209,7 +209,7 @@ const cmd = {
 
 
 function helpCall(a, v, settings, currentState, i) {
-  if (i === 2) {
+  if (i === 3) {
     currentState.helpCMD = true;
   } else
     currentState.err = errorCodes(50, a);

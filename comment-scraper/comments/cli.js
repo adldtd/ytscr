@@ -19,7 +19,7 @@ function cli (args) {
     err: false //Stops the CLI if made true
   };
 
-  for (let i = 2; i < args.length; i++) {
+  for (let i = 3; i < args.length; i++) {
 
     let a = ""; let v = "";
     let ind = args[i].indexOf("=");

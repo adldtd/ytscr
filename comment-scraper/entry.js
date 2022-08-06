@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const CLI = require(__dirname + "/comments/cli");
+const CLI = require(__dirname + "/cli");
 const comment_scraper = require(__dirname + "/comments/comment-scraper");
 
 (async () => { //Main
@@ -21,6 +21,6 @@ const comment_scraper = require(__dirname + "/comments/comment-scraper");
   //console.log(settings.selectors);
   //return;
 
-  await comment_scraper.collectComments(url, destination, 1000, settings);
+  await comment_scraper.scrape(url, destination, 1000, settings);
 
 })();
