@@ -434,6 +434,21 @@ async function collectComments(settings) {
   }
 
   let initialData = JSON.parse(resp.data.substring(location + 20, resp.data.length).split(";</script><script nonce", 1)[0]);
+  if ("conversationBar" in initialData.contents.twoColumnWatchNextResults) { //Indicates the chat bar
+    
+    let bar = initialData.contents.twoColumnWatchNextResults.conversationBar;
+    let live = ("isReplay" in bar.liveChatRenderer) ? !bar.liveChatRenderer.isReplay : true;
+    if (live) {
+      console.log("\nLivestream ongoing.");
+      if (settings.save)
+        console.log("No comments found. No save made.");
+      else
+        console.log("No comments found.");
+      return;
+    }
+  }
+  
+  
   initialData = initialData.contents.twoColumnWatchNextResults.results.results.contents;
 
   if ("videoPrimaryInfoRenderer" in initialData[0]) {
