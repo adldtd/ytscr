@@ -1,8 +1,9 @@
-const axios = require("axios").default;
+//const axios = require("axios").default;
 const fs = require("fs");
-const process = require("node:process");
-const readline = require("readline");
 const path = require("path");
+const makeRequest = require(path.join(__dirname, "..", "helpers")).makeRequest;
+const handleSaveJSON = require(path.join(__dirname, "..", "helpers")).handleSaveJSON;
+const clearLastLine = require(path.join(__dirname, "..", "helpers")).clearLastLine;
 
 
   /*************************************************/
@@ -31,12 +32,6 @@ const path = require("path");
 */
 
 
-function clearLastLine() {
-  readline.moveCursor(process.stdout, 0, -1); //https://stackoverflow.com/a/65863081
-  readline.clearLine(process.stdout, 1); //Only works if cursor was on a newline before the function
-}
-
-
 //*********************************************************************************
 //Scrapes Youtube comments using a "chain" of continuation ids provided by each
 //response
@@ -53,15 +48,10 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
     hasContinuation = false;
     config.data.continuation = continuation_id; //Chaining requests
 
-    await new Promise((resolve) => setTimeout(resolve, timeout));
-    let resp = await axios(config);
+    let resp = await makeRequest(config, timeout, 1)
+    if (resp === -1) return savedComments;
 
-    if (resp.status != 200) {
-      console.log(resp.status + " " + resp.statusText);
-      return [];
-    }
-
-
+    //Parse recieved data
     let comments = resp.data.onResponseReceivedEndpoints;
     if (comments.length > 1) { //First batch of comments recieved
 
@@ -71,13 +61,8 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
         continuation_id = newestSection.serviceEndpoint.continuationCommand.token;
         config.data.continuation = continuation_id;
 
-        await new Promise((resolve) => setTimeout(resolve, timeout));
-        resp = await axios(config);
-
-        if (resp.status != 200) {
-          console.log(resp.status + " " + resp.statusText);
-          return [];
-        }
+        resp = await makeRequest(config, timeout, 1);
+        if (resp === -1) return savedComments;
 
         comments = resp.data.onResponseReceivedEndpoints[1].reloadContinuationItemsCommand.continuationItems;
 
@@ -173,13 +158,8 @@ async function scrapeReplies(continuation_id, config, timeout, counter, matchCou
     hasContinuation = false;
     config.data.continuation = continuation_id; //Chaining requests
 
-    await new Promise((resolve) => setTimeout(resolve, timeout));
-    let resp = await axios(config);
-
-    if (resp.status != 200) {
-      console.log(resp.status + " " + resp.statusText);
-      return [counter, matchCounter, []];
-    }
+    let resp = await makeRequest(config, timeout, 1);
+    if (resp === -1) return [counter, matchCounter, savedComments];
 
 
     let comments = resp.data.onResponseReceivedEndpoints;
@@ -244,7 +224,7 @@ function getCommentData(innerComment, include = {}) { //Condenses a retrieved co
   if ("text" in include ? include.text : true) {
     singleComment.text = "";
     for (run in innerComment.contentText.runs)
-    singleComment.text += innerComment.contentText.runs[run].text;
+      singleComment.text += innerComment.contentText.runs[run].text;
   }
 
   if ("id" in include ? include.id : true)
@@ -400,22 +380,20 @@ async function collectComments(settings) {
   };
   
   let config = {
-      method: "POST",
-      url: "__________",
-      authority: "www.youtube.com",
-      validateStatus: () => true
+    method: "POST",
+    url: "__________",
+    authority: "www.youtube.com",
+    validateStatus: () => true
   };
   config.data = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "config_data.json")));
 
-
+  //Set up data and make the initial video request
   get_video.url = url;
   config.data.context.client.originalUrl = url;
   config.data.context.client.mainAppWebInfo.graftUrl = url;
 
-  let resp = await axios(get_video);
-
-  if (resp.status !== 200) {
-    console.log("\n" + resp.status + " " + resp.statusText);
+  let resp = await makeRequest(get_video, timeout, 1);
+  if (resp === -1) {
     if (settings.save)
       console.log("No comments found. No save made.");
     else
@@ -433,7 +411,7 @@ async function collectComments(settings) {
     return;
   }
 
-  let initialData = JSON.parse(resp.data.substring(location + 20, resp.data.length).split(";</script><script nonce", 1)[0]);
+  let initialData = JSON.parse(resp.data.substring(location + 20).split(";</script><script nonce", 1)[0]);
   if ("conversationBar" in initialData.contents.twoColumnWatchNextResults) { //Indicates the chat bar
     
     let bar = initialData.contents.twoColumnWatchNextResults.conversationBar;
@@ -459,12 +437,8 @@ async function collectComments(settings) {
     console.log("\n\"" + title + "\"");
     console.log(initialData[0].videoPrimaryInfoRenderer.dateText.simpleText);
   }
-
-  //console.log(initialData[initialData.length - 1].itemSectionRenderer.contents[0].backgroundPromoRenderer.title.runs[0].text); //Video does not exist
-  //console.log(initialData[initialData.length - 1].itemSectionRenderer.contents[0].messageRenderer.text.runs[0].text); //Comments turned off; Video unavailable
-  //console.log(initialData[initialData.length - 1].itemSectionRenderer.contents); //Has continuationEndpoint; exists
   
-
+  //Determine the video type, as well as any video errors encountered
   let contents = initialData[initialData.length - 1].itemSectionRenderer.contents;
   let requestError = false;
   for (c in contents) {
@@ -496,7 +470,7 @@ async function collectComments(settings) {
   } else
     console.log("\n");
   
-
+  //Start scraping
   let inner_api_key = resp.data.split('"INNERTUBE_API_KEY":"', 2)[1].split('"')[0];
   let continuation_id = resp.data.split('"continuationCommand":{"token":"', 2)[1].split('"')[0];
 
@@ -507,24 +481,18 @@ async function collectComments(settings) {
   let savedComments = await scrapeComments(continuation_id, config, timeout, settings);
   console.log("Complete");
 
-  if (savedComments.length > 0) {
-    let filename = "comments_" + url.split("v=", 2)[1] + ".json";
-    if (destination === "")
-      destination = __dirname + "/" + filename;
-    else
-      destination = destination + "/" + filename;
+  if (!settings.save)
+    return;
 
-    if (settings.prettyPrint)
-      fs.writeFileSync(destination, JSON.stringify(savedComments, null, 2));
-    else
-      fs.writeFileSync(destination, JSON.stringify(savedComments));
-    
-    console.log("Saved as " + destination);
+  if (savedComments.length === 0) {
+    console.log("No comments found. No save made.");
+    return;
   }
-  else {
-    if (settings.save)
-      console.log("No comments found. No save made.");
-  }
+
+  let filename = "comments_" + settings.url.split("v=", 2)[1];
+  let filepath = handleSaveJSON(filename, savedComments, settings);
+  console.log("Saved as " + filepath);
+  
 }
 
 

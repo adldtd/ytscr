@@ -11,7 +11,36 @@ const errorCodes = commands.errorCodes;
 //*********************************************************************************
 function cli(args) {
 
-  let settings = {url: "", destination: "", timeout: 1000, selectors: [], include: {}};
+  //Initialize default values
+  let settings = {
+    url: "",
+
+    newestFirst: false,
+    save: true,
+    saveOnlyMatch: false,
+    prettyprint: true,
+
+    useReplies: true,
+    replyFiltering: true,
+
+    logMatch: false,
+    limit: Number.POSITIVE_INFINITY,
+    limitMatch: Number.POSITIVE_INFINITY,
+
+    selectors: [],
+    include: {
+      author: true,
+      text: true,
+      id: true,
+      published: true,
+      votes: true,
+      picture: true,
+      channel: true
+    },
+
+    destination: "",
+    timeout: 1000
+  };
 
   let currentState = //Used to pass CLI tracking variables to individual CLI functions
   {
@@ -78,17 +107,7 @@ function cli(args) {
   if (currentState.err)
     return -1;
 
-
-  if (!("newestFirst" in settings)) settings.newestFirst = false; //Default values
-  if (!("save" in settings)) settings.save = true;
-  if (!("saveOnlyMatch" in settings)) settings.saveOnlyMatch = false;
-  if (!("prettyPrint" in settings)) settings.prettyPrint = true;
-  if (!("useReplies" in settings)) settings.useReplies = true;
-  if (!("replyFiltering" in settings)) settings.replyFiltering = true;
-  if (!("logMatch" in settings)) settings.logMatch = false;
-  if (!("limit" in settings)) settings.limit = Number.POSITIVE_INFINITY;
-  if (!("limitMatch" in settings)) settings.limitMatch = Number.POSITIVE_INFINITY;
-
+  //Print all warnings
   if (settings.save === false && settings.saveOnlyMatch === true) {
     settings.saveOnlyMatch = false;
     console.log("WARNING: Argument -savefilter conflicts with -nosave; no information will be saved.");
@@ -102,7 +121,7 @@ function cli(args) {
     console.log("WARNING: Limit is lower than limitfilter; scraping will end before the filter limit can be reached.");
   }
 
-  if (settings.save === false && settings.prettyPrint === false)
+  if (settings.save === false && settings.prettyprint === false)
     console.log("WARNING: Argument -nopretty conflicts with -nosave; no information will be saved.");
   if (!settings.logMatch && !settings.save)
     console.log("WARNING: Scraped information will neither be saved nor displayed on-screen.");

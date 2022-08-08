@@ -257,7 +257,7 @@ function nosaveCall(a, v, settings, currentState) {
 
 function noprettyCall(a, v, settings, currentState) {
   if (!currentState.inFilter)
-    settings.prettyPrint = false;
+    settings.prettyprint = false;
   else
     currentState.err = errorCodes(2, a);
 }
