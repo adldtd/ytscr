@@ -6,6 +6,11 @@ const handleSaveJSON = require(path.join(__dirname, "..", "helpers")).handleSave
 const clearLastLine = require(path.join(__dirname, "..", "helpers")).clearLastLine;
 
 
+  /*********************************************/
+ /* The scraping function for the chat module */
+/*********************************************/
+
+
 //*********************************************************************************
 //Retrieves the first bunch of chat messages for processing, and configures config
 //for POST requests in the future
@@ -98,10 +103,14 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
       if (!("authorName" in innerMessage)) //Not a written message
         continue;
 
-      let singleMessage = getMessageData(innerMessage, {});
-
-      if ("videoOffsetTimeMsec" in messages[m].replayChatItemAction)
+      let timestamp = "0";
+      if ("videoOffsetTimeMsec" in messages[m].replayChatItemAction) {
+        //This value is needed both to ask for the next request, and to place in the collected message data
+        timestamp = messages[m].replayChatItemAction.videoOffsetTimeMsec;
         config.data.currentPlayerState.playerOffsetMs = messages[m].replayChatItemAction.videoOffsetTimeMsec;
+      }
+
+      let singleMessage = getMessageData(innerMessage, timestamp, {});
 
       savedMessages.push(singleMessage);
       counter++;
@@ -127,7 +136,7 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
 //*********************************************************************************
 //Crunch message data into simpler parts
 //*********************************************************************************
-function getMessageData(innerMessage, ignore = {}) {
+function getMessageData(innerMessage, timestamp, ignore = {}) {
   
   let singleMessage = {};
 
@@ -147,8 +156,12 @@ function getMessageData(innerMessage, ignore = {}) {
   if ("id" in ignore ? !ignore.id : true) //***************************************SEE IF THIS IS EVEN USEFUL
     singleMessage.id = innerMessage.id;
 
-  if ("timestamp" in ignore ? !ignore.timestamp : true)
-    singleMessage.timestamp = innerMessage.timestampText.simpleText;
+  if ("timestamp" in ignore ? !ignore.timestamp : true) {
+    if (timestamp === "0") //When the timestamp text is negative/zero, the msec numerical timestamp is always 0
+      timestamp = timestampTextToMsec(innerMessage.timestampText.simpleText); //Less accurate than standard msec
+    singleMessage.timestamp = timestamp;
+  }
+  //singleMessage.timestamp = innerMessage.timestampText.simpleText;
 
   if ("picture" in ignore ? !ignore.picture : true) {
     let pictures = innerMessage.authorPhoto.thumbnails;
@@ -159,6 +172,30 @@ function getMessageData(innerMessage, ignore = {}) {
     singleMessage.channel = innerMessage.authorExternalChannelId;
 
   return singleMessage;
+}
+
+
+//*********************************************************************************
+//Helper function to convert timestamp text to a numerical value; used by
+//getMessageData when there is a negative timestamp text
+//*********************************************************************************
+function timestampTextToMsec(timestampText) {
+  
+  let time = 0;
+  let sign = 1;
+  let divisions = timestampText.split(":");
+
+  for (let i = 0; i < divisions.length; i++)
+    divisions[i] = parseInt(divisions[i]);
+  if (divisions[0] < 0) //Negative
+    sign = -1;
+
+  if (divisions.length === 3) //hh:mm::ss
+    time = (divisions[0] * 3600000) + (divisions[1] * 60000 * sign) + (divisions[2] * 1000 * sign);
+  else if (divisions.length === 2) //mm:ss
+    time = (divisions[0] * 60000) + (divisions[1] * 1000 * sign);
+  
+  return (time + "");
 }
 
 

@@ -15,31 +15,25 @@ function cli(args) {
   let settings = {
     url: "",
 
-    newestFirst: false,
     save: true,
-    saveOnlyMatch: false,
     prettyprint: true,
+    savefilter: false,
+    printfilter: false,
 
-    useReplies: true,
-    replyFiltering: true,
+    lim: Number.POSITIVE_INFINITY,
+    limfilter: Number.POSITIVE_INFINITY,
 
-    logMatch: false,
-    limit: Number.POSITIVE_INFINITY,
-    limitMatch: Number.POSITIVE_INFINITY,
-
-    selectors: [],
-    include: {
-      author: true,
-      text: true,
-      id: true,
-      published: true,
-      votes: true,
-      picture: true,
-      channel: true
+    filter: [],
+    ignore: {
+      author: false,
+      text: false,
+      id: false,
+      timestamp: false,
+      picture: false,
+      channel: false
     },
 
-    destination: "",
-    timeout: 1000
+    destination: ""
   };
 
   let currentState = //Used to pass CLI tracking variables to individual CLI functions
@@ -51,6 +45,7 @@ function cli(args) {
     err: false //Stops the CLI if made true
   };
 
+  //Argument parsing
   for (let i = 3; i < args.length; i++) {
 
     let a = ""; let v = "";
@@ -69,7 +64,7 @@ function cli(args) {
 
       if (currentState.helpCMD) {
 
-        if (i === args.length - 1) { //Expected for there to be either 0 or 1 inputs to the help command
+        if (i === args.length - 1) {
           if ("description" in commandObject) {
             helpers.outputHelp(a, commandObject);
             currentState.helpCMD = false;
@@ -94,6 +89,7 @@ function cli(args) {
 
   }
 
+
   if (currentState.helpCMD) {
     helpers.outputHelpAll(cmd);
     return -1;
@@ -108,33 +104,30 @@ function cli(args) {
     return -1;
 
   //Print all warnings
-  if (settings.save === false && settings.saveOnlyMatch === true) {
-    settings.saveOnlyMatch = false;
+  if (settings.save === false && settings.savefilter === true) {
+    settings.savefilter = false;
     console.log("WARNING: Argument -savefilter conflicts with -nosave; no information will be saved.");
   }
   if (settings.save === false && settings.destination !== "") {
     settings.destination = "";
     console.log("WARNING: A destination is given but -nosave is present; no information will be saved.");
   }
-  if ((settings.limit !== Number.POSITIVE_INFINITY && settings.limitMatch !== Number.POSITIVE_INFINITY) && settings.limit < settings.limitMatch) {
-    settings.limitMatch = settings.limit;
+  if ((settings.lim !== Number.POSITIVE_INFINITY && settings.limfilter !== Number.POSITIVE_INFINITY) && settings.lim < settings.limfilter) {
+    settings.limfilter = settings.lim;
     console.log("WARNING: Limit is lower than limitfilter; scraping will end before the filter limit can be reached.");
   }
 
   if (settings.save === false && settings.prettyprint === false)
     console.log("WARNING: Argument -nopretty conflicts with -nosave; no information will be saved.");
-  if (!settings.logMatch && !settings.save)
+  if (!settings.printfilter && !settings.save)
     console.log("WARNING: Scraped information will neither be saved nor displayed on-screen.");
-  if (settings.logMatch && settings.selectors.length === 0)
+  if (settings.printfilter && settings.filter.length === 0)
     console.log("WARNING: Argument -printfilter is given, but no filters are applied; all comments will be printed on-screen.");
-  if (settings.limitMatch !== Number.POSITIVE_INFINITY && settings.selectors.length === 0)
+  if (settings.limfilter !== Number.POSITIVE_INFINITY && settings.filter.length === 0)
     console.log("WARNING: Argument limfilter is given, but no filters are applied; limitfilter will be treated as the normal filter.");
-  if (!settings.useReplies && !settings.replyFiltering)
-    console.log("WARNING: Argument -noreply conflicts with -nrf; no replies will be scraped.");
-  if (!settings.replyFiltering && settings.selectors.length === 0 && settings.limitMatch !== Number.POSITIVE_INFINITY)
-    console.log("WARNING: -nrf mode enabled, but no filters set; thus all replies will not be counted up to limitfilter.");
 
   return settings;
+
 }
 
 

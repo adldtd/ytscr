@@ -4,9 +4,9 @@ const helpers = require(path.join(__dirname, "..", "helpers"));
 const errorCodes = require(path.join(__dirname, "..", "errors")).errorCodes;
 
 
-  /****************************************************************************/
- /* Arguments + commands and corresponding functions for the comments module */
-/****************************************************************************/
+  /************************************************************************/
+ /* Arguments + commands and corresponding functions for the chat module */
+/************************************************************************/
 
 
 const cmd = {
@@ -17,7 +17,7 @@ const cmd = {
     simpleDescription: "Displays argument information",
     description: "A command which takes in an argument name as the next input. By specifiying a valid argument, " +
     "the program will print info, as well as the usability of that arg.",
-    examples: ["help input", "help -nrf"],
+    examples: ["help input", "help dest"],
     call: helpCall
   },
 
@@ -26,20 +26,10 @@ const cmd = {
   {
     aliases: ["input", "i"],
     simpleDescription: "A YouTube video link",
-    description: "Specifies the video link from where to scrape comments. Can either be a normal YouTube link, " +
+    description: "Specifies the video link from where to scrape messages. Can either be a normal YouTube link, " +
     "a shorts link, a \"youtu.be\" link, or a video ID.",
     examples: ["input=https://www.youtube.com/watch?v=jNQXAC9IVRw", "i=youtu.be/jNQXAC9IVRw", "i=jNQXAC9IVRw"],
     call: inputCall
-  },
-
-  "-new": {redirect: "-newest"},
-  "-newest":
-  {
-    aliases: ["-newest", "-new"],
-    simpleDescription: "Searches newest comments first",
-    description: "Sets \"SORT BY\" to \"newest first.\" NOTE: Pinned comments will still appear at the top, " +
-    "regardless of date.",
-    call: newestCall
   },
 
   "-NS": {redirect: "-nosave"},
@@ -66,8 +56,8 @@ const cmd = {
   {
     aliases: ["-savefilter", "-sf"],
     simpleDescription: "Only saves filter matches",
-    description: "A flag that restricts the scraper to saving a comment ONLY IF it matches the user given " +
-    "filters. If no filters are specified, then every comment will be saved (as usual).",
+    description: "A flag that restricts the scraper to saving a message ONLY IF it matches the user given " +
+    "filters. If no filters are specified, then every message will be saved (as usual).",
     call: savefilterCall
   },
 
@@ -76,38 +66,18 @@ const cmd = {
   {
     aliases: ["-printfilter", "-pf"],
     simpleDescription: "Prints out filter matches",
-    description: "A flag that causes the scraper to print comments which match given filters.",
+    description: "A flag that causes the scraper to print messages which match given filters.",
     call: printfilterCall
-  },
-
-  "-NR": {redirect: "-noreply"},
-  "-noreply":
-  {
-    aliases: ["-noreply", "-NR"],
-    simpleDescription: "Stops the program from considering replies",
-    description: "When present, the program will not collect/print any replies to a comment.",
-    call: noreplyCall
-  },
-
-  "-nrf":
-  {
-    aliases: ["-nrf"],
-    simpleDescription: "Enters a special mode where replies are unfiltered",
-    description: "As standard, the scraper applies filters to both comments and replies. When this flag is " +
-    "present, however, if the program \"matches\" a comment, it will automatically match all of its replies. " +
-    "If the comment fails the filter, it will still try to match its replies, one by one. This flag may " +
-    "be useful when searching for questions - as well as answers - on a YouTube video.",
-    call: nrfCall
   },
 
   "l": {redirect: "lim"},
   "lim":
   {
     aliases: ["lim", "l"],
-    simpleDescription: "Limits the amount of comments scraped",
+    simpleDescription: "Limits the amount of messages scraped",
     description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
-    "as a positive integer. If this argument is not present, the scraper will not stop until all comments are " +
-    "retrieved. NOTE: The value entered limits the scraper based on how many comments were checked, " +
+    "as a positive integer. If this argument is not present, the scraper will not stop until all messages are " +
+    "retrieved. NOTE: The value entered limits the scraper based on how many messages were checked, " +
     "not how many matched the filters (see limfilter).",
     examples: ["lim=100", "l=27"],
     call: limCall
@@ -117,10 +87,9 @@ const cmd = {
   "limfilter":
   {
     aliases: ["limfilter", "lf"],
-    simpleDescription: "Limits the amount of \"matching\" comments",
+    simpleDescription: "Limits the amount of \"matching\" messages",
     description: "An argument which stops the scraper once enough match the filters. Should be defined as a " +
-    "positive integer. If this is not defined, the scraper will preform matches without a threshold. NOTE: " +
-    "If flag -nrf is present, all replies that are automatically matched will NOT be counted as such.",
+    "positive integer. If this is not defined, the scraper will preform matches without a threshold.",
     examples: ["limfilter=50", "lf=5"],
     call: limfilterCall
   },
@@ -129,7 +98,7 @@ const cmd = {
   "filter":
   {
     aliases: ["filter", "f"],
-    simpleDescription: "Used to filter comments based on attributes",
+    simpleDescription: "Used to filter messages based on attributes",
     description: "Begins a \"filter object,\" where arguments define the filter's attributes. A filter's first " +
     "argument is always an opening bracket, and is later ended by a closing bracket. An indefinite amount " +
     "of filter objects can be created, each with different attributes and properties, to narrow down a search.",
@@ -144,7 +113,12 @@ const cmd = {
     simpleDescription: "Filter arg; defines which attribute to check",
     description: "Used exclusively in a filter object; the value entered is the attribute to inspect and filter. " +
     "Values that are listed as \"num\" are numerical; in that case \"match\" must be defined as an integer.",
-    validValues: {"author": "str", "text": "str", "id": "str", "published": "str", "votes": "num", "picture": "str", "channel": "str"},
+    validValues: {"author": "str",
+                  "text": "str",
+                  "id": "str",
+                  "timestamp": "num",
+                  "picture": "str",
+                  "channel": "str"},
     examples: ["check=text", "check=votes"],
     call: checkCall
   },
@@ -168,7 +142,12 @@ const cmd = {
     "compared with the match one. Str and num \"check\" values have different valid values. NOTE: By default, " +
     "not calling the argument will result in a compare value of \"\", meaning, for a num value, compare must be " +
     "defined.",
-    validValues: {"":"", "=":"", "<":"", ">":"", "<=":"", ">=":""},
+    validValues: {"":"",
+                  "=":"",
+                  "<":"",
+                  ">":"",
+                  "<=":"",
+                  ">=":""},
     examples: ["compare=\"=\"", "compare=", "compare=>="],
     call: compareCall
   },
@@ -191,11 +170,16 @@ const cmd = {
   "ignore":
   {
     aliases: ["ignore"],
-    simpleDescription: "Specifies a comment attribute to ignore",
-    description: "Removes a comment attribute from \"consideration\" while scraping. This means that the " +
+    simpleDescription: "Specifies a message attribute to ignore",
+    description: "Removes a message attribute from \"consideration\" while scraping. This means that the " +
     "attribute will not be saved, printed, and cannot be filtered during execution. May be defined an " +
     "indefinite amount of times, each with a different attribute.",
-    validValues: {"author":"", "text":"", "id":"", "published":"", "votes":"", "picture":"", "channel":""},
+    validValues: {"author": "",
+                  "text": "",
+                  "id": "",
+                  "timestamp": "",
+                  "picture": "",
+                  "channel": ""},
     examples: ["ignore=\"id\"", "ignore=text"],
     call: ignoreCall
   },
@@ -211,7 +195,7 @@ const cmd = {
     call: destCall
   }
 
-};
+}
 
 
 
@@ -244,13 +228,6 @@ function inputCall(a, v, settings, currentState) {
     currentState.err = errorCodes(2, a);
 }
 
-function newestCall(a, v, settings, currentState) {
-  if (!currentState.inFilter)
-    settings.newestFirst = true;
-  else
-    currentState.err = errorCodes(2, a);
-}
-
 function nosaveCall(a, v, settings, currentState) {
   if (!currentState.inFilter)
     settings.save = false;
@@ -267,28 +244,14 @@ function noprettyCall(a, v, settings, currentState) {
 
 function savefilterCall(a, v, settings, currentState) {
   if (!currentState.inFilter)
-    settings.saveOnlyMatch = true;
+    settings.savefilter = true;
   else
     currentState.err = errorCodes(2, a);
 }
 
 function printfilterCall(a, v, settings, currentState) {
   if (!currentState.inFilter)
-    settings.logMatch = true;
-  else
-    currentState.err = errorCodes(2, a);
-}
-
-function noreplyCall(a, v, settings, currentState) {
-  if (!currentState.inFilter)
-    settings.useReplies = false;
-  else
-    currentState.err = errorCodes(2, a);
-}
-
-function nrfCall(a, v, settings, currentState) {
-  if (!currentState.inFilter)
-    settings.replyFiltering = false;
+    settings.printfilter = true;
   else
     currentState.err = errorCodes(2, a);
 }
@@ -299,7 +262,7 @@ function limCall(a, v, settings, currentState) {
     if (!isNaN(parseInt(v))) {
       v = parseInt(v);
       if (v > 0)
-        settings.limit = v;
+        settings.lim = v;
       else
         currentState.err = errorCodes(15, a, v);
     } else
@@ -314,7 +277,7 @@ function limfilterCall(a, v, settings, currentState) {
     if (!isNaN(parseInt(v))) {
       v = parseInt(v);
       if (v > 0)
-        settings.limitMatch = v;
+        settings.limfilter = v;
       else
         currentState.err = errorCodes(15, a, v);
     } else
@@ -375,7 +338,7 @@ function compareCall(a, v, settings, currentState) {
 
 function casesensitiveCall(a, v, settings, currentState) {
   if (currentState.inFilter)
-    currentState.currentFilter.caseSensitive = true;
+    currentState.currentFilter.casesensitive = true;
   else
     currentState.err = errorCodes(4, a);
 }
@@ -423,13 +386,13 @@ function closingbracketCall(a, v, settings, currentState) {
     }
     
   }
-  if (currentState.currentFilter.check in settings.include && !settings.include[currentState.currentFilter.check]) {
+  if (currentState.currentFilter.check in settings.ignore && settings.ignore[currentState.currentFilter.check]) {
     currentState.err = errorCodes(12, a, currentState.currentFilter.check);
     return;
   }
 
   currentState.usedFilterCheckValues[currentState.currentFilter.check] = "";
-  settings.selectors.push(currentState.currentFilter);
+  settings.filter.push(currentState.currentFilter);
   currentState.currentFilter = {};
   currentState.inFilter = false;
 }
@@ -439,7 +402,7 @@ function ignoreCall(a, v, settings, currentState) {
   if (!currentState.inFilter) {
     if (v in cmd.ignore.validValues) {
       if (!(v in currentState.usedFilterCheckValues))
-        settings.include[v] = false;
+        settings.ignore[v] = true;
       else
         currentState.err = errorCodes(12, a, v);
     } else {
