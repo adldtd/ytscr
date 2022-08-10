@@ -33,7 +33,8 @@ function cli(args) {
       channel: false
     },
 
-    destination: ""
+    destination: "",
+    timeout: 1000
   };
 
   let currentState = //Used to pass CLI tracking variables to individual CLI functions

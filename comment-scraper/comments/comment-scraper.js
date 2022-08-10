@@ -467,8 +467,7 @@ async function collectComments(settings) {
     else
       console.log("No comments found.");
     return;
-  } else
-    console.log("\n");
+  }
   
   //Start scraping
   let inner_api_key = resp.data.split('"INNERTUBE_API_KEY":"', 2)[1].split('"')[0];
@@ -478,6 +477,7 @@ async function collectComments(settings) {
   config.url = commentUrl;
   config.data.continuation = continuation_id;
   
+  console.log("\n");
   let savedComments = await scrapeComments(continuation_id, config, timeout, settings);
   console.log("Complete");
 

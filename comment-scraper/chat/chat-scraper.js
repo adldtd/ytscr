@@ -80,8 +80,10 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
 
     //Navigate through the data retrieved
     let messages = pureData.continuationContents.liveChatContinuation;
-    if (!("actions" in messages))
+    if (!("actions" in messages)) {
+      fs.writeFileSync("analysis6.json", JSON.stringify(pureData, null, 2));
       return savedMessages; //Indicates the end of all chat
+    }
     messages = messages.actions;
 
     for (let m = 0; m < messages.length + 1; m++) {
@@ -89,7 +91,8 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
 
       //To make sure the counter does not go over a limit, and that no extraneous requests (after limit is reached) are made
       if (counter >= settings.lim || matchCounter >= settings.limfilter) {
-        console.log(counter);
+        clearLastLine();
+        console.log("Messages scraped: " + counter);
         hasContinuation = false;
         return savedMessages;
       } else if (m === messages.length)
@@ -110,9 +113,18 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
         config.data.currentPlayerState.playerOffsetMs = messages[m].replayChatItemAction.videoOffsetTimeMsec;
       }
 
-      let singleMessage = getMessageData(innerMessage, timestamp, {});
+      let singleMessage = getMessageData(innerMessage, timestamp, settings.ignore);
+      let match = messageMatches(singleMessage, settings.filter);
 
-      savedMessages.push(singleMessage);
+      if (match) {
+        if (settings.printfilter)
+          printMessage(singleMessage);
+        matchCounter++;
+      }
+
+      if (match || !settings.savefilter) //If it matches or save match only is disabled
+        savedMessages.push(singleMessage);
+      
       counter++;
     }
 
@@ -125,7 +137,8 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
       }
     }
 
-    console.log(savedMessages.length);
+    clearLastLine();
+    console.log("Messages scraped: " + counter);
 
   }
 
@@ -200,6 +213,77 @@ function timestampTextToMsec(timestampText) {
 
 
 //*********************************************************************************
+//Check if a message matches all given filters
+//*********************************************************************************
+function messageMatches(singleMessage, filter) {
+
+  let returnMatch = true;
+
+  for (f in filter) {
+
+    let condition = filter[f];
+    if (condition.check !== "timestamp") {
+
+      let messageCheck = singleMessage[condition.check];
+      let conditionMatch = condition.match;
+      if ("casesensitive" in condition ? !condition.casesensitive : true) {
+        messageCheck = messageCheck.toLowerCase();
+        conditionMatch = conditionMatch.toLowerCase();
+      }
+
+      if (condition.compare === "=") //Exact match needed
+        returnMatch = messageCheck === conditionMatch;
+      else if (condition.compare === "")
+        returnMatch = messageCheck.includes(conditionMatch);
+    }
+    else {
+      
+      let messageCheck = parseInt(singleComment["timestamp"]);
+      switch (condition.compare) {
+        case "<":
+          returnMatch = messageCheck < parseInt(condition.match);
+          break;
+        case ">":
+          returnMatch = messageCheck > parseInt(condition.match);
+          break;
+        case "<=":
+          returnMatch = messageCheck <= parseInt(condition.match);
+          break;
+        case ">=":
+          returnMatch = messageCheck >= parseInt(condition.match);
+          break;
+        case "=":
+          returnMatch = messageCheck === parseInt(condition.match);
+          break;
+      }
+    }
+
+    if (!returnMatch)
+      break;
+  }
+
+  return returnMatch;
+}
+
+
+//*********************************************************************************
+//Prints a single message to the screen
+//*********************************************************************************
+function printMessage(singleMessage) {
+
+  clearLastLine();
+  console.log("-------------------------------------------------------------------");
+  for (att in singleMessage) {
+    if (att === "channel")
+      console.log("channel: " + "https://youtube.com/channel/" + singleMessage[att]);
+    else
+      console.log(att + ": " + singleMessage[att]);
+  }
+  console.log("-------------------------------------------------------------------\n\n");
+}
+
+
+//*********************************************************************************
 //Function to initialize and start the scraping process; to be called by the CLI
 //*********************************************************************************
 async function collectChat(settings) {
@@ -251,11 +335,22 @@ async function collectChat(settings) {
   }
 
   let initialData = JSON.parse(resp.data.substring(location + 20, resp.data.length).split(";</script><script nonce", 1)[0]);
-  
+  //console.log(initialData);
+  //fs.writeFileSync("analysis6.json", JSON.parse(initialData, null, 2));
+
   let live = false; //If the video requested is an ongoing stream
   if ("conversationBar" in initialData.contents.twoColumnWatchNextResults) { //Indicates the chat bar
     
     let bar = initialData.contents.twoColumnWatchNextResults.conversationBar;
+    if (!("liveChatRenderer" in bar)) {
+      console.log("\n" + bar.conversationBarRenderer.availabilityMessage.messageRenderer.text.runs[0].text);
+      if (settings.save)
+        console.log("No messages found. No save made.");
+      else
+        console.log("No messages found.");
+      return;
+    }
+
     live = ("isReplay" in bar.liveChatRenderer) ? !bar.liveChatRenderer.isReplay : true;
 
   } else {
@@ -288,6 +383,7 @@ async function collectChat(settings) {
   let inner_api_key = resp.data.split('"INNERTUBE_API_KEY":"', 2)[1].split('"')[0];
   let continuation_id = resp.data.split('"liveChatRenderer":{"continuations":[{"reloadContinuationData":{"continuation":"', 2)[1].split('"')[0];
 
+  console.log("\n");
   let savedMessages = await scrapeReplayChat(inner_api_key, continuation_id, config, settings.timeout, settings);
   console.log("Complete");
 
@@ -304,6 +400,10 @@ async function collectChat(settings) {
   console.log("Saved as " + filepath);
 
 }
+
+
+module.exports.scrape = collectChat;
+
 
 
 (async () => { //Main

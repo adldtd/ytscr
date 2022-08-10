@@ -1,8 +1,10 @@
 const path = require("path");
 
 const comments = require(path.join(__dirname, "..", "comments", "cli"));
+const chat = require(path.join(__dirname, "..", "chat", "cli"));
 
 const scrape_comments = require(path.join(__dirname, "..", "comments", "comment-scraper"));
+const scrape_chat = require(path.join(__dirname, "..", "chat", "chat-scraper"));
 
 
   /***********************************************************************/
@@ -30,6 +32,18 @@ const cmd = {
     examples: ["comments i=https://www.youtube.com/watch?v=jNQXAC9IVRw"],
     cli: comments.cli,
     scrape: scrape_comments.scrape
+  },
+
+  "chat": {
+    aliases: ["chat"],
+    simpleDescription: "Command for YouTube chat message scraping",
+    description: "A command which scrapes message data from a live chat. Requires one video as input (see \"" +
+    "chat help input\" for a more detailed description), which is/was a stream or a premiere with enabled " +
+    "chat. Records the author, the author id, the author image, the message text, the message id, and the " +
+    "timestamp (in milliseconds).",
+    examples: ["chat i=https://www.youtube.com/watch?v=1fueZCTYkpA"],
+    cli: chat.cli,
+    scrape: scrape_chat.scrape
   }
 
 }

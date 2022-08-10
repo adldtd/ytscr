@@ -188,9 +188,9 @@ const cmd = {
   "dest":
   {
     aliases: ["dest", "d"],
-    simpleDescription: "The folder where to save scraped comments",
-    description: "Specifies the folder where the saved comments are placed. The directory must exist and must be " +
-    "accessible by the scraper. By default, the script will place the file in its residing directory.",
+    simpleDescription: "The folder where to save scraped messages",
+    description: "Specifies the folder where the saved messages are placed. The directory must exist and must be " +
+    "accessible by the scraper. By default, the script will place the file in the /SAVES folder of the project.",
     examples: ["dest=\"C:/Users\"", "d=D:/MyFiles"],
     call: destCall
   }
