@@ -41,6 +41,16 @@ const cmd = {
     call: nosaveCall
   },
 
+  "-top": {redirect: "-topchat"},
+  "-topchat":
+  {
+    aliases: ["-topchat", "-top"],
+    simpleDescription: "Scrapes \"top chat replay\"",
+    description: "When present, the scraper switches the chat to \"top replay\" mode, which means YouTube will " +
+    "filter out some potential spam. By default, the chat is on \"live replay\" mode; all messages are sent.",
+    call: topchatCall
+  },
+
   "-np": {redirect: "-nopretty"},
   "-nopretty":
   {
@@ -231,6 +241,13 @@ function inputCall(a, v, settings, currentState) {
 function nosaveCall(a, v, settings, currentState) {
   if (!currentState.inFilter)
     settings.save = false;
+  else
+    currentState.err = errorCodes(2, a);
+}
+
+function topchatCall(a, v, settings, currentState) {
+  if (!currentState.inFilter)
+    settings.topchat = true;
   else
     currentState.err = errorCodes(2, a);
 }

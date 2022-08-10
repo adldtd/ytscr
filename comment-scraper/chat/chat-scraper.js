@@ -39,7 +39,6 @@ async function scrapeReplayInitialResponse(inner_api_key, continuation_id, confi
   }
 
   pureData = JSON.parse(pureData.substring(0, location)); //Complete
-  //fs.writeFileSync("analysis4.json", JSON.stringify(pureData, null, 2));
 
   //Reconfigure config
   config.url = "https://www.youtube.com/youtubei/v1/live_chat/get_live_chat_replay?key=" + inner_api_key + "&prettyPrint=false";
@@ -48,7 +47,7 @@ async function scrapeReplayInitialResponse(inner_api_key, continuation_id, confi
   config.data.context.client.originalUrl = settings.url;
   config.data.context.client.mainAppWebInfo.graftUrl = settings.url;
 
-  config.data.currentPlayerState = {playerOffsetMs: "__________"};
+  config.data.currentPlayerState = {playerOffsetMs: "0"};
   return pureData;
 }
 
@@ -76,14 +75,29 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
     } else {
       pureData = await scrapeReplayInitialResponse(inner_api_key, continuation_id, config, timeout, settings);
       if (pureData === -1) return savedMessages;
+
+      //Decide whether to make an additional request for either top or live messages
+      let selectors = pureData.continuationContents.liveChatContinuation.header.liveChatHeaderRenderer.viewSelector.sortFilterSubMenuRenderer.subMenuItems;
+      for (s in selectors) {
+
+        if ((selectors[s].title === "Top chat replay" && settings.topchat && !selectors[s].selected) ||
+            (selectors[s].title === "Live chat replay" && !settings.topchat && !selectors[s].selected)) {
+
+          //Either switch to top chat or to live chat (when not already selected)
+          config.data.continuation = selectors[s].continuation.reloadContinuationData.continuation;
+          resp = await makeRequest(config, timeout, 1);
+          if (resp === -1) return savedMessages;
+          pureData = resp.data;
+
+        }
+      }
+
     }
 
     //Navigate through the data retrieved
     let messages = pureData.continuationContents.liveChatContinuation;
-    if (!("actions" in messages)) {
-      fs.writeFileSync("analysis6.json", JSON.stringify(pureData, null, 2));
+    if (!("actions" in messages))
       return savedMessages; //Indicates the end of all chat
-    }
     messages = messages.actions;
 
     for (let m = 0; m < messages.length + 1; m++) {
@@ -198,10 +212,10 @@ function timestampTextToMsec(timestampText) {
   let sign = 1;
   let divisions = timestampText.split(":");
 
+  if (divisions[0].substring(0, 1) === "-") //Negative
+    sign = -1;
   for (let i = 0; i < divisions.length; i++)
     divisions[i] = parseInt(divisions[i]);
-  if (divisions[0] < 0) //Negative
-    sign = -1;
 
   if (divisions.length === 3) //hh:mm::ss
     time = (divisions[0] * 3600000) + (divisions[1] * 60000 * sign) + (divisions[2] * 1000 * sign);
@@ -335,8 +349,6 @@ async function collectChat(settings) {
   }
 
   let initialData = JSON.parse(resp.data.substring(location + 20, resp.data.length).split(";</script><script nonce", 1)[0]);
-  //console.log(initialData);
-  //fs.writeFileSync("analysis6.json", JSON.parse(initialData, null, 2));
 
   let live = false; //If the video requested is an ongoing stream
   if ("conversationBar" in initialData.contents.twoColumnWatchNextResults) { //Indicates the chat bar
@@ -403,9 +415,3 @@ async function collectChat(settings) {
 
 
 module.exports.scrape = collectChat;
-
-
-
-(async () => { //Main
-
-})();

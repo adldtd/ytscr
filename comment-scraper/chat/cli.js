@@ -17,6 +17,8 @@ function cli(args) {
 
     save: true,
     prettyprint: true,
+    topchat: false,
+
     savefilter: false,
     printfilter: false,
 
