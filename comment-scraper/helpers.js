@@ -40,18 +40,18 @@ function outputHelp(arg, commandObject) {
   console.log(commandObject.description);
 
   if ("validValues" in commandObject) {
-    if (commandObject.aliases[0] !== "compare") { //Special case
+    if (commandObject.aliases[0] !== "compare") { //Special case; hardcoded
       console.log("");
       outputValidValues(commandObject.aliases[0], commandObject.validValues);
     } else {
       console.log("\nThe valid values for argument \"compare\" (str) are:");
-      for (valid in {"":"", "=":""})
-        console.log("\t\"" + valid + "\"");
+      for (valid in {"in":"", "eq":""})
+        console.log("\t\"" + valid + "\" (" + commandObject.validValues[valid] + ")");
 
       console.log("\nThe valid values for argument \"compare\" (num) are:");
       for (valid in commandObject.validValues) {
-        if (valid !== "")
-          console.log("\t\"" + valid + "\"");
+        if (valid !== "in")
+          console.log("\t\"" + valid + "\" (" + commandObject.validValues[valid] + ")");
       }
     }
   }

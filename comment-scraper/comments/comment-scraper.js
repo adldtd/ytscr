@@ -274,29 +274,29 @@ function commentMatches(singleComment, selectors) {
         conditionMatch = conditionMatch.toLowerCase();
       }
 
-      if (condition.compare === "=") //Exact match needed
+      if (condition.compare === "eq") //Exact match needed
         returnMatch = commentCheck === conditionMatch;
-      else if (condition.compare === "")
+      else if (condition.compare === "in")
         returnMatch = commentCheck.includes(conditionMatch);
     }
     else {
       
       let commentCheck = votesToNum(singleComment["votes"]);
       switch (condition.compare) {
-        case "<":
-          returnMatch = commentCheck < condition.match;
+        case "less":
+          returnMatch = commentCheck < parseInt(condition.match);
           break;
-        case ">":
-          returnMatch = commentCheck > condition.match;
+        case "greater":
+          returnMatch = commentCheck > parseInt(condition.match);
           break;
-        case "<=":
-          returnMatch = commentCheck <= condition.match;
+        case "lesseq":
+          returnMatch = commentCheck <= parseInt(condition.match);
           break;
-        case ">=":
-          returnMatch = commentCheck >= condition.match;
+        case "greatereq":
+          returnMatch = commentCheck >= parseInt(condition.match);
           break;
-        case "=":
-          returnMatch = commentCheck === condition.match;
+        case "eq":
+          returnMatch = commentCheck === parseInt(condition.match);
           break;
       }
     }

@@ -73,7 +73,7 @@ function cli(args) {
           if ("description" in commandObject) {
             helpers.outputHelp(a, commandObject);
             currentState.helpCMD = false;
-            return -1;
+            return 1;
           } else
             currentState.err = errorCodes(99, a);
         } else
@@ -96,7 +96,7 @@ function cli(args) {
 
   if (currentState.helpCMD) {
     helpers.outputHelpAll(cmd);
-    return -1;
+    return 1;
   }
 
   if (settings.url === "")

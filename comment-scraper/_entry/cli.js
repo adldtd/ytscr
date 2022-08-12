@@ -20,18 +20,21 @@ function cli(args) {
         
         let a2 = args[3];
         if (a2 in cmd) {
-          if (args.length === 4)
+          if (args.length === 4) {
             helpers.outputHelp(a2, cmd[a2]);
-          else
+            return 1;
+          } else {
             console.log("Error: Extraneous arguments for command \"help\"");
-        } else
+            return -1
+          }
+        } else {
           console.log("Error: Invalid command \"" + a2 + "\"");
-        
-        return -1;
+          return -1;
+        }
 
       } else {
         helpers.outputHelpAll(cmd);
-        return -1;
+        return 1;
       }
       
     } else if (a in cmd) {

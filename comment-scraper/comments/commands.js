@@ -168,8 +168,13 @@ const cmd = {
     "compared with the match one. Str and num \"check\" values have different valid values. NOTE: By default, " +
     "not calling the argument will result in a compare value of \"\", meaning, for a num value, compare must be " +
     "defined.",
-    validValues: {"":"", "=":"", "<":"", ">":"", "<=":"", ">=":""},
-    examples: ["compare=\"=\"", "compare=", "compare=>="],
+     validValues: {"in":"If match is located inside value",
+                  "eq":"If match and value are equal",
+                  "less":"If value < match",
+                  "greater":"If value > match",
+                  "lesseq":"If value <= match",
+                  "greatereq":"If value >= match"},
+    examples: ["compare=\"in\"", "compare=eq", "compare=greatereq"],
     call: compareCall
   },
 
@@ -404,7 +409,7 @@ function closingbracketCall(a, v, settings, currentState) {
     }
     if (!(currentState.currentFilter.compare in cmd.compare.validValues) || currentState.currentFilter.compare === "") {
       currentState.err = errorCodes(9, a, currentState.currentFilter.compare);
-      helpers.outputValidValues("compare", cmd.compare.validValues, {"":""});
+      helpers.outputValidValues("compare", cmd.compare.validValues, {"in":""});
       return;
     }
     if (isNaN(parseInt(currentState.currentFilter.match))) {
@@ -418,7 +423,7 @@ function closingbracketCall(a, v, settings, currentState) {
       currentState.currentFilter.compare = ""; //Default value
     else if (!(currentState.currentFilter.compare in cmd.compare.validValues) || (currentState.currentFilter.compare !== "=" && currentState.currentFilter.compare !== "")) {
       currentState.err = errorCodes(11, a, currentState.currentFilter.compare);
-      helpers.outputValidValues("compare", cmd.compare.validValues, {"<":"", ">":"", "<=":"", ">=":""});
+      helpers.outputValidValues("compare", cmd.compare.validValues, {"less":"", "greater":"", "lesseq":"", "greatereq":""});
       return;
     }
     

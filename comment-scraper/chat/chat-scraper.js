@@ -245,28 +245,28 @@ function messageMatches(singleMessage, filter) {
         conditionMatch = conditionMatch.toLowerCase();
       }
 
-      if (condition.compare === "=") //Exact match needed
+      if (condition.compare === "eq") //Exact match needed
         returnMatch = messageCheck === conditionMatch;
-      else if (condition.compare === "")
+      else if (condition.compare === "in")
         returnMatch = messageCheck.includes(conditionMatch);
     }
     else {
       
       let messageCheck = parseInt(singleComment["timestamp"]);
       switch (condition.compare) {
-        case "<":
+        case "less":
           returnMatch = messageCheck < parseInt(condition.match);
           break;
-        case ">":
+        case "greater":
           returnMatch = messageCheck > parseInt(condition.match);
           break;
-        case "<=":
+        case "lesseq":
           returnMatch = messageCheck <= parseInt(condition.match);
           break;
-        case ">=":
+        case "greatereq":
           returnMatch = messageCheck >= parseInt(condition.match);
           break;
-        case "=":
+        case "eq":
           returnMatch = messageCheck === parseInt(condition.match);
           break;
       }
