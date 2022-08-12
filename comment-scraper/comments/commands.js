@@ -407,7 +407,7 @@ function closingbracketCall(a, v, settings, currentState) {
       currentState.err = errorCodes(8, a, currentState.currentFilter.check);
       return;
     }
-    if (!(currentState.currentFilter.compare in cmd.compare.validValues) || currentState.currentFilter.compare === "") {
+    if (!(currentState.currentFilter.compare in cmd.compare.validValues) || currentState.currentFilter.compare === "in") {
       currentState.err = errorCodes(9, a, currentState.currentFilter.compare);
       helpers.outputValidValues("compare", cmd.compare.validValues, {"in":""});
       return;
@@ -421,7 +421,7 @@ function closingbracketCall(a, v, settings, currentState) {
 
     if (!("compare" in currentState.currentFilter))
       currentState.currentFilter.compare = ""; //Default value
-    else if (!(currentState.currentFilter.compare in cmd.compare.validValues) || (currentState.currentFilter.compare !== "=" && currentState.currentFilter.compare !== "")) {
+    else if (!(currentState.currentFilter.compare in cmd.compare.validValues) || (currentState.currentFilter.compare !== "eq" && currentState.currentFilter.compare !== "in")) {
       currentState.err = errorCodes(11, a, currentState.currentFilter.compare);
       helpers.outputValidValues("compare", cmd.compare.validValues, {"less":"", "greater":"", "lesseq":"", "greatereq":""});
       return;

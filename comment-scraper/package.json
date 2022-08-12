@@ -17,7 +17,7 @@
     "mime-types": "^2.1.35"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --silent ./_tests"
   },
   "keywords": [
     "youtube",
@@ -26,5 +26,8 @@
     "scraper"
   ],
   "author": "adldtd",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^28.1.3"
+  }
 }
