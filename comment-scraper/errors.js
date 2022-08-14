@@ -12,7 +12,7 @@ function errorCodes(code, arg, value = "") {
       console.log("Error: Invalid youtube link \"" + value + "\"");
       break;
     case -1: //Multiple inputs
-      console.log("Error: Must specify only one input link");
+      console.log("Error: Must specify only one video link");
       break;
     
     case 2: //Non-filter argument
@@ -73,7 +73,7 @@ function errorCodes(code, arg, value = "") {
       break;
 
     case 100: //No input specified
-      console.log("Error: No input link specified");
+      console.log("Error: No video link specified");
       break;
     case 101: //Bracket unclosed
       console.log("Error: Filter unclosed; needs an ending bracket \"}\"");

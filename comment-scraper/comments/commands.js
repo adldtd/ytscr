@@ -21,15 +21,15 @@ const cmd = {
     call: helpCall
   },
 
-  "i": {redirect: "input"},
-  "input":
+  "v": {redirect: "video"},
+  "video":
   {
-    aliases: ["input", "i"],
+    aliases: ["video", "v"],
     simpleDescription: "A YouTube video link",
     description: "Specifies the video link from where to scrape comments. Can either be a normal YouTube link, " +
     "a shorts link, a \"youtu.be\" link, or a video ID.",
-    examples: ["input=https://www.youtube.com/watch?v=jNQXAC9IVRw", "i=youtu.be/jNQXAC9IVRw", "i=jNQXAC9IVRw"],
-    call: inputCall
+    examples: ["video=https://www.youtube.com/watch?v=jNQXAC9IVRw", "v=youtu.be/jNQXAC9IVRw", "v=jNQXAC9IVRw"],
+    call: videoCall
   },
 
   "-new": {redirect: "-newest"},
@@ -227,7 +227,7 @@ function helpCall(a, v, settings, currentState, i) {
     currentState.err = errorCodes(50, a);
 }
 
-function inputCall(a, v, settings, currentState) {
+function videoCall(a, v, settings, currentState) {
 
   if (!currentState.inFilter) {
     if (settings.url === "") {
