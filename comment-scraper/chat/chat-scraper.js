@@ -101,7 +101,6 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
     messages = messages.actions;
 
     for (let m = 0; m < messages.length + 1; m++) {
-      m = parseInt(m);
 
       //To make sure the counter does not go over a limit, and that no extraneous requests (after limit is reached) are made
       if (counter >= settings.lim || matchCounter >= settings.limfilter) {
