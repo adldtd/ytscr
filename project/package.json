@@ -1,8 +1,8 @@
 {
-  "name": "comment-scraper",
+  "name": "ytscr",
   "version": "1.0.0",
-  "description": "A CLI for scraping youtube comments",
-  "main": "comment-scraper.js",
+  "description": "A CLI for scraping YouTube data",
+  "main": "_entry/entry.js",
   "bin": {
     "ytscr": "_entry/entry.js"
   },
@@ -21,7 +21,7 @@
   },
   "keywords": [
     "youtube",
-    "comments",
+    "data",
     "CLI",
     "scraper"
   ],

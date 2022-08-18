@@ -1,6 +1,6 @@
-/comment-scraper/node_modules
-/comment-scraper/todo.txt
-/comment-scraper/_DEBUG
-/comment-scraper/SAVES/*
-/comment-scraper/console-tracker.js
-/comment-scraper/package-lock.json
+/project/node_modules
+/project/todo.txt
+/project/_DEBUG
+/project/SAVES/*
+/project/console-tracker.js
+/project/package-lock.json
