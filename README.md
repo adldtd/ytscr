@@ -3,14 +3,21 @@
 A tool for extracting and searching YouTube data. Wrapped in a custom built CLI to help automate and tidy up the process. Comes with numerous arguments to specify scraping, including a simple filtering system. This project is meant to assist with data collection, as well as more mundane tasks (for that one time you scrolled for 7 minutes to find one comment/video).
 
 Currently, the tool contains 3 modules:
+
 `comments`: Comment scraper
+
 `chat`: A live chat replay scraper
+
 `videos`: A video searcher + scraper
 
 A (working) list of modules to be added in the future:
+
 `uploads`: Extracts YouTube user uploads
+
 `recommended`: Extracts recommended videos
+
 `channels`: A channel searcher + scraper
+
 `playlists`: A playlist searcher + scraper
 
 ## Installation
