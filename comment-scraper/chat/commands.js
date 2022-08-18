@@ -17,7 +17,7 @@ const cmd = {
     simpleDescription: "Displays argument information",
     description: "A command which takes in an argument name as the next input. By specifiying a valid argument, " +
     "the program will print info, as well as the usability of that arg.",
-    examples: ["help input", "help dest"],
+    examples: ["help video", "help dest"],
     call: helpCall
   },
 

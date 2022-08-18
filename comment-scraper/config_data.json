@@ -10,7 +10,7 @@
       "platform": "DESKTOP",
       "clientFormFactor": "UNKNOWN_FORM_FACTOR",
       "configInfo": {},
-      "timeZone": "",
+      "timeZone": "America/New York",
       "browserName": "Chrome",
       "browserVersion": "103.0.0.0",
       "screenWidthPoints": 577,

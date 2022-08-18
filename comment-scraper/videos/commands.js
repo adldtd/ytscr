@@ -4,11 +4,6 @@ const helpers = require(path.join(__dirname, "..", "helpers"));
 const errorCodes = require(path.join(__dirname, "..", "errors")).errorCodes;
 
 
-  /****************************************************************************/
- /* Arguments + commands and corresponding functions for the comments module */
-/****************************************************************************/
-
-
 const cmd = {
 
   "help":
@@ -17,29 +12,19 @@ const cmd = {
     simpleDescription: "Displays argument information",
     description: "A command which takes in an argument name as the next input. By specifiying a valid argument, " +
     "the program will print info, as well as the usability of that arg.",
-    examples: ["help video", "help -nrf"],
+    examples: ["help input", "help dest"],
     call: helpCall
   },
 
-  "v": {redirect: "video"},
-  "video":
+  "s": {redirect: "search"},
+  "search":
   {
-    aliases: ["video", "v"],
-    simpleDescription: "A YouTube video link",
-    description: "Specifies the video link from where to scrape comments. Can either be a normal YouTube link, " +
-    "a shorts link, a \"youtu.be\" link, or a video ID.",
-    examples: ["video=https://www.youtube.com/watch?v=jNQXAC9IVRw", "v=youtu.be/jNQXAC9IVRw", "v=jNQXAC9IVRw"],
-    call: videoCall
-  },
-
-  "-new": {redirect: "-newest"},
-  "-newest":
-  {
-    aliases: ["-newest", "-new"],
-    simpleDescription: "Searches newest comments first",
-    description: "Sets \"SORT BY\" to \"newest first.\" NOTE: Pinned comments will still appear at the top, " +
-    "regardless of date.",
-    call: newestCall
+    aliases: ["search", "s"],
+    simpleDescription: "A video search term",
+    description: "An argument which takes in a string to search on YouTube. NOTE: Some queries may not return " +
+    "results.",
+    examples: ["search=Markiplier", "search=\"hi\""],
+    call: searchCall
   },
 
   "-NS": {redirect: "-nosave"},
@@ -66,8 +51,8 @@ const cmd = {
   {
     aliases: ["-savefilter", "-sf"],
     simpleDescription: "Only saves filter matches",
-    description: "A flag that restricts the scraper to saving a comment ONLY IF it matches the user given " +
-    "filters. If no filters are specified, then every comment will be saved (as usual).",
+    description: "A flag that restricts the scraper to saving a video ONLY IF it matches the user given " +
+    "filters. If no filters are specified, then every video will be saved (as usual).",
     call: savefilterCall
   },
 
@@ -76,38 +61,18 @@ const cmd = {
   {
     aliases: ["-printfilter", "-pf"],
     simpleDescription: "Prints out filter matches",
-    description: "A flag that causes the scraper to print comments which match given filters.",
+    description: "A flag that causes the scraper to print videos which match given filters.",
     call: printfilterCall
-  },
-
-  "-NR": {redirect: "-noreply"},
-  "-noreply":
-  {
-    aliases: ["-noreply", "-NR"],
-    simpleDescription: "Stops the program from considering replies",
-    description: "When present, the program will not collect/print any replies to a comment.",
-    call: noreplyCall
-  },
-
-  "-nrf":
-  {
-    aliases: ["-nrf"],
-    simpleDescription: "Enters a special mode where replies are unfiltered",
-    description: "As standard, the scraper applies filters to both comments and replies. When this flag is " +
-    "present, however, if the program \"matches\" a comment, it will automatically match all of its replies. " +
-    "If the comment fails the filter, it will still try to match its replies, one by one. This flag may " +
-    "be useful when searching for questions - as well as answers - on a YouTube video.",
-    call: nrfCall
   },
 
   "l": {redirect: "lim"},
   "lim":
   {
     aliases: ["lim", "l"],
-    simpleDescription: "Limits the amount of comments scraped",
+    simpleDescription: "Limits the amount of videos scraped",
     description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
-    "as a positive integer. If this argument is not present, the scraper will not stop until all comments are " +
-    "retrieved. NOTE: The value entered limits the scraper based on how many comments were checked, " +
+    "as a positive integer. If this argument is not present, the scraper will not stop until all videos are " +
+    "retrieved. NOTE: The value entered limits the scraper based on how many videos were checked, " +
     "not how many matched the filters (see limfilter).",
     examples: ["lim=100", "l=27"],
     call: limCall
@@ -117,10 +82,9 @@ const cmd = {
   "limfilter":
   {
     aliases: ["limfilter", "lf"],
-    simpleDescription: "Limits the amount of \"matching\" comments",
+    simpleDescription: "Limits the amount of \"matching\" videos",
     description: "An argument which stops the scraper once enough match the filters. Should be defined as a " +
-    "positive integer. If this is not defined, the scraper will preform matches without a threshold. NOTE: " +
-    "If flag -nrf is present, all replies that are automatically matched will NOT be counted as such.",
+    "positive integer. If this is not defined, the scraper will preform matches without a threshold.",
     examples: ["limfilter=50", "lf=5"],
     call: limfilterCall
   },
@@ -129,7 +93,7 @@ const cmd = {
   "filter":
   {
     aliases: ["filter", "f"],
-    simpleDescription: "Used to filter comments based on attributes",
+    simpleDescription: "Used to filter videos based on attributes",
     description: "Begins a \"filter object,\" where arguments define the filter's attributes. A filter's first " +
     "argument is always an opening bracket, and is later ended by a closing bracket. An indefinite amount " +
     "of filter objects can be created, each with different attributes and properties, to narrow down a search.",
@@ -144,7 +108,17 @@ const cmd = {
     simpleDescription: "Filter arg; defines which attribute to check",
     description: "Used exclusively in a filter object; the value entered is the attribute to inspect and filter. " +
     "Values that are listed as \"num\" are numerical; in that case \"match\" must be defined as an integer.",
-    validValues: {"author": "str", "text": "str", "id": "str", "published": "str", "votes": "num", "picture": "str", "channel": "str"},
+    validValues: {"author": "str",
+                  "name": "str",
+                  "snippet": "str",
+                  "duration": "num",
+                  "views": "num",
+                  "published": "str",
+                  "thumbnail": "str",
+                  "id": "str",
+                  "picture": "str",
+                  "channel": "str"
+                },
     examples: ["check=text", "check=votes"],
     call: checkCall
   },
@@ -166,9 +140,9 @@ const cmd = {
     simpleDescription: "Filter arg; how to compare the \"match\" value",
     description: "Used exclusively in a filter object; the value entered specifies how the actual value will be " +
     "compared with the match one. Str and num \"check\" values have different valid values. NOTE: By default, " +
-    "not calling the argument will result in a compare value of \"\", meaning, for a num value, compare must be " +
+    "not calling the argument will result in a compare value of \"in\", meaning, for a num value, compare must be " +
     "defined.",
-     validValues: {"in":"If match is located inside value",
+    validValues: {"in":"If match is located inside value",
                   "eq":"If match and value are equal",
                   "less":"If value < match",
                   "greater":"If value > match",
@@ -196,12 +170,22 @@ const cmd = {
   "ignore":
   {
     aliases: ["ignore"],
-    simpleDescription: "Specifies a comment attribute to ignore",
-    description: "Removes a comment attribute from \"consideration\" while scraping. This means that the " +
+    simpleDescription: "Specifies a video attribute to ignore",
+    description: "Removes a video attribute from \"consideration\" while scraping. This means that the " +
     "attribute will not be saved, printed, and cannot be filtered during execution. May be defined an " +
     "indefinite amount of times, each with a different attribute.",
-    validValues: {"author":"", "text":"", "id":"", "published":"", "votes":"", "picture":"", "channel":""},
-    examples: ["ignore=\"id\"", "ignore=text"],
+    validValues: {"author": "",
+                  "name": "",
+                  "snippet": "",
+                  "duration": "",
+                  "views": "",
+                  "published": "",
+                  "thumbnail": "",
+                  "id": "",
+                  "picture": "",
+                  "channel": ""
+                },
+    examples: ["ignore=\"name\"", "ignore=picture"],
     call: ignoreCall
   },
 
@@ -209,15 +193,13 @@ const cmd = {
   "dest":
   {
     aliases: ["dest", "d"],
-    simpleDescription: "The folder where to save scraped comments",
-    description: "Specifies the folder where the saved comments are placed. The directory must exist and must be " +
+    simpleDescription: "The folder where to save scraped videos",
+    description: "Specifies the folder where the saved videos are placed. The directory must exist and must be " +
     "accessible by the scraper. By default, the script will place the file in the /SAVES folder of the project.",
     examples: ["dest=\"C:/Users\"", "d=D:/MyFiles"],
     call: destCall
   }
-
-};
-
+}
 
 
 function helpCall(a, v, settings, currentState, i) {
@@ -227,32 +209,17 @@ function helpCall(a, v, settings, currentState, i) {
     currentState.err = errorCodes(50, a);
 }
 
-function videoCall(a, v, settings, currentState) {
+function searchCall(a, v, settings, currentState) {
 
   if (!currentState.inFilter) {
-    if (settings.url === "") {
-      
-      if (v.substring(0, 32) === "https://www.youtube.com/watch?v=" || v.substring(0, 24) === "www.youtube.com/watch?v=" || v.substring(0, 20) === "youtube.com/watch?v=") {
-        settings.url = v;
-      } else if (v.substring(0, 31) === "https://www.youtube.com/shorts/" || v.substring(0, 23) === "www.youtube.com/shorts/" || v.substring(0, 19) === "youtube.com/shorts/") {
-        settings.url = "https://youtube.com/watch?v=" + v.split("shorts/", 2)[1]; //YouTube shorts are converted to videos this way
-      } else if (v.substring(0, 17) === "https://youtu.be/" || v.substring(0, 9) === "youtu.be/") {
-        settings.url = "https://youtube.com/watch?v=" + v.split(".be/", 2)[1];
-      } else if (v.length === 11) { //Pure video ID
-        settings.url = "https://youtube.com/watch?v=" + v;
-      } else
-        currentState.err = errorCodes(-2, a, v);
-        
+    if (settings.search === "") {
+      if (v !== "")
+        settings.search = v;
+      else
+        currentState.err = errorCodes(3, a, v);
     } else
       currentState.err = errorCodes(-1, a);
   } else
-    currentState.err = errorCodes(2, a);
-}
-
-function newestCall(a, v, settings, currentState) {
-  if (!currentState.inFilter)
-    settings.newestFirst = true;
-  else
     currentState.err = errorCodes(2, a);
 }
 
@@ -272,28 +239,14 @@ function noprettyCall(a, v, settings, currentState) {
 
 function savefilterCall(a, v, settings, currentState) {
   if (!currentState.inFilter)
-    settings.saveOnlyMatch = true;
+    settings.savefilter = true;
   else
     currentState.err = errorCodes(2, a);
 }
 
 function printfilterCall(a, v, settings, currentState) {
   if (!currentState.inFilter)
-    settings.logMatch = true;
-  else
-    currentState.err = errorCodes(2, a);
-}
-
-function noreplyCall(a, v, settings, currentState) {
-  if (!currentState.inFilter)
-    settings.useReplies = false;
-  else
-    currentState.err = errorCodes(2, a);
-}
-
-function nrfCall(a, v, settings, currentState) {
-  if (!currentState.inFilter)
-    settings.replyFiltering = false;
+    settings.printfilter = true;
   else
     currentState.err = errorCodes(2, a);
 }
@@ -304,7 +257,7 @@ function limCall(a, v, settings, currentState) {
     if (!isNaN(parseInt(v))) {
       v = parseInt(v);
       if (v > 0)
-        settings.limit = v;
+        settings.lim = v;
       else
         currentState.err = errorCodes(15, a, v);
     } else
@@ -319,7 +272,7 @@ function limfilterCall(a, v, settings, currentState) {
     if (!isNaN(parseInt(v))) {
       v = parseInt(v);
       if (v > 0)
-        settings.limitMatch = v;
+        settings.limfilter = v;
       else
         currentState.err = errorCodes(15, a, v);
     } else
@@ -380,7 +333,7 @@ function compareCall(a, v, settings, currentState) {
 
 function casesensitiveCall(a, v, settings, currentState) {
   if (currentState.inFilter)
-    currentState.currentFilter.caseSensitive = true;
+    currentState.currentFilter.casesensitive = true;
   else
     currentState.err = errorCodes(4, a);
 }
@@ -428,13 +381,13 @@ function closingbracketCall(a, v, settings, currentState) {
     }
     
   }
-  if (currentState.currentFilter.check in settings.include && !settings.include[currentState.currentFilter.check]) {
+  if (currentState.currentFilter.check in settings.ignore && settings.ignore[currentState.currentFilter.check]) {
     currentState.err = errorCodes(12, a, currentState.currentFilter.check);
     return;
   }
 
   currentState.usedFilterCheckValues[currentState.currentFilter.check] = "";
-  settings.selectors.push(currentState.currentFilter);
+  settings.filter.push(currentState.currentFilter);
   currentState.currentFilter = {};
   currentState.inFilter = false;
 }
@@ -444,7 +397,7 @@ function ignoreCall(a, v, settings, currentState) {
   if (!currentState.inFilter) {
     if (v in cmd.ignore.validValues) {
       if (!(v in currentState.usedFilterCheckValues))
-        settings.include[v] = false;
+        settings.ignore[v] = true;
       else
         currentState.err = errorCodes(12, a, v);
     } else {

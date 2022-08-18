@@ -118,7 +118,7 @@ function cli(args) {
   }
   if ((settings.limit !== Number.POSITIVE_INFINITY && settings.limitMatch !== Number.POSITIVE_INFINITY) && settings.limit < settings.limitMatch) {
     settings.limitMatch = settings.limit;
-    console.log("WARNING: Limit is lower than limitfilter; scraping will end before the filter limit can be reached.");
+    console.log("WARNING: Limit is lower than limfilter; scraping will end before the filter limit can be reached.");
   }
 
   if (settings.save === false && settings.prettyprint === false)
@@ -128,7 +128,7 @@ function cli(args) {
   if (settings.logMatch && settings.selectors.length === 0)
     console.log("WARNING: Argument -printfilter is given, but no filters are applied; all comments will be printed on-screen.");
   if (settings.limitMatch !== Number.POSITIVE_INFINITY && settings.selectors.length === 0)
-    console.log("WARNING: Argument limfilter is given, but no filters are applied; limitfilter will be treated as the normal filter.");
+    console.log("WARNING: Argument limfilter is given, but no filters are applied; limfilter will be treated like the normal filter.");
   if (!settings.useReplies && !settings.replyFiltering)
     console.log("WARNING: Argument -noreply conflicts with -nrf; no replies will be scraped.");
   if (!settings.replyFiltering && settings.selectors.length === 0 && settings.limitMatch !== Number.POSITIVE_INFINITY)

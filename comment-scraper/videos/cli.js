@@ -1,23 +1,18 @@
 const path = require("path");
 const helpers = require(path.join(__dirname, "..", "helpers"));
-const commands = require(__dirname + "/commands");
+const cmd = require(__dirname + "/commands").cmd;
 const errorCodes = require(path.join(__dirname, "..", "errors")).errorCodes;
 
-const cmd = commands.cmd;
 
-
-//*********************************************************************************
-//Parser for the chat module
-//*********************************************************************************
 function cli(args) {
 
   //Initialize default values
-  let settings = {
-    url: "",
+  let settings =
+  {
+    search: "", //A url is later created using this term
 
     save: true,
     prettyprint: true,
-    topchat: false,
 
     savefilter: false,
     printfilter: false,
@@ -26,18 +21,23 @@ function cli(args) {
     limfilter: Number.POSITIVE_INFINITY,
 
     filter: [],
-    ignore: {
+    ignore:
+    {
       author: false,
-      text: false,
+      name: false,
+      snippet: false,
+      duration: false,
+      views: false,
+      published: false,
+      thumbnail: false,
       id: false,
-      timestamp: false,
       picture: false,
       channel: false
     },
 
     destination: "",
     timeout: 1000
-  };
+  }
 
   let currentState = //Used to pass CLI tracking variables to individual CLI functions
   {
@@ -48,7 +48,7 @@ function cli(args) {
     err: false //Stops the CLI if made true
   };
 
-  //Argument parsing
+  //Iterate through arguments passed
   for (let i = 3; i < args.length; i++) {
 
     let a = ""; let v = "";
@@ -60,6 +60,7 @@ function cli(args) {
     } else
       a = args[i];
 
+    //Argument exists; now work with special cases
     if (a in cmd) {
       let commandObject = cmd[a]
       if ("redirect" in commandObject)
@@ -98,8 +99,8 @@ function cli(args) {
     return 1;
   }
 
-  if (settings.url === "")
-    currentState.err = errorCodes(100, "");
+  if (settings.search === "")
+    currentState.err = errorCodes(102, "");
   if (currentState.inFilter)
     currentState.err = errorCodes(101, "");
 
@@ -125,12 +126,11 @@ function cli(args) {
   if (!settings.printfilter && !settings.save)
     console.log("WARNING: Scraped information will neither be saved nor displayed on-screen.");
   if (settings.printfilter && settings.filter.length === 0)
-    console.log("WARNING: Argument -printfilter is given, but no filters are applied; all messages will be printed on-screen.");
+    console.log("WARNING: Argument -printfilter is given, but no filters are applied; all videos will be printed on-screen.");
   if (settings.limfilter !== Number.POSITIVE_INFINITY && settings.filter.length === 0)
     console.log("WARNING: Argument limfilter is given, but no filters are applied; limfilter will be treated like the normal limit.");
 
   return settings;
-
 }
 
 

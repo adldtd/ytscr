@@ -251,7 +251,7 @@ function messageMatches(singleMessage, filter) {
     }
     else {
       
-      let messageCheck = parseInt(singleComment["timestamp"]);
+      let messageCheck = parseInt(singleMessage["timestamp"]);
       switch (condition.compare) {
         case "less":
           returnMatch = messageCheck < parseInt(condition.match);

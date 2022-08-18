@@ -72,12 +72,14 @@ function errorCodes(code, arg, value = "") {
       console.log("Error: Invalid argument \"" + arg + "\"");
       break;
 
-    case 100: //No input specified
+    case 100: //No video specified
       console.log("Error: No video link specified");
       break;
     case 101: //Bracket unclosed
       console.log("Error: Filter unclosed; needs an ending bracket \"}\"");
       break;
+    case 102: //No search specified
+      console.log("Error: No search query specified")
   }
 
   return true;
