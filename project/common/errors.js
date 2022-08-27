@@ -4,9 +4,37 @@
 /**********************************************************/
 
 
+//*********************************************************************************
+//Focuses specifically on errors found while processing a command and its arguments
+//*********************************************************************************
+function errorCodesNums(code, command, expected, recieved) {
+
+  switch (code) {
+    
+    case 0: //Not enough args
+      console.log("Error: Command \"" + command + "\" requires at least " + expected + " arguments; recieved " + recieved);
+      break;
+    case 1: //Too many args; mainly to be used for --help
+      console.log("Error: Extraneous arguments for command \"" + command + "\"; only expected " + expected + " leading arg");
+      break;
+    case 2: //Command given too many times
+      console.log("Error: Command \"" + command + "\" called " + recieved + " times; only expected " + expected);
+      break;
+    case 3: //Command (or module) does not exist
+      console.log("Error: Invalid command/argument \"" + command + "\"");
+      break;
+  }
+
+  return true;
+}
+
+
+//*********************************************************************************
+//More general error code list; mostly for values and value conflicts
+//*********************************************************************************
 function errorCodes(code, arg, value = "") {
   
-  switch(code) {
+  switch (code) {
 
     case -2: //Bad link
       console.log("Error: Invalid youtube link \"" + value + "\"");
@@ -79,11 +107,12 @@ function errorCodes(code, arg, value = "") {
       console.log("Error: Filter unclosed; needs an ending bracket \"}\"");
       break;
     case 102: //No search specified
-      console.log("Error: No search query specified")
+      console.log("Error: No search query specified");
   }
 
   return true;
 }
 
 
+module.exports.errorCodesNums = errorCodesNums;
 module.exports.errorCodes = errorCodes;

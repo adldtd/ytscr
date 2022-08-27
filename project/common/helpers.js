@@ -4,10 +4,74 @@ const path = require("path");
 const readline = require("readline");
 const process = require("node:process");
 
+const errorCodesNums = require(__dirname + "/errors").errorCodesNums;
+
 
   /************************************************************/
  /* Helper functions for different command CLIs and scrapers */
 /************************************************************/
+
+
+//*********************************************************************************
+//Parses an argument as a command; returns an object with details on the command
+//itself, its arguments, and its validity; does not check for modules/submodules
+//*********************************************************************************
+function parseArgs(args, index, cmd, currentState) {
+
+  let returnVal = {command: "", commandBox: {}, args: [], currentIndex: index + 1, isModule: false};
+
+  if ("modules" in cmd && args[index] in cmd.modules) {
+    returnVal.command = args[index];
+    returnVal.isModule = true;
+    returnVal.currentIndex++;
+    returnVal.commandBox = cmd.modules[returnVal.command];
+    return returnVal;
+  }
+
+  //Check for the first argument in an equals sign
+  let equalInd = args[index].indexOf("=");
+    
+  if (equalInd !== -1) {
+    returnVal.command = args[index].slice(0, equalInd);
+    let v1 = args[index].slice(equalInd + 1, args[index].length);
+    returnVal.args.push(v1);
+  } else
+    returnVal.command = args[index];
+
+  if (!(returnVal.command in cmd.commands)) {
+    currentState.error = errorCodesNums(3, returnVal.command, 0, 0);
+    return returnVal;
+  }
+
+  //Work with redirects/aliases
+  if ("redirect" in cmd.commands[ returnVal.command ])
+    returnVal.commandBox = cmd.commands[ cmd.commands[returnVal.command].redirect ];
+  else
+    returnVal.commandBox = cmd.commands[returnVal.command];
+
+  if (!("numArgs" in returnVal.commandBox)) //Solely for debugging purposes
+    throw "ERR! Command " + returnVal.command + " defined improperly: missing numArgs";
+
+  //Collect needed arguments for a command; iterate until you either reach the end of all arguments or collect enough
+  let limit = returnVal.commandBox.numArgs;
+  while (returnVal.currentIndex < args.length && returnVal.args.length < limit) {
+
+    returnVal.args.push(args[ returnVal.currentIndex ]);
+    returnVal.currentIndex++;
+  }
+
+  //Special case for --help command
+  if ((returnVal.command === "-h" || returnVal.command === "--help") && returnVal.args.length === 0)
+    return returnVal;
+
+  if (returnVal.args.length < limit)
+    currentState.error = errorCodesNums(0, returnVal.command, limit, returnVal.args.length);
+  else if (returnVal.args.length > limit)
+    currentState.error = errorCodesNums(1, returnVal.command, limit, returnVal.args.length);
+
+  return returnVal;
+    
+}
 
 
 //*********************************************************************************
@@ -30,7 +94,7 @@ function outputValidValues(arg, values = {}, ignore = {}) { //Gives the end user
 //*********************************************************************************
 //Print an argument/command's aliases, its description, and other info
 //*********************************************************************************
-function outputHelp(arg, commandObject) {
+function outputHelp(commandObject) {
 
   let ali = "NAMES: " + commandObject.aliases[0];
   for (let i = 1; i < commandObject.aliases.length; i++)
@@ -70,24 +134,37 @@ function outputHelp(arg, commandObject) {
 function outputHelpAll(cmd) {
   let buffer_space = 25; //The buffer space "names" get before the simple description is printed
 
-  for (c in cmd) {
-    if ("simpleDescription" in cmd[c]) {
-      
-      let names = cmd[c].aliases[0];
-      for (let i = 1; i < cmd[c].aliases.length; i++)
-        names += ", " + cmd[c].aliases[i];
+  for (s in cmd) {
 
-      let spaces = "";
-      let numSpaces = buffer_space - names.length;
-      if (numSpaces > 0)
-        spaces = " ".repeat(numSpaces);
-      else
-        spaces = " ";
+    if (s === "modules")
+      console.log("MODULES:");
+    else
+      console.log("COMMANDS/FLAGS:");
 
-      console.log(names + spaces + cmd[c].simpleDescription); //One tab is about 8 spaces
+    let section = cmd[s];
+    
+    for (c in section) {
+      if ("simpleDescription" in section[c]) {
+        
+        let names = section[c].aliases[0];
+        for (let i = 1; i < section[c].aliases.length; i++)
+          names += ", " + section[c].aliases[i];
 
+        let spaces = "";
+        let numSpaces = buffer_space - names.length;
+        if (numSpaces > 0)
+          spaces = " ".repeat(numSpaces);
+        else
+          spaces = " ";
+
+        console.log(names + spaces + section[c].simpleDescription);
+      }
     }
+
+    console.log(""); //New line
+
   }
+
 }
 
 
@@ -151,6 +228,7 @@ function clearLastLine() {
 }
 
 
+module.exports.parseArgs = parseArgs;
 module.exports.outputValidValues = outputValidValues;
 module.exports.outputHelp = outputHelp;
 module.exports.outputHelpAll = outputHelpAll;

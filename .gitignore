@@ -1,5 +1,6 @@
 /project/node_modules
 /project/todo.txt
+/project/planner.txt
 /project/_DEBUG
 /project/SAVES/*
 /project/console-tracker.js

@@ -2,9 +2,9 @@
   "name": "ytscr",
   "version": "1.0.0",
   "description": "A CLI for scraping YouTube data",
-  "main": "_entry/entry.js",
+  "main": "entry/ytscr.js",
   "bin": {
-    "ytscr": "_entry/entry.js"
+    "ytscr": "entry/ytscr.js"
   },
   "dependencies": {
     "asynckit": "^0.4.0",
