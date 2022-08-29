@@ -15,13 +15,50 @@ function errorCodesNums(code, command, expected, recieved) {
       console.log("Error: Command \"" + command + "\" requires at least " + expected + " arguments; recieved " + recieved);
       break;
     case 1: //Too many args; mainly to be used for --help
-      console.log("Error: Extraneous arguments for command \"" + command + "\"; only expected " + expected + " leading arg");
+      console.log("Error: Extraneous arguments for command \"" + command + "\"; only expected " + expected + " leading args");
       break;
     case 2: //Command given too many times
       console.log("Error: Command \"" + command + "\" called " + recieved + " times; only expected " + expected);
       break;
     case 3: //Command (or module) does not exist
       console.log("Error: Invalid command/argument \"" + command + "\"");
+      break;
+  }
+
+  return true;
+}
+
+
+//*********************************************************************************
+//Focuses on errors involving command/module conflicts
+//*********************************************************************************
+function errorCodesConflict(code, command1, command2, value = "") {
+
+  switch (code) {
+
+    case 0: //Simple conflict between flags or between a flag and a command
+      console.log("Error: Command \"" + command1 + "\" is mutually exclusive with \"" + command2 + "\"");
+      break;
+    case 1: //Conflict between commands, based on a common value
+      console.log("Error: Argument \"" + value + "\" cannot be specified for both command \"" + command1 + "\" and \"" + command2 + "\"");
+      break;
+    case 2: //Conflict when a command (command1) is called, and a module (value) is called
+      console.log("Error: Module \"" + value + "\" cannot be both specified as an argument for command \"" + command1 + "\" and be called");
+  }
+
+  return true;
+}
+
+
+function errorCodesOutput(code, command, value) {
+
+  switch (code) {
+
+    case 0: //Invalid filename
+      console.log("Error: Invalid filename \"" + value + "\" for command \"" + command + "\"");
+      break;
+    case 1: //Invalid filepath
+      console.log("Error: Invalid destination \"" + value + "\" for command \"" + command + "\"");
       break;
   }
 
@@ -47,7 +84,7 @@ function errorCodes(code, arg, value = "") {
       console.log("Error: Argument \"" + arg + "\" is invalid inside of a filter");
       break;
     case 3: //Invalid value
-      console.log("Error: Value \"" + value + "\" is invalid for argument \"" + arg + "\"");
+      console.log("Error: Argument \"" + value + "\" is invalid for command \"" + arg + "\"");
       break;
     case 4: //Filter argument misplaced
       console.log("Error: Argument \"" + arg + "\" is invalid outside of a filter");
@@ -115,4 +152,6 @@ function errorCodes(code, arg, value = "") {
 
 
 module.exports.errorCodesNums = errorCodesNums;
+module.exports.errorCodesConflict = errorCodesConflict;
+module.exports.errorCodesOutput = errorCodesOutput;
 module.exports.errorCodes = errorCodes;

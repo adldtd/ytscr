@@ -36,15 +36,8 @@ function cli(args) {
           helpers.outputHelpAll(cmd);
           return 1;
         } else {
-
-          //Still more to go; this should not be the case whenever --help is called
-          if (parsed.currentIndex < args.length) {
-            errors.errorCodesNums(1, parsed.command, parsed.commandBox.numArgs, parsed.args.length + (args.length - parsed.currentIndex));
-            return -1;
-          } else {
-            helpers.outputHelp(parsed.commandBox);
-            return 1;
-          }
+          helpers.outputHelp(parsed.commandBox);
+          return 1;
         }
 
       }
@@ -55,6 +48,8 @@ function cli(args) {
     console.log("Error: No modules/commands provided")
     return -1;
   }
+
+  return -1;
 }
 
 

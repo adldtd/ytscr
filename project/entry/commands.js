@@ -40,12 +40,12 @@ const cmd = {
 
     "-h": {redirect: "--help"},
     "--help": {
-      aliases: ["--help"],
+      aliases: ["--help", "-h"],
       simpleDescription: "Displays command information",
       description: "A command which takes in a command/module as the next input. By specifiying a valid " +
       "command, the program will print some info as well as the usability of that cmd. All modules have their " +
       "own help commands, which can be accessed by typing \"ytscr [module] --help\".",
-      examples: ["--help video"],
+      examples: ["--help video", "-h search"],
       numArgs: 1
     }
 

@@ -60,9 +60,17 @@ function parseArgs(args, index, cmd, currentState) {
     returnVal.currentIndex++;
   }
 
-  //Special case for --help command
-  if ((returnVal.command === "-h" || returnVal.command === "--help") && returnVal.args.length === 0)
-    return returnVal;
+  //Hard coding for --help meta command
+  if ((returnVal.command === "-h" || returnVal.command === "--help")) {
+
+    if (returnVal.args.length === 0) //Avoids an error
+      return returnVal;
+    else if (returnVal.currentIndex < args.length) { //Still more to go; should not be valid for --help
+      currentState.error = errorCodesNums(1, returnVal.command, returnVal.commandBox.numArgs, 0);
+      return -1;
+    }
+
+  }
 
   if (returnVal.args.length < limit)
     currentState.error = errorCodesNums(0, returnVal.command, limit, returnVal.args.length);
@@ -75,11 +83,11 @@ function parseArgs(args, index, cmd, currentState) {
 
 
 //*********************************************************************************
-//Taking an argument as input, output the restricted values to enter (to be located
+//Taking a command as input, output the restricted values to enter (to be located
 //in the "validValues" section of cmd)
 //*********************************************************************************
 function outputValidValues(arg, values = {}, ignore = {}) { //Gives the end user more information in case of an error
-  console.log("The valid values for argument \"" + arg + "\" are:");
+  console.log("The valid values for command \"" + arg + "\" are:");
   for (valid in values) {
     if (!(valid in ignore)) {
       if (values[valid] === "")
@@ -222,6 +230,41 @@ function handleSaveJSON(name, savedInformation, settings) {
 }
 
 
+//*********************************************************************************
+//Splits a string without removing the delimiter all throughout; only splits a
+//specified amount of times
+//*********************************************************************************
+function safeSplit(str, find, times, backwards = false) {
+
+  let returnArray = [];
+  for (let splits = 0; splits < times; splits++) {
+
+    ind = backwards ? str.lastIndexOf(find) : str.indexOf(find);
+    if (ind === -1) break;
+
+    let part1 = str.substring(0, ind);
+    let part2 = str.substring(ind + find.length);
+
+    if (backwards) {
+      returnArray.push(part2); str = part1;
+    } else {
+      returnArray.push(part1); str = part2;
+    }
+  }
+
+  returnArray.push(str);
+  if (backwards) returnArray.reverse();
+  return returnArray;
+
+}
+
+
+function validFileName(filename) { //https://stackoverflow.com/a/53635003
+  let re = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])$|([<>:"\/\\|?*])|(\.|\s)$/;
+  return !(filename === "" || re.test(filename));
+}
+
+
 function clearLastLine() {
   readline.moveCursor(process.stdout, 0, -1); //https://stackoverflow.com/a/65863081
   readline.clearLine(process.stdout, 1); //Only works if cursor was on a newline before the function
@@ -234,4 +277,6 @@ module.exports.outputHelp = outputHelp;
 module.exports.outputHelpAll = outputHelpAll;
 module.exports.makeRequest = makeRequest;
 module.exports.handleSaveJSON = handleSaveJSON;
+module.exports.safeSplit = safeSplit;
+module.exports.validFileName = validFileName;
 module.exports.clearLastLine = clearLastLine;
