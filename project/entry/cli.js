@@ -24,8 +24,9 @@ function cli(args) {
     //Call designated CLI command for a module
     if (parsed.isModule) {
 
-      let scrapeCommand = parse.commandBox.scrape;
-      let settings = parse.commandBox.cli(args, 3);
+      let scrapeCommand = parsed.commandBox.scrape;
+      let settings = parsed.commandBox.cli(args, 3);
+      if (settings === -1 || settings === 1) return settings;
       return [scrapeCommand, settings];
 
     } else {
@@ -36,8 +37,8 @@ function cli(args) {
           helpers.outputHelpAll(cmd);
           return 1;
         } else {
-          helpers.outputHelp(parsed.commandBox);
-          return 1;
+          let result = helpers.parseHelp(cmd, currentState, parsed);
+          return result;
         }
 
       }

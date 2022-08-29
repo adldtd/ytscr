@@ -23,6 +23,9 @@ function errorCodesNums(code, command, expected, recieved) {
     case 3: //Command (or module) does not exist
       console.log("Error: Invalid command/argument \"" + command + "\"");
       break;
+    case 4: //Command required
+      console.log("Error: Command \"" + command + "\" is required");
+      break;
   }
 
   return true;
@@ -44,6 +47,7 @@ function errorCodesConflict(code, command1, command2, value = "") {
       break;
     case 2: //Conflict when a command (command1) is called, and a module (value) is called
       console.log("Error: Module \"" + value + "\" cannot be both specified as an argument for command \"" + command1 + "\" and be called");
+      break;
   }
 
   return true;
@@ -59,6 +63,28 @@ function errorCodesOutput(code, command, value) {
       break;
     case 1: //Invalid filepath
       console.log("Error: Invalid destination \"" + value + "\" for command \"" + command + "\"");
+      break;
+  }
+
+  return true;
+}
+
+
+//*********************************************************************************
+//Focuses on errors involving user defined "scope", either with modules or commands
+//*********************************************************************************
+function errorCodesScope(code, moduleOrCommand) {
+
+  switch (code) {
+
+    case 0: //Module cannot be exited
+      console.log("Error: Extraneous closing semicolon \";\", module \"" + moduleOrCommand + "\" cannot be exited");
+      break;
+    case 1: //Extra closing bracket
+      console.log("Error: Extraneous closing bracket \"}\"");
+      break;
+    case 2: //Scope not closed
+      console.log("Error: Command \"" + moduleOrCommand + "\" requires a closing bracket \"}\"");
       break;
   }
 
@@ -154,4 +180,5 @@ function errorCodes(code, arg, value = "") {
 module.exports.errorCodesNums = errorCodesNums;
 module.exports.errorCodesConflict = errorCodesConflict;
 module.exports.errorCodesOutput = errorCodesOutput;
+module.exports.errorCodesScope = errorCodesScope;
 module.exports.errorCodes = errorCodes;

@@ -1,5 +1,9 @@
 const path = require("path");
 
+const video_cli = require(path.join(__dirname, "..", "modules", "video", "cli")).cli;
+
+const video_scraper = require(path.join(__dirname, "..", "modules", "video", "video-scraper")).scrape;
+
 
   /*******************************************************************/
  /* The "location" modules; specify which part of YouTube to scrape */
@@ -18,8 +22,8 @@ const cmd = {
       "\"video --help --input\" for a more detailed description.) Records video metadata, live chat replay, " +
       "comments, and video recommendations.",
       examples: ["video -i https://www.youtube.com/watch?v=1fueZCTYkpA"],
-      cli: undefined,
-      scrape: undefined ///////////////////////////////////////////////////////////TODO
+      cli: video_cli,
+      scrape: video_scraper
     },
 
     "search": {

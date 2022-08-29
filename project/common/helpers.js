@@ -4,7 +4,7 @@ const path = require("path");
 const readline = require("readline");
 const process = require("node:process");
 
-const errorCodesNums = require(__dirname + "/errors").errorCodesNums;
+const errors = require(__dirname + "/errors");
 
 
   /************************************************************/
@@ -39,7 +39,7 @@ function parseArgs(args, index, cmd, currentState) {
     returnVal.command = args[index];
 
   if (!(returnVal.command in cmd.commands)) {
-    currentState.error = errorCodesNums(3, returnVal.command, 0, 0);
+    currentState.error = errors.errorCodesNums(3, returnVal.command, 0, 0);
     return returnVal;
   }
 
@@ -65,17 +65,18 @@ function parseArgs(args, index, cmd, currentState) {
 
     if (returnVal.args.length === 0) //Avoids an error
       return returnVal;
-    else if (returnVal.currentIndex < args.length) { //Still more to go; should not be valid for --help
-      currentState.error = errorCodesNums(1, returnVal.command, returnVal.commandBox.numArgs, 0);
-      return -1;
+    
+    if (returnVal.currentIndex < args.length) { //Still more to go; should not be valid for --help
+      currentState.error = errors.errorCodesNums(1, returnVal.command, returnVal.commandBox.numArgs, 0);
+      return returnVal;
     }
 
   }
 
   if (returnVal.args.length < limit)
-    currentState.error = errorCodesNums(0, returnVal.command, limit, returnVal.args.length);
+    currentState.error = errors.errorCodesNums(0, returnVal.command, limit, returnVal.args.length);
   else if (returnVal.args.length > limit)
-    currentState.error = errorCodesNums(1, returnVal.command, limit, returnVal.args.length);
+    currentState.error = errors.errorCodesNums(1, returnVal.command, limit, returnVal.args.length);
 
   return returnVal;
     
@@ -133,6 +134,35 @@ function outputHelp(commandObject) {
     for (e in commandObject.examples)
       console.log(commandObject.examples[e]);
   }
+}
+
+
+//*********************************************************************************
+//Determines whether the argument given to the help command is valid; returns 1 on
+//success and -1 on faliure
+//*********************************************************************************
+function parseHelp(cmd, currentState, parsed) {
+
+  let c = parsed.command; let a = parsed.args[0];
+
+  if (a in cmd.modules) {
+
+    let argumentBox = cmd.modules[a];
+    outputHelp(argumentBox);
+
+  } else if (a in cmd.commands) {
+
+    let argumentBox = cmd.commands[a];
+    if ("redirect" in argumentBox)
+      argumentBox = cmd.commands[ argumentBox.redirect ];
+    outputHelp(argumentBox);
+
+  } else {
+    currentState.error = errors.errorCodes(3, c, a);
+    return -1;
+  }
+
+  return 1;
 }
 
 
@@ -274,6 +304,7 @@ function clearLastLine() {
 module.exports.parseArgs = parseArgs;
 module.exports.outputValidValues = outputValidValues;
 module.exports.outputHelp = outputHelp;
+module.exports.parseHelp = parseHelp;
 module.exports.outputHelpAll = outputHelpAll;
 module.exports.makeRequest = makeRequest;
 module.exports.handleSaveJSON = handleSaveJSON;

@@ -143,10 +143,10 @@ function inputCall(parsed, currentState, settings) {
     } else if (argument.length === 11) { //Pure video ID
       settings.video.input = "https://youtube.com/watch?v=" + argument;
     } else
-      currentState.general.error = error.errorCodes(-2, command, argument);
+      currentState.error = errors.errorCodes(-2, command, argument);
         
   } else
-    currentState.general.error = error.errorCodes(-1, command, argument);
+    currentState.error = errors.errorCodes(-1, command, argument);
 }
 
 function focusCall(parsed, currentState, settings) {
@@ -167,9 +167,9 @@ function focusCall(parsed, currentState, settings) {
       currentState.video.focusList[a] = ""; //To detect collisions with --exclude
 
     } else
-      currentState.general.error = errors.errorCodesConflict(1, c, "--exclude", a);
+      currentState.error = errors.errorCodesConflict(1, c, "--exclude", a);
   } else {
-    currentState.general.error = errors.errorCodes(3, c, a);
+    currentState.error = errors.errorCodes(3, c, a);
     helpers.outputValidValues(c, parsed.commandBox.validValues);
   }
 }
@@ -186,11 +186,11 @@ function excludeCall(parsed, currentState, settings) {
         currentState.video.excludeList[a] = ""; //To detect collisions with --focus and calling modules
 
       } else
-        currentState.general.error = errors.errorCodesConflict(2, c, "", a);
+        currentState.error = errors.errorCodesConflict(2, c, "", a);
     } else
-      currentState.general.error = errors.errorCodesConflict(1, c, "--focus", a);
+      currentState.error = errors.errorCodesConflict(1, c, "--focus", a);
   } else {
-    currentState.general.error = errors.errorCodes(3, c, a);
+    currentState.error = errors.errorCodes(3, c, a);
     helpers.outputValidValues(c, parsed.commandBox.validValues);
   }
 }
@@ -205,7 +205,7 @@ function outputCall(parsed, currentState, settings) {
   let forwardSlashSplit = true;
   
   if (settings.video.output !== "") {
-    currentState.general.error = errors.errorCodesNums(2, c, 1, 2);
+    currentState.error = errors.errorCodesNums(2, c, 1, 2);
     return;
   }
 
@@ -224,12 +224,12 @@ function outputCall(parsed, currentState, settings) {
   }
 
   if (sp.length === 1 && !fs.existsSync(filepath)) {
-    currentState.general.error = errors.errorCodesOutput(1, c, filepath);
+    currentState.error = errors.errorCodesOutput(1, c, filepath);
     return;
   }
 
   if (!helpers.validFileName(filename)) {
-    currentState.general.error = errors.errorCodesOutput(0, c, filename);
+    currentState.error = errors.errorCodesOutput(0, c, filename);
     return;
   }
 
