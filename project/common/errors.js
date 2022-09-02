@@ -86,6 +86,9 @@ function errorCodesScope(code, moduleOrCommand) {
     case 2: //Scope not closed
       console.log("Error: Command \"" + moduleOrCommand + "\" requires a closing bracket \"}\"");
       break;
+    case 3: //Filter unclosed but scope closed
+      console.log("Error: Attempt to exit module \"" + moduleOrCommand + "\" while filter is still open");
+      break;
   }
 
   return true;

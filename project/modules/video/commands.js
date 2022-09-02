@@ -3,6 +3,10 @@ const path = require("path");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 
+const comment_cli = require(path.join(__dirname, "comments", "cli")).cli;
+
+const comment_scraper = require(path.join(__dirname, "comments", "comment-scraper")).scraper;
+
 
   /******************************************/
  /* The video module commands + submodules */
@@ -22,8 +26,8 @@ const cmd = {
       description: "The module for retrieving comment data inside a YouTube video. Will be ignored if 0 " +
       "comments are found.",
       examples: ["comments [argument 1] [argument 2] ... ;"],
-      cli: undefined,
-      scrape: undefined ///////////////////////////////////////////////////////////TODO
+      cli: comment_cli,
+      scrape: comment_scraper
     },
 
     "chat": {

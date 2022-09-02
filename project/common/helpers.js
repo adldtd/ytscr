@@ -23,7 +23,6 @@ function parseArgs(args, index, cmd, currentState) {
   if ("modules" in cmd && args[index] in cmd.modules) {
     returnVal.command = args[index];
     returnVal.isModule = true;
-    returnVal.currentIndex++;
     returnVal.commandBox = cmd.modules[returnVal.command];
     return returnVal;
   }
@@ -234,29 +233,25 @@ async function makeRequest(config, timeout, retry = 0) {
 
 
 //*********************************************************************************
-//Determines what filepath to save to; avoids existing filepath conflicts
+//Saves a JSON; avoids overwriting existing files
 //*********************************************************************************
-function handleSaveJSON(name, savedInformation, settings) {
-  
-  let filepath = "";
-  if (settings.destination === "")
-    filepath = __dirname + "\\SAVES\\" + name; //Default directory
-  else
-    filepath = settings.destination + "/" + name;
+function handleSaveJSON(file, information, prettyprint) {
 
-  //Avoid filepath conflict and overwriting
+  file = safeSplit(file, ".json", 1, true)[0];
+
+  //Keep probing until it is safe to save
   let probes = 1;
-  let probepath = filepath + ".json";
-  while (fs.existsSync(probepath))
-    probepath = filepath + " (" + probes++ + ").json";
-  filepath = probepath;
+  let probingFile = file + ".json";
+  while (fs.existsSync(probingFile))
+    probingFile = file + " (" + probes++ + ").json";
+  file = probingFile;
 
-  if (settings.prettyprint)
-    fs.writeFileSync(filepath, JSON.stringify(savedInformation, null, 2));
+  if (prettyprint)
+    fs.writeFileSync(file, JSON.stringify(information, null, 2));
   else
-    fs.writeFileSync(filepath, JSON.stringify(savedInformation));
+    fs.writeFileSync(file, JSON.stringify(information));
 
-  return filepath;
+  return file;
 }
 
 

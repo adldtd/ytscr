@@ -106,7 +106,8 @@ function cli(args, index) {
 
     if (parsed.isModule) {
     
-      parsed.commandBox.cli(args, currentState, settings);
+      let result = parsed.commandBox.cli(args, currentState, settings);
+      if (result === -1 || result === 1) return result;
       
     } else {
 
@@ -136,6 +137,11 @@ function cli(args, index) {
 
   if (currentState.error)
     return -1;
+
+  if (settings.video.output === "") { //Default destination
+    let filename = "video_" + settings.video.input.split("?v=", 2)[1] + ".json";
+    settings.video.output = path.join(__dirname, "..", "..", "SAVES", filename);
+  }
 
   return settings;
 }
