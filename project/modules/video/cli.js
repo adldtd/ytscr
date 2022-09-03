@@ -3,6 +3,7 @@ const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 
 const cmd = require(__dirname + "/commands").cmd;
+const verifyFilterable = require(path.join(__dirname, "..", "..", "common", "subscribe-filterable")).verifyFilterable;
 
 
 //*********************************************************************************
@@ -27,17 +28,17 @@ function cli(args, index) {
     },
 
     comments: {
-      saveOnlyMatch: false,
-      newestFirst: false,
-      useReplies: true,
-      replyFiltering: true,
+      savefilter: false,
+      newest: false,
+      replies: true,
+      nrf: true,
 
-      logMatch: false,
-      limit: Number.POSITIVE_INFINITY,
-      limitMatch: Number.POSITIVE_INFINITY,
+      printfilter: false,
+      lim: Number.POSITIVE_INFINITY,
+      limfilter: Number.POSITIVE_INFINITY,
 
-      selectors: [],
-      include: {
+      filter: [],
+      ignore: {
         author: true,
         text: true,
         id: true,
@@ -96,6 +97,8 @@ function cli(args, index) {
     }
 
   };
+
+  verifyFilterable(currentState.comments, settings.comments); /////////////////////Debugging
   
   //Loop through the CLI
   while (currentState.index < args.length) {

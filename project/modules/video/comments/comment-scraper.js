@@ -119,7 +119,7 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
     let comments = resp.data.onResponseReceivedEndpoints;
     if (comments.length > 1) { //First batch of comments recieved
 
-      if (settings.newestFirst) {
+      if (settings.newest) {
 
         let newestSection = comments[0].reloadContinuationItemsCommand.continuationItems[0].commentsHeaderRenderer.sortMenu.sortFilterSubMenuRenderer.subMenuItems[1];
         continuation_id = newestSection.serviceEndpoint.continuationCommand.token;
@@ -139,7 +139,7 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
 
     for (c in comments) {
 
-      if (counter >= settings.limit || matchCounter >= settings.limitMatch) {
+      if (counter >= settings.lim || matchCounter >= settings.limfilter) {
         hasContinuation = false;
         break;
       }
@@ -157,23 +157,23 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
         continue;
 
 
-      let singleComment = getCommentData(innerComment, settings.include);
-      let match = commentMatches(singleComment, settings.selectors);
+      let singleComment = getCommentData(innerComment, settings.ignore);
+      let match = commentMatches(singleComment, settings.filter);
       if (match) matchCounter++;
 
-      if (settings.saveOnlyMatch && !match)
+      if (settings.savefilter && !match)
         singleComment = {};
 
-      if (settings.logMatch && match)
+      if (settings.printfilter && match)
         printComment(singleComment, config);
       
       counter++;
 
-      if (settings.useReplies && "replies" in comments[c].commentThreadRenderer) {
+      if (settings.replies && "replies" in comments[c].commentThreadRenderer) {
 
-        let oldSelectors = settings.selectors; let oldMatchCounter = matchCounter;
-        if (!settings.replyFiltering && match) {
-          settings.selectors = [];
+        let oldSelectors = settings.filter; let oldMatchCounter = matchCounter;
+        if (!settings.nrf && match) {
+          settings.filter = [];
           matchCounter = Number.NEGATIVE_INFINITY;
         }
 
@@ -184,16 +184,16 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
         matchCounter = pack[1];
         singleComment.replies = pack[2];
 
-        if (!settings.replyFiltering && match) {
-          settings.selectors = oldSelectors;
+        if (!settings.nrf && match) {
+          settings.filter = oldSelectors;
           matchCounter = oldMatchCounter; //Any matches made in replies are ignored in NRF mode
         }
       }
 
-      if (settings.saveOnlyMatch) {
+      if (settings.savefilter) {
         if (match)
           savedComments.push(singleComment);
-        else if (settings.useReplies && "replies" in singleComment && singleComment.replies.length > 0)
+        else if (settings.replies && "replies" in singleComment && singleComment.replies.length > 0)
           savedComments.push(singleComment);
       } else if (settings.save)
         savedComments.push(singleComment);
@@ -235,7 +235,7 @@ async function scrapeReplies(continuation_id, config, timeout, counter, matchCou
 
     for (c in comments) {
 
-      if (counter >= settings.limit || matchCounter >= settings.limitMatch) {
+      if (counter >= settings.lim || matchCounter >= settings.limfilter) {
         hasContinuation = false;
         break;
       }
@@ -252,15 +252,15 @@ async function scrapeReplies(continuation_id, config, timeout, counter, matchCou
       else
         continue;
 
-      let singleComment = getCommentData(innerComment, settings.include);
-      let match = commentMatches(singleComment, settings.selectors);
+      let singleComment = getCommentData(innerComment, settings.ignore);
+      let match = commentMatches(singleComment, settings.filter);
       if (match) matchCounter++;
       
       if (settings.save) {
-        if (!settings.saveOnlyMatch || match)
+        if (!settings.savefilter || match)
           savedComments.push(singleComment);
       }
-      if (settings.logMatch && match)
+      if (settings.printfilter && match)
         printReply(singleComment, config);
 
       counter++;
@@ -278,41 +278,41 @@ async function scrapeReplies(continuation_id, config, timeout, counter, matchCou
 //*********************************************************************************
 //Crunch a comment and return a simplified form
 //*********************************************************************************
-function getCommentData(innerComment, include = {}) { //Condenses a retrieved comment
+function getCommentData(innerComment, ignore = {}) { //Condenses a retrieved comment
 
   let singleComment = {};
 
-  if ("author" in include ? include.author : true)
+  if (!ignore.author)
     singleComment.author = innerComment.authorText.simpleText;
 
-  if ("text" in include ? include.text : true) {
+  if (!ignore.text) {
     singleComment.text = "";
     for (run in innerComment.contentText.runs)
       singleComment.text += innerComment.contentText.runs[run].text;
   }
 
-  if ("id" in include ? include.id : true)
+  if (!ignore.id)
     singleComment.id = innerComment.commentId;
 
-  if ("published" in include ? include.published : true) {
+  if (!ignore.published) {
     singleComment.published = "";
     for (run in innerComment.publishedTimeText.runs)
     singleComment.published += innerComment.publishedTimeText.runs[run].text;
   }
 
-  if ("votes" in include ? include.votes : true) {
+  if (!ignore.votes) {
     if ("voteCount" in innerComment)
       singleComment.votes = innerComment.voteCount.simpleText;
     else
       singleComment.votes = "0";
   }
 
-  if ("picture" in include ? include.picture : true) {
+  if (!ignore.picture) {
     let thumbnails = innerComment.authorThumbnail.thumbnails;
     singleComment.picture = thumbnails[thumbnails.length - 1.].url; //Always goes for the biggest thumbnail
   }
 
-  if ("channel" in include ? include.channel : true)
+  if (!ignore.channel)
     singleComment.channel = innerComment.authorEndpoint.browseEndpoint.browseId;
 
   return singleComment;
@@ -322,13 +322,13 @@ function getCommentData(innerComment, include = {}) { //Condenses a retrieved co
 //*********************************************************************************
 //Checks if a comment matches by looking at an array of guidelines
 //*********************************************************************************
-function commentMatches(singleComment, selectors) {
+function commentMatches(singleComment, filter) {
 
   let returnMatch = true;
 
-  for (s in selectors) {
+  for (s in filter) {
 
-    let condition = selectors[s];
+    let condition = filter[s];
     if (condition.check !== "votes") {
 
       let commentCheck = singleComment[condition.check];

@@ -112,7 +112,7 @@ function outputHelp(commandObject) {
   console.log(commandObject.description);
 
   if ("validValues" in commandObject) {
-    if (commandObject.aliases[0] !== "compare") { //Special case; hardcoded
+    if (commandObject.aliases[0] !== "--compare") { //Special case; hardcoded
       console.log("");
       outputValidValues(commandObject.aliases[0], commandObject.validValues);
     } else {
@@ -144,12 +144,12 @@ function parseHelp(cmd, currentState, parsed) {
 
   let c = parsed.command; let a = parsed.args[0];
 
-  if (a in cmd.modules) {
+  if ("modules" in cmd && a in cmd.modules) {
 
     let argumentBox = cmd.modules[a];
     outputHelp(argumentBox);
 
-  } else if (a in cmd.commands) {
+  } else if ("commands" in cmd && a in cmd.commands) {
 
     let argumentBox = cmd.commands[a];
     if ("redirect" in argumentBox)

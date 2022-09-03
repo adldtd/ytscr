@@ -38,7 +38,7 @@ function cli(args, currentState, settings) {
       }
 
     } else //Default; non-meta commands
-      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState.comments, settings);
+      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState.comments, settings.video, settings.comments);
 
     if (currentState.error)
       return -1;
