@@ -1,5 +1,4 @@
 const path = require("path");
-const helpers = require(path.join(__dirname, "..", "..", "..", "common", "helpers"));
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
 const subscribeFilterable = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-filterable")).subscribeFilterable;
 
@@ -96,7 +95,7 @@ const cmd = {
 
 };
 
-var commands = cmd.commands;
+const commands = cmd.commands;
 subscribeFilterable(attributes, commands);
 
 

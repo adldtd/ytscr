@@ -4,8 +4,10 @@ const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 
 const comment_cli = require(path.join(__dirname, "comments", "cli")).cli;
+const chat_cli = require(path.join(__dirname, "chat", "cli")).cli;
 
 const comment_scraper = require(path.join(__dirname, "comments", "comment-scraper")).scraper;
+const chat_scraper = require(path.join(__dirname, "chat", "chat-scraper")).scraper;
 
 
   /******************************************/
@@ -36,8 +38,8 @@ const cmd = {
       description: "The module for retrieving chat data from a past livestream/premiere. Will be ignored " +
       "if the video was not live in the past (and if it is an ongoing livestream.)",
       examples: ["chat [argument 1] [argument 2] ... ;"],
-      cli: undefined,
-      scrape: undefined //////////////////////////////////////////////////////////////TODO
+      cli: chat_cli,
+      scrape: chat_scraper
     }
 
   },

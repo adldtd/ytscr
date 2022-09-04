@@ -1,6 +1,6 @@
 const path = require("path");
-const helpers = require(path.join(__dirname, "..", "helpers"));
-const errors = require(path.join(__dirname, "..", "errors"));
+const helpers = require(path.join(__dirname, "helpers"));
+const errors = require(path.join(__dirname, "errors"));
 
 
   /************************************************************************************************/

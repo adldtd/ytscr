@@ -6,7 +6,7 @@ const cmd = require(__dirname + "/commands").cmd;
 
 
 //*********************************************************************************
-//Comments module CLI; modifies settings.comments
+//Chat module CLI; modifies settings.chat
 //*********************************************************************************
 function cli(args, currentState, settings) {
   
@@ -19,8 +19,8 @@ function cli(args, currentState, settings) {
 
     if (parsed.command === ";") {
 
-      if (currentState.comments.inFilter) {
-        currentState.error = errors.errorCodesScope(3, "comments");
+      if (currentState.chat.inFilter) {
+        currentState.error = errors.errorCodesScope(3, "chat");
         return -1;
       }
       return 0; //Exit scope safely
@@ -36,7 +36,7 @@ function cli(args, currentState, settings) {
       }
 
     } else //Default; non-meta commands
-      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState.comments, settings.video, settings.comments);
+      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState.chat, settings.video, settings.chat);
 
     if (currentState.error)
       return -1;

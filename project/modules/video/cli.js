@@ -39,13 +39,13 @@ function cli(args, index) {
 
       filter: [],
       ignore: {
-        author: true,
-        text: true,
-        id: true,
-        published: true,
-        votes: true,
-        picture: true,
-        channel: true
+        author: false,
+        text: false,
+        id: false,
+        published: false,
+        votes: false,
+        picture: false,
+        channel: false
       }
     },
 
@@ -99,6 +99,7 @@ function cli(args, index) {
   };
 
   verifyFilterable(currentState.comments, settings.comments); /////////////////////Debugging
+  verifyFilterable(currentState.chat, settings.chat); /////////////////////Debugging
   
   //Loop through the CLI
   while (currentState.index < args.length) {

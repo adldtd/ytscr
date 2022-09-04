@@ -195,7 +195,7 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
           savedComments.push(singleComment);
         else if (settings.replies && "replies" in singleComment && singleComment.replies.length > 0)
           savedComments.push(singleComment);
-      } else if (settings.save)
+      } else
         savedComments.push(singleComment);
     }
 
@@ -256,10 +256,8 @@ async function scrapeReplies(continuation_id, config, timeout, counter, matchCou
       let match = commentMatches(singleComment, settings.filter);
       if (match) matchCounter++;
       
-      if (settings.save) {
-        if (!settings.savefilter || match)
-          savedComments.push(singleComment);
-      }
+      if (!settings.savefilter || match)
+        savedComments.push(singleComment);
       if (settings.printfilter && match)
         printReply(singleComment, config);
 
