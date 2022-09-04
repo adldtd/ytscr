@@ -115,7 +115,7 @@ function cli(args, index) {
       
     } else {
 
-      if (parsed.command === ";")
+      if (parsed.command === "|")
         currentState.error = errors.errorCodesScope(0, "video"); //To help avoid user confusion
       else if (parsed.command === "--help" || parsed.command === "-h") {
         

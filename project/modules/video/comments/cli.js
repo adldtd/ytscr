@@ -17,7 +17,7 @@ function cli(args, currentState, settings) {
     if (currentState.error) return -1;
     currentState.index = parsed.currentIndex;
 
-    if (parsed.command === ";") {
+    if (parsed.command === "|") {
 
       if (currentState.comments.inFilter) {
         currentState.error = errors.errorCodesScope(3, "comments");

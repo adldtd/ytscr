@@ -27,7 +27,7 @@ const cmd = {
       simpleDescription: "Module for scraping comments from a YouTube video",
       description: "The module for retrieving comment data inside a YouTube video. Will be ignored if 0 " +
       "comments are found.",
-      examples: ["comments [argument 1] [argument 2] ... ;"],
+      examples: ["comments [argument 1] [argument 2] ... |"],
       cli: comment_cli,
       scrape: comment_scraper
     },
@@ -37,7 +37,7 @@ const cmd = {
       simpleDescription: "Module for scraping live chat replay from a YouTube video",
       description: "The module for retrieving chat data from a past livestream/premiere. Will be ignored " +
       "if the video was not live in the past (and if it is an ongoing livestream.)",
-      examples: ["chat [argument 1] [argument 2] ... ;"],
+      examples: ["chat [argument 1] [argument 2] ... |"],
       cli: chat_cli,
       scrape: chat_scraper
     }
@@ -46,14 +46,14 @@ const cmd = {
 
   commands: {
 
-    ";": {
-      aliases: [";"],
+    "|": {
+      aliases: ["|"],
       simpleDescription: "META COMMAND: Exits the \"scope\" of a module",
       description: "When typed, exits a module previously specified. This means that the CLI will go back to " +
       "parsing commands and other submodules inside of the video module. In short, it allows the user to " +
       "enter arguments for more than one submodule. NOTE: As only one module may be specified as the first " +
       "argument to the CLI, the video module cannot be exited.",
-      examples: ["[module 1] [argument 1] [argument 2] ... ; [module 2] ..."],
+      examples: ["[module 1] [argument 1] [argument 2] ... | [module 2] ..."],
       numArgs: 0
     },
 

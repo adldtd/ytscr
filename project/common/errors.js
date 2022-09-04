@@ -78,7 +78,7 @@ function errorCodesScope(code, moduleOrCommand) {
   switch (code) {
 
     case 0: //Module cannot be exited
-      console.log("Error: Extraneous closing semicolon \";\", module \"" + moduleOrCommand + "\" cannot be exited");
+      console.log("Error: Extraneous closing marker \"|\", module \"" + moduleOrCommand + "\" cannot be exited");
       break;
     case 1: //Extra closing bracket
       console.log("Error: Extraneous closing bracket \"}\"");

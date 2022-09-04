@@ -19,15 +19,15 @@ const cmd = {
 
   commands: {
 
-    ";":
+    "|":
     {
-      aliases: [";"],
+      aliases: ["|"],
       simpleDescription: "META COMMAND: Exits the \"scope\" of a module",
       description: "When typed, exits a module previously specified. This means that the CLI will go back to " +
       "parsing commands and other submodules inside of the video module. In short, it allows the user to " +
       "enter arguments for more than one submodule. NOTE: As only one module may be specified as the first " +
       "argument to the CLI, the video module cannot be exited.",
-      examples: ["[module 1] [argument 1] [argument 2] ... ; [module 2] ..."],
+      examples: ["[module 1] [argument 1] [argument 2] ... | [module 2] ..."],
       numArgs: 0
     },
 
