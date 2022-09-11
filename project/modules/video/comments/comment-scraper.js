@@ -15,13 +15,7 @@ const helpers = require(path.join(__dirname, "..", "..", "..", "common", "helper
 //*********************************************************************************
 function reformatConfig(inner_api_key, continuation_id, config) {
 
-  if (!("data" in config)) { //Has not been loaded yet
-    config.data = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "..", "common", "config_data.json")));
-    config.data.context.client.originalUrl = config.headers.referer;
-    config.data.context.client.mainAppWebInfo.graftUrl = config.headers.referer;
-    config.method = "POST";
-  }
-
+  config.method = "POST";
   let commentUrl = "https://www.youtube.com/youtubei/v1/next?key=" + inner_api_key + "&prettyPrint=false";
   config.url = commentUrl;
   config.data.continuation = continuation_id;

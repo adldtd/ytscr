@@ -210,9 +210,16 @@ function outputHelpAll(cmd) {
 //upon faliure
 //*********************************************************************************
 async function makeRequest(config, timeout, retry = 0) {
+
+  let storeData = undefined;
+  if ("data" in config && config.method == "GET") {
+    storeData = config.data;
+    delete config.data;
+  }
   
   let resp;
   let attempts = -1;
+  let result = -1;
 
   do {
     attempts++;
@@ -221,11 +228,15 @@ async function makeRequest(config, timeout, retry = 0) {
     resp = await axios(config);
 
     if (resp.status >= 200 && resp.status < 300)
-      return resp;
-    else if (resp.status >= 500)
-      return -1;
+      result = 1;
     
-  } while (attempts < retry)
+  } while (attempts < retry && result === -1)
+
+  if (storeData !== undefined)
+    config.data = storeData;
+
+  if (result === 1)
+    return resp;
 
   console.log("\nUnexpected status code: " + resp.status + " " + resp.statusText);
   return -1;

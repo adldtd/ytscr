@@ -17,7 +17,7 @@ function verifyResponse(resp) {
 
   let initialData = helpers.safeSplit(resp.data, "var ytInitialData = ", 1);
   if (initialData.length < 2) {
-    console.log("\nAn unexpected error occurred.\nNo comments found.");
+    console.log("\nAn unexpected error occurred.\nNo messages found.");
     return -1;
   }
 
@@ -52,6 +52,8 @@ function verifyResponse(resp) {
 //*********************************************************************************
 async function scrapeReplayInitialResponse(inner_api_key, continuation_id, config, timeout, settings) {
 
+  if (config.method !== "GET") config.method = "GET";
+
   let chatUrl = "https://www.youtube.com/live_chat_replay?continuation=" + continuation_id;
   config.url = chatUrl;
 
@@ -65,7 +67,7 @@ async function scrapeReplayInitialResponse(inner_api_key, continuation_id, confi
   }
   let pureData = chatResp.data.substring(location + 27);
 
-  pureData = helpers.safeSplit(pureData[1], ";</script><yt-live-chat-app>", 1, true);
+  pureData = helpers.safeSplit(pureData, ";</script><yt-live-chat-app>", 1, true);
   if (pureData.length < 2) {
     console.log("\nAn unexpected error occured.");
     return -1;
@@ -76,9 +78,6 @@ async function scrapeReplayInitialResponse(inner_api_key, continuation_id, confi
   //Reconfigure config
   config.url = "https://www.youtube.com/youtubei/v1/live_chat/get_live_chat_replay?key=" + inner_api_key + "&prettyPrint=false";
   config.method = "POST";
-  config.data = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "config_data.json")));
-  config.data.context.client.originalUrl = config.headers.referer;
-  config.data.context.client.mainAppWebInfo.graftUrl = config.headers.referer;
 
   config.data.currentPlayerState = {playerOffsetMs: "0"};
   return pureData;

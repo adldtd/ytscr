@@ -1,6 +1,6 @@
-const axios = require("axios").default;
 const cmd = require(__dirname + "/commands").cmd;
 const path = require("path");
+const fs = require("fs");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 
 
@@ -24,6 +24,10 @@ async function scrapeVideoModule(settings) {
   config.url = settings.video.input;
   config.headers.referer = settings.video.input;
   console.log("\nScraping video \"" + settings.video.input + "\".");
+
+  config.data = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "common", "config_data.json")));
+  config.data.context.client.originalUrl = config.headers.referer;
+  config.data.context.client.mainAppWebInfo.graftUrl = config.headers.referer;
 
   //Contains the data needed for the other scrapers
   let videoResp = await helpers.makeRequest(config, settings.video.timeout, 1);
