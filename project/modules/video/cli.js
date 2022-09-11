@@ -3,6 +3,7 @@ const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 
 const cmd = require(__dirname + "/commands").cmd;
+const verifyDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).verifyDmodule;
 const verifyFilterable = require(path.join(__dirname, "..", "..", "common", "subscribe-filterable")).verifyFilterable;
 
 
@@ -98,9 +99,12 @@ function cli(args, index) {
 
   };
 
+
+  verifyDmodule(currentState.video, settings.video); /////////////////////Debugging
   verifyFilterable(currentState.comments, settings.comments); /////////////////////Debugging
   verifyFilterable(currentState.chat, settings.chat); /////////////////////Debugging
   
+
   //Loop through the CLI
   while (currentState.index < args.length) {
 
@@ -115,7 +119,7 @@ function cli(args, index) {
       
     } else {
 
-      if (parsed.command === "|")
+      if (parsed.command === "#")
         currentState.error = errors.errorCodesScope(0, "video"); //To help avoid user confusion
       else if (parsed.command === "--help" || parsed.command === "-h") {
         

@@ -1,6 +1,8 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
+
 const subscribeFilterable = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-filterable")).subscribeFilterable;
+const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-meta")).subscribeMeta;
 
 
   /************************************************************************/
@@ -74,6 +76,7 @@ const cmd = {
 
 const commands = cmd.commands;
 subscribeFilterable(attributes, commands);
+subscribeMeta(commands);
 
 
 function topchatCall(c, a, currentState, innerState, moduleSettings, innerSettings) {

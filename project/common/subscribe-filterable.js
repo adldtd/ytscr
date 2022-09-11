@@ -323,11 +323,11 @@ function verifyFilterable(innerState, innerSettings) {
     settingsError = true;
   
   if (stateError && settingsError)
-    throw "Error: currentState and settings are incomplete";
+    throw "Error: currentState and settings are incomplete (filterable)";
   if (stateError)
-    throw "Error: currentState is incomplete";
+    throw "Error: currentState is incomplete (filterable)";
   if (settingsError)
-    throw "Error: settings is incomplete";
+    throw "Error: settings is incomplete (filterable)";
 }
 
 /**

@@ -21,7 +21,7 @@ function errorCodesNums(code, command, expected, recieved) {
       console.log("Error: Command \"" + command + "\" called " + recieved + " times; only expected " + expected);
       break;
     case 3: //Command (or module) does not exist
-      console.log("Error: Invalid command/argument \"" + command + "\"");
+      console.log("Error: Invalid command/module \"" + command + "\"");
       break;
     case 4: //Command required
       console.log("Error: Command \"" + command + "\" is required");
@@ -43,7 +43,7 @@ function errorCodesConflict(code, command1, command2, value = "") {
       console.log("Error: Command \"" + command1 + "\" is mutually exclusive with \"" + command2 + "\"");
       break;
     case 1: //Conflict between commands, based on a common value
-      console.log("Error: Argument \"" + value + "\" cannot be specified for both command \"" + command1 + "\" and \"" + command2 + "\"");
+      console.log("Error: Argument \"" + value + "\" cannot be specified for both commands \"" + command1 + "\" and \"" + command2 + "\"");
       break;
     case 2: //Conflict when a command (command1) is called, and a module (value) is called
       console.log("Error: Module \"" + value + "\" cannot be both specified as an argument for command \"" + command1 + "\" and be called");
@@ -78,7 +78,7 @@ function errorCodesScope(code, moduleOrCommand) {
   switch (code) {
 
     case 0: //Module cannot be exited
-      console.log("Error: Extraneous closing marker \"|\", module \"" + moduleOrCommand + "\" cannot be exited");
+      console.log("Error: Extraneous closing marker; module \"" + moduleOrCommand + "\" cannot be exited");
       break;
     case 1: //Extra closing bracket
       console.log("Error: Extraneous closing bracket \"}\"");
@@ -109,50 +109,50 @@ function errorCodes(code, arg, value = "") {
       console.log("Error: Must specify only one video link");
       break;
     
-    case 2: //Non-filter argument
-      console.log("Error: Argument \"" + arg + "\" is invalid inside of a filter");
+    case 2: //Non-filter command
+      console.log("Error: Command \"" + arg + "\" is invalid inside of a filter");
       break;
     case 3: //Invalid value
       console.log("Error: Argument \"" + value + "\" is invalid for command \"" + arg + "\"");
       break;
-    case 4: //Filter argument misplaced
-      console.log("Error: Argument \"" + arg + "\" is invalid outside of a filter");
+    case 4: //Filter command misplaced
+      console.log("Error: Command \"" + arg + "\" is invalid outside of a filter");
       break;
     case 5: //Multiple in filter
-      console.log("Error: Multiple occurences of argument \"" + arg + "\" not allowed inside of a filter");
+      console.log("Error: Multiple occurences of command \"" + arg + "\" not allowed inside of a filter");
       break;
     case 6: //Misplaced bracket
       console.log("Error: Extraneous filter ending bracket \"}\"");
       break;
     case 7: //Check and match required
-      console.log("Error: Arguments \"check\" and \"match\" required in a filter");
+      console.log("Error: Commands \"--check\" and \"--match\" required in a filter");
       break;
     case 8: //Compare required for numerical
-      console.log("Error: Argument \"compare\" required for numerical checker \"" + value + "\"");
+      console.log("Error: Command \"--compare\" required for numerical checker \"" + value + "\"");
       break;
     case 9: //Invalid compare value for numerical
-      console.log("Error: Value \"" + value + "\" for compare incompatible with a numerical checker");
+      console.log("Error: Value \"" + value + "\" for --compare incompatible with a numerical checker");
       break;
     case 10: //Non-numerical match value
       console.log("Error: Value \"" + value + "\" cannot be evaluated as an integer for a numerical checker");
       break;
     case 11: //Invalid compare value for string
-      console.log("Error: Value \"" + value + "\" for compare incompatible with a string checker");
+      console.log("Error: Value \"" + value + "\" for --compare incompatible with a string checker");
       break;
     case 12: //Filter ignore conflict
       console.log("Error: Check value \"" + value + "\" cannot be used in a filter and also be ignored");
       break;
     case 13: //Multiple output destinations
-      console.log("Error: Must specify only one output destination");
+      console.log("Error: Must specify only one output");
       break;
     case 14: //Invalid destination
       console.log("Error: Folder/file destination not found");
       break;
     case 15: //Value has to be non-zero natural
-      console.log("Error: Value \"" + value + "\" is required to be positive by argument \"" + arg + "\"");
+      console.log("Error: Value \"" + value + "\" is required to be positive by command \"" + arg + "\"");
       break;
     case 16: //Not a number
-      console.log("Error: Value \"" + value + "\" cannot be evaluated as an integer for argument \"" + arg + "\"");
+      console.log("Error: Value \"" + value + "\" cannot be evaluated as an integer for command \"" + arg + "\"");
       break;
 
     case 50: //Starting command
