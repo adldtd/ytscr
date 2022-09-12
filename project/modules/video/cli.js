@@ -20,12 +20,31 @@ function cli(args, index) {
       prettyprint: true,
 
       focus: {
+        meta: true,
         comments: true,
         chat: true
       },
 
       output: "",
       timeout: 1000
+    },
+
+    meta: {
+      ignore: {
+          id: false,
+          type: false,
+          title: false,
+          description: false,
+          tags: false,
+          views: false,
+          likes: false,
+          published: false,
+          comments: false,
+          uploader: false,
+          subscribers: false,
+          channelId: false,
+          pfp: false
+      }
     },
 
     comments: {
@@ -83,6 +102,10 @@ function cli(args, index) {
       excludeList: {},
       modulesCalled: {},
       firstFocusCalled: false
+    },
+
+    meta: {
+
     },
 
     comments: {

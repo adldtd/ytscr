@@ -4,9 +4,11 @@ const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
 
+const meta_cli = require(path.join(__dirname, "meta", "cli")).cli;
 const comment_cli = require(path.join(__dirname, "comments", "cli")).cli;
 const chat_cli = require(path.join(__dirname, "chat", "cli")).cli;
 
+const meta_scraper = require(path.join(__dirname, "meta", "meta-scraper")).scraper;
 const comment_scraper = require(path.join(__dirname, "comments", "comment-scraper")).scraper;
 const chat_scraper = require(path.join(__dirname, "chat", "chat-scraper")).scraper;
 
@@ -15,7 +17,7 @@ const chat_scraper = require(path.join(__dirname, "chat", "chat-scraper")).scrap
  /* The video module commands + submodules */
 /******************************************/
 
-var validModules = {comments: "", chat: ""}; //Reused by both --exclude and --focus
+var validModules = {meta: "", comments: "", chat: ""}; //Reused by both --exclude and --focus
 
 
 const cmd = {
@@ -23,12 +25,22 @@ const cmd = {
   modules: { //Special commands that allow entrance to other subcommands/submodules
   //In this case, these need to be specified at the start
   
+    "meta": {
+      aliases: ["meta"],
+      simpleDescription: "Module for scraping metadata from a YouTube video",
+      description: "The module for retrieving inner video information (the title, uploader, description, " +
+      "etc).",
+      examples: ["meta [argument 1] [argument 2] ... #"],
+      cli: meta_cli,
+      scrape: meta_scraper
+    },
+
     "comments": {
       aliases: ["comments"],
       simpleDescription: "Module for scraping comments from a YouTube video",
       description: "The module for retrieving comment data inside a YouTube video. Will be ignored if 0 " +
       "comments are found.",
-      examples: ["comments [argument 1] [argument 2] ... |"],
+      examples: ["comments [argument 1] [argument 2] ... #"],
       cli: comment_cli,
       scrape: comment_scraper
     },
@@ -38,7 +50,7 @@ const cmd = {
       simpleDescription: "Module for scraping live chat replay from a YouTube video",
       description: "The module for retrieving chat data from a past livestream/premiere. Will be ignored " +
       "if the video was not live in the past (and if it is an ongoing livestream.)",
-      examples: ["chat [argument 1] [argument 2] ... |"],
+      examples: ["chat [argument 1] [argument 2] ... #"],
       cli: chat_cli,
       scrape: chat_scraper
     }

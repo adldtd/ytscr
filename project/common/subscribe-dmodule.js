@@ -132,9 +132,11 @@ function outputCall(parsed, currentState, settings) {
 
   let filepath = ""; let filename = "";
   if (sp.length === 1) { //Treat the entered string as a filename
-    filepath = path.join(__dirname, "..", "..", "SAVES"); filename = sp[0];
+    filepath = path.join(__dirname, "..", "SAVES");
+    filename = sp[0];
   } else {
-    filepath = sp[0]; filename = sp[1];
+    filepath = sp[0];
+    filename = sp[1];
   }
 
   if (sp.length === 1 && !fs.existsSync(filepath)) {
