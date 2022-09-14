@@ -295,6 +295,25 @@ function safeSplit(str, find, times, backwards = false) {
 }
 
 
+//*********************************************************************************
+//Converts the % encoded characters in a URL to normal chars
+//*********************************************************************************
+function unencodeURL(link) {
+
+  for (let i = 0; i < link.length; i++) {
+    if (link.charAt(i) === "%") { //Escape character
+      if (i < link.length - 2) {
+        let val = link.substring(i + 1, i + 3);
+        val = parseInt(val, 16);
+        link = link.substring(0, i) + String.fromCharCode(val) + link.substring(i + 3);
+      }
+    }
+  }
+
+  return link;
+}
+
+
 function validFileName(filename) { //https://stackoverflow.com/a/53635003
   let re = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])$|([<>:"\/\\|?*])|(\.|\s)$/;
   return !(filename === "" || re.test(filename));
@@ -315,5 +334,6 @@ module.exports.outputHelpAll = outputHelpAll;
 module.exports.makeRequest = makeRequest;
 module.exports.handleSaveJSON = handleSaveJSON;
 module.exports.safeSplit = safeSplit;
+module.exports.unencodeURL = unencodeURL;
 module.exports.validFileName = validFileName;
 module.exports.clearLastLine = clearLastLine;

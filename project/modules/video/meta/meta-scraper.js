@@ -1,6 +1,4 @@
 const path = require("path");
-const makeRequest = require(path.join(__dirname, "..", "..", "..", "common", "helpers")).makeRequest;
-const clearLastLine = require(path.join(__dirname, "..", "..", "..", "common", "helpers")).clearLastLine;
 const helpers = require(path.join(__dirname, "..", "..", "..", "common", "helpers"));
 
 
@@ -95,9 +93,19 @@ function scrapeMetadata(config, settings, resp) {
 
       let secondaryData = videoData.videoSecondaryInfoRenderer;
 
-      if (!settings.ignore["description"]) {
-        for (run in secondaryData.description.runs)
-          savedMeta.description += secondaryData.description.runs[run].text;
+      if (!settings.ignore["description"] && "description" in secondaryData) {
+        for (run in secondaryData.description.runs) {
+          
+          let text = secondaryData.description.runs[run].text;
+          if ("navigationEndpoint" in secondaryData.description.runs[run] && "urlEndpoint" in secondaryData.description.runs[run].navigationEndpoint) {
+            
+            let link = secondaryData.description.runs[run].navigationEndpoint.urlEndpoint.url;
+            if (link.includes("https://www.youtube.com/redirect?event=video_description&redir_token="))
+              link = helpers.safeSplit(link.split("&q=", 2)[1], "&v=", 1, true)[0];
+            text = helpers.unencodeURL(link);
+          }
+          savedMeta.description += text;
+        }
       }
 
       if ("owner" in secondaryData) {
@@ -117,8 +125,12 @@ function scrapeMetadata(config, settings, resp) {
           savedMeta.pfp = pfps[pfps.length - 1].url;
         }
 
-        if (!settings.ignore["subscribers"])
-          savedMeta.subscribers = ownerData.subscriberCountText.simpleText;
+        if (!settings.ignore["subscribers"]) {
+          if ("subscriberCountText" in ownerData)
+            savedMeta.subscribers = ownerData.subscriberCountText.simpleText;
+          else
+            savedMeta.subscribers = "0 subscribers";
+        }
       }
 
     //Number of comments
@@ -126,8 +138,12 @@ function scrapeMetadata(config, settings, resp) {
 
       let contents = videoData.itemSectionRenderer.contents;
       for (c in contents) {
-        if ("commentsEntryPointHeaderRenderer" in contents[c])
-          savedMeta.comments = contents[c].commentsEntryPointHeaderRenderer.commentCount.simpleText;
+        if ("commentsEntryPointHeaderRenderer" in contents[c]) {
+          if ("commentCount" in contents[c].commentsEntryPointHeaderRenderer)
+            savedMeta.comments = contents[c].commentsEntryPointHeaderRenderer.commentCount.simpleText;
+          else
+            savedMeta.comments = "0";
+        }
       }
     }
 
