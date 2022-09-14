@@ -31,19 +31,19 @@ function cli(args, index) {
 
     meta: {
       ignore: {
-          id: false,
-          type: false,
-          title: false,
-          description: false,
-          tags: false,
-          views: false,
-          likes: false,
-          published: false,
-          comments: false,
-          uploader: false,
-          subscribers: false,
-          channelId: false,
-          pfp: false
+        id: false,
+        type: false,
+        title: false,
+        description: false,
+        tags: false,
+        views: false,
+        likes: false,
+        published: false,
+        comments: false,
+        uploader: false,
+        subscribers: false,
+        channelId: false,
+        pfp: false
       }
     },
 
