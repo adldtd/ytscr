@@ -37,48 +37,36 @@ function verifyResponse(resp) {
   if ("conversationBar" in initialData.contents.twoColumnWatchNextResults) { //Indicates the chat bar
     
     let bar = initialData.contents.twoColumnWatchNextResults.conversationBar;
-    let live = ("isReplay" in bar.liveChatRenderer) ? !bar.liveChatRenderer.isReplay : true;
+    let live;
+    if ("liveChatRenderer" in bar)
+      live = ("isReplay" in bar.liveChatRenderer) ? !bar.liveChatRenderer.isReplay : true;
+    else {
+      let text = bar.conversationBarRenderer.availabilityMessage.messageRenderer.text.runs[0].text;
+      if (text.toLowerCase().includes("replay")) //Chat replay
+        live = false;
+      else
+        live = true;
+    }
+
     if (live) {
       console.log("\nLivestream ongoing.\nNo comments found.");
       return -1;
     }
   }
   
-  //Deeper
-  initialData = initialData.contents.twoColumnWatchNextResults.results.results.contents;
-
-  /*
-  if ("videoPrimaryInfoRenderer" in initialData[0]) {
-    let runs = initialData[0].videoPrimaryInfoRenderer.title.runs;
-    let title = "";
-    for (run in runs)
-      title += runs[run].text;
-    console.log("\n\"" + title + "\"");
-    console.log(initialData[0].videoPrimaryInfoRenderer.dateText.simpleText);
-  }
-  */
+  initialData = initialData.contents.twoColumnWatchNextResults.results.results.contents; //Deeper
   
   //Determine the video type, as well as any video errors encountered
   let contents = initialData[initialData.length - 1].itemSectionRenderer.contents;
   let requestError = false;
   for (c in contents) {
 
-    if ("backgroundPromoRenderer" in contents[c]) {
-      console.log("\n" + contents[c].backgroundPromoRenderer.title.runs[0].text);
-      requestError = true;
-      break;
-    } else if ("messageRenderer" in contents[c]) {
-      console.log("\n" + contents[c].messageRenderer.text.runs[0].text);
+    if ("messageRenderer" in contents[c]) { //Background promo renderer is handled by video scraper
+      console.log("\nError: " + contents[c].messageRenderer.text.runs[0].text);
       requestError = true;
       break;
     } else if ("continuationItemRenderer" in contents[c])
       continue;
-    else {
-      console.log(contents[c]);
-      console.log("\nAn unexpected error occurred.");
-      requestError = true;
-      break;
-    }
   }
 
   if (requestError) {
@@ -425,7 +413,7 @@ function printReply(singleComment, config) {
 async function collectComments(settings, config, timeout, videoResponse) {
 
   let result = verifyResponse(videoResponse);
-  if (result === -1) return -1;
+  if (result === -1) return [];
   
   //Start scraping
   let inner_api_key = helpers.safeSplit(videoResponse.data, '"INNERTUBE_API_KEY":"', 1)[1];

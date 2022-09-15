@@ -4,6 +4,42 @@ const fs = require("fs");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 
 
+function verifyResponse(resp) {
+
+  let initialData = helpers.safeSplit(resp.data, "var ytInitialData = ", 1);
+  if (initialData.length < 2) {
+    console.log("\nAn unexpected error occurred.\nNo info retrievable.");
+    return -1;
+  }
+  initialData = JSON.parse(helpers.safeSplit(initialData[1], ";</script><script nonce", 1)[0]);
+  initialData = initialData.contents.twoColumnWatchNextResults.results.results;
+  if (!("contents" in initialData)) {
+    console.log("\nThe video entered does not exist.\nNo info retrievable.");
+    return -1;
+  }
+  initialData = initialData.contents;
+
+  let contents = initialData[initialData.length - 1].itemSectionRenderer.contents;
+  let requestError = false;
+  for (c in contents) {
+
+    if ("backgroundPromoRenderer" in contents[c]) {
+      console.log("\nError: " + contents[c].backgroundPromoRenderer.title.runs[0].text);
+      requestError = true;
+      break;
+    } else if ("continuationItemRenderer" in contents[c])
+      continue;
+  }
+
+  if (requestError) {
+    console.log("No info retrievable.");
+    return -1;
+  }
+
+  return 0;
+}
+
+
 async function scrapeVideoModule(settings) {
 
   let savedData = {};
@@ -31,7 +67,16 @@ async function scrapeVideoModule(settings) {
 
   //Contains the data needed for the other scrapers
   let videoResp = await helpers.makeRequest(config, settings.video.timeout, 1);
-  if (videoResp === -1) return -1;
+  if (videoResp === -1) {
+    console.log("No save made.");
+    return -1;
+  }
+
+  let result = verifyResponse(videoResp);
+  if (result === -1) {
+    console.log("No save made.");
+    return -1;
+  }
 
   //Scrape each of the modules
   for (md in settings.video.focus) {

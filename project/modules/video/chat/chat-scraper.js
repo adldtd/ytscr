@@ -334,7 +334,7 @@ function printMessage(singleMessage) {
 async function collectChat(settings, config, timeout, videoResponse) {
 
   let result = verifyResponse(videoResponse);
-  if (result === -1) return -1;
+  if (result === -1) return [];
 
   //Activate scraping
   let inner_api_key = helpers.safeSplit(videoResponse.data, '"INNERTUBE_API_KEY":"', 1)[1];
