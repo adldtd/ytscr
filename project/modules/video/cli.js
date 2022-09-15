@@ -1,3 +1,4 @@
+const { parse } = require("path");
 const path = require("path");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
@@ -137,6 +138,7 @@ function cli(args, index) {
 
     if (parsed.isModule) {
     
+      currentState.video.modulesCalled[parsed.command] = "";
       let result = parsed.commandBox.cli(args, currentState, settings);
       if (result === -1 || result === 1) return result;
       
@@ -165,6 +167,16 @@ function cli(args, index) {
   //Check for required inputs/errors after the fact
   if (settings.video.input === "")
     currentState.error = errors.errorCodesNums(4, "--input", 1, 0);
+  else {
+
+    for (md in currentState.video.modulesCalled) { //Catches an error where a module is called but not focused
+      if (!settings.video.focus[md]) {
+        console.log("Error: Module \"" + md + "\" is modified, but is either ignored or not focused");
+        currentState.error = true;
+        break;
+      }
+    }
+  }
 
   if (currentState.error)
     return -1;

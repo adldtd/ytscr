@@ -96,14 +96,25 @@ function scrapeMetadata(config, settings, resp) {
       if (!settings.ignore["description"] && "description" in secondaryData) {
         for (run in secondaryData.description.runs) {
           
+          //Manage links; often they are cut off in the returned description, and we don't want that
           let text = secondaryData.description.runs[run].text;
-          if ("navigationEndpoint" in secondaryData.description.runs[run] && "urlEndpoint" in secondaryData.description.runs[run].navigationEndpoint) {
-            
-            let link = secondaryData.description.runs[run].navigationEndpoint.urlEndpoint.url;
-            if (link.includes("https://www.youtube.com/redirect?event=video_description&redir_token="))
-              link = helpers.safeSplit(link.split("&q=", 2)[1], "&v=", 1, true)[0];
-            text = helpers.unencodeURL(link);
+          if ("navigationEndpoint" in secondaryData.description.runs[run]) {
+            if ("urlEndpoint" in secondaryData.description.runs[run].navigationEndpoint) {
+
+              let link = secondaryData.description.runs[run].navigationEndpoint.urlEndpoint.url;
+              if (link.includes("https://www.youtube.com/redirect?event=video_description&redir_token="))
+                link = helpers.safeSplit(link.split("&q=", 2)[1], "&v=", 1, true)[0];
+              text = helpers.unencodeURL(link);
+
+            //Manages special YouTube pages (channels, videos)
+            } else if ("commandMetadata" in secondaryData.description.runs[run].navigationEndpoint) {
+
+              text = secondaryData.description.runs[run].navigationEndpoint.commandMetadata.webCommandMetadata.url;
+              if (text.charAt(0) === "/") //Redirect to a YouTube page
+                text = "https://www.youtube.com" + text;
+            }
           }
+
           savedMeta.description += text;
         }
       }

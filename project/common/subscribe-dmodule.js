@@ -70,7 +70,7 @@ function focusCall(parsed, currentState, settings) {
   if (a in parsed.commandBox.validValues) {
     if (!(a in currentState.video.excludeList)) {
 
-      if (!currentState.video.firstFocusCalled) {
+      if (!currentState.video.firstFocusCalled) { //The first focus called disables all other modules
         currentState.video.firstFocusCalled = true;
         for (md in settings.video.focus) {
           if (md !== a)
