@@ -7,17 +7,19 @@ const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscr
 const meta_cli = require(path.join(__dirname, "meta", "cli")).cli;
 const comment_cli = require(path.join(__dirname, "comments", "cli")).cli;
 const chat_cli = require(path.join(__dirname, "chat", "cli")).cli;
+const recommended_cli = require(path.join(__dirname, "recommended", "cli")).cli;
 
 const meta_scraper = require(path.join(__dirname, "meta", "meta-scraper")).scraper;
 const comment_scraper = require(path.join(__dirname, "comments", "comment-scraper")).scraper;
 const chat_scraper = require(path.join(__dirname, "chat", "chat-scraper")).scraper;
+const recommended_scraper = require(path.join(__dirname, "recommended", "recommended-scraper")).scraper;
 
 
   /******************************************/
  /* The video module commands + submodules */
 /******************************************/
 
-var validModules = {meta: "", comments: "", chat: ""}; //Reused by both --exclude and --focus
+var validModules = {meta: "", comments: "", chat: "", recommended: ""}; //Reused by both --exclude and --focus
 
 
 const cmd = {
@@ -53,6 +55,16 @@ const cmd = {
       examples: ["chat [argument 1] [argument 2] ... #"],
       cli: chat_cli,
       scrape: chat_scraper
+    },
+
+    "recommended": {
+      aliases: ["recommended"],
+      simpleDescription: "Module for scraping recommendations for a YouTube video",
+      description: "The module for retrieving recommended videos. The amount of recommendations heavily depends " +
+      "on the video type, its uploader, and the time of access.",
+      examples: ["recommended [argument 1] [argument 2] ... #"],
+      cli: recommended_cli,
+      scrape: recommended_scraper
     }
 
   },

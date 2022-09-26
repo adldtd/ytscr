@@ -6,7 +6,7 @@ const cmd = require(__dirname + "/commands").cmd;
 
 
 //*********************************************************************************
-//Comments module CLI; modifies settings.comments
+//Recommended module CLI; modifies settings.recommended
 //*********************************************************************************
 function cli(args, currentState, settings) {
   
@@ -18,11 +18,6 @@ function cli(args, currentState, settings) {
     currentState.index = parsed.currentIndex;
 
     if (parsed.command === "#") {
-
-      if (currentState.comments.inFilter) {
-        currentState.error = errors.errorCodesScope(3, "comments");
-        return -1;
-      }
       return 0; //Exit scope safely
 
     } else if (parsed.command === "--help" || parsed.command === "-h") {
@@ -36,14 +31,11 @@ function cli(args, currentState, settings) {
       }
 
     } else //Default; non-meta commands
-      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState.comments, settings.video, settings.comments);
+      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState.recommended, settings.video, settings.recommended);
 
     if (currentState.error)
       return -1;
   }
-
-  if (!settings.comments.replies && settings.comments.nrf)
-    console.log("WARNING: -nrf is specified alongside --noreply, making the former redundant (no replies will be saved).")
 
   return 0; //No errors and no stopping commands called
 }

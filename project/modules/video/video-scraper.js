@@ -4,6 +4,11 @@ const fs = require("fs");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 
 
+  /*********************************************************************************************/
+ /* The handler for the video module and all of its submodules; calls other scraping commands */
+/*********************************************************************************************/
+
+
 function verifyResponse(resp) {
 
   let initialData = helpers.safeSplit(resp.data, "var ytInitialData = ", 1);

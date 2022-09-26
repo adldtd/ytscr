@@ -23,7 +23,8 @@ function cli(args, index) {
       focus: {
         meta: true,
         comments: true,
-        chat: true
+        chat: true,
+        recommended: true
       },
 
       output: "",
@@ -88,6 +89,26 @@ function cli(args, index) {
         picture: false,
         channel: false
       }
+    },
+
+    recommended: {
+      savefilter: false,
+      printfilter: false,
+
+      lim: Number.POSITIVE_INFINITY,
+      limfilter: Number.POSITIVE_INFINITY,
+
+      filter: [],
+      ignore: {
+        id: false,
+        title: false,
+        views: false,
+        duration: false,
+        published: false,
+        thumbnail: false,
+        uploader: false,
+        channelId: false
+      }
     }
 
   }
@@ -119,6 +140,12 @@ function cli(args, index) {
       usedFilterCheckValues: {},
       inFilter: false,
       currentFilter: {}
+    },
+
+    recommended: {
+      usedFilterCheckValues: {},
+      inFilter: false,
+      currentFilter: {}
     }
 
   };
@@ -127,6 +154,7 @@ function cli(args, index) {
   verifyDmodule(currentState.video, settings.video); /////////////////////Debugging
   verifyFilterable(currentState.comments, settings.comments); /////////////////////Debugging
   verifyFilterable(currentState.chat, settings.chat); /////////////////////Debugging
+  verifyFilterable(currentState.recommended, settings.recommended); /////////////////////Debugging
   
 
   //Loop through the CLI
