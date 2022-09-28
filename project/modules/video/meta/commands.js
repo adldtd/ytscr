@@ -40,6 +40,50 @@ const cmd = {
       numArgs: 1
     }
 
+  },
+
+  attributes: {
+    
+    "id": {
+      simpleDescription: "ID of the YouTube video"
+    },
+    "type": {
+      simpleDescription: "The type of the \"video\" entered"
+    },
+    "title": {
+      simpleDescription: "The video title"
+    },
+    "description": {
+      simpleDescription: "The video description"
+    },
+    "tags": {
+      simpleDescription: "An array of video tags"
+    },
+    "views": {
+      simpleDescription: "Num. views"
+    },
+    "likes": {
+      simpleDescription: "Num. likes"
+    },
+    "published": {
+      simpleDescription: "Publish/stream date"
+    },
+    "comments": {
+      simpleDescription: "Num. comments"
+    },
+    "uploader": {
+      simpleDescription: "Name of uploader"
+    },
+    "subscribers": {
+      simpleDescription: "Num. subscribers"
+    },
+    "channelId": {
+      simpleDescription: "Uploader's channel ID"
+    },
+    "pfp": {
+      simpleDescription: "Uploader's profile picture"
+    }
+
   }
 }
 

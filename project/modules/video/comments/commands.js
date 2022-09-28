@@ -69,6 +69,31 @@ const cmd = {
       numArgs: 1
     }
 
+  },
+
+  attributes: {
+
+    "author": {
+      simpleDescription: "The comment author's name"
+    },
+    "text": {
+      simpleDescription: "The comment's contents"
+    },
+    "id": {
+      simpleDescription: "The ID of the comment"
+    },
+    "published": {
+      simpleDescription: "When the comment was made"
+    },
+    "votes": {
+      simpleDescription: "Num. likes"
+    },
+    "picture": {
+      simpleDescription: "The author's profile picture"
+    },
+    "channel": {
+      simpleDescription: "The author's channel ID"
+    }
   }
 
 };

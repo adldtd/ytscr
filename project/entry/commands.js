@@ -26,6 +26,7 @@ const cmd = {
       scrape: video_scraper
     },
 
+    /*
     "search": {
       aliases: ["search"],
       simpleDescription: "Module for scraping data from a YouTube search",
@@ -37,6 +38,7 @@ const cmd = {
       cli: undefined,
       scrape: undefined //////////////////////////////////////////////////////////////TODO
     }
+    */
 
   },
 

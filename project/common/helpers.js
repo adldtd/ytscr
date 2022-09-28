@@ -170,22 +170,31 @@ function parseHelp(cmd, currentState, parsed) {
 //*********************************************************************************
 function outputHelpAll(cmd) {
   let buffer_space = 25; //The buffer space "names" get before the simple description is printed
+  let attrMode = false;
 
   for (s in cmd) {
 
     if (s === "modules")
       console.log("MODULES:");
-    else
+    else if (s === "commands")
       console.log("COMMANDS/FLAGS:");
+    else {
+      console.log("\nScraped Attributes:");
+      attrMode = true;
+    }
 
     let section = cmd[s];
     
     for (c in section) {
       if ("simpleDescription" in section[c]) {
         
-        let names = section[c].aliases[0];
-        for (let i = 1; i < section[c].aliases.length; i++)
-          names += ", " + section[c].aliases[i];
+        let names;
+        if (!attrMode) {
+          names = section[c].aliases[0];
+          for (let i = 1; i < section[c].aliases.length; i++)
+            names += ", " + section[c].aliases[i];
+        } else
+          names = c;
 
         let spaces = "";
         let numSpaces = buffer_space - names.length;
@@ -199,6 +208,7 @@ function outputHelpAll(cmd) {
     }
 
     console.log(""); //New line
+    attrMode = false;
 
   }
 

@@ -46,6 +46,28 @@ const cmd = {
       numArgs: 1
     }
 
+  },
+
+  attributes: {
+
+    "author": {
+      simpleDescription: "The author of the message"
+    },
+    "text": {
+      simpleDescription: "The message contents"
+    },
+    "id": {
+      simpleDescription: "The message's ID"
+    },
+    "timestamp": {
+      simpleDescription: "When the message was sent (in ms, from when the stream started)"
+    },
+    "picture": {
+      simpleDescription: "The author's profile picture"
+    },
+    "channel": {
+      simpleDescription: "The author's channel ID"
+    }
   }
 
 }
