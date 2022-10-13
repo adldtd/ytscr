@@ -1,4 +1,3 @@
-const { parse } = require("path");
 const path = require("path");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
@@ -28,6 +27,7 @@ function cli(args, index) {
       },
 
       output: "",
+      verbose: 4,
       timeout: 1000
     },
 

@@ -3,6 +3,7 @@
 /project/planner.txt
 /project/_DEBUG
 /project/SAVES/*
+!/project/SAVES/stub.txt
 /project/console-tracker.js
 /project/package-lock.json
 .vscode

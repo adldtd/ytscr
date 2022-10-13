@@ -12,7 +12,7 @@ function retrieveFirstRecommended(inner_api_key, videoResponse, config) {
 
   let pureData = helpers.safeSplit(videoResponse.data, "var ytInitialData = ", 1);
   if (pureData.length < 2) {
-    console.log("\nAn unexpected error occurred.");
+    global.sendvb(2, "\nAn unexpected error occurred.");
     return -1;
   }
   pureData = JSON.parse(helpers.safeSplit(pureData[1], ";</script><script nonce", 1)[0]);
@@ -44,13 +44,13 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
       if (pureData === -1) return savedRecommended;
       recommendations = pureData.contents.twoColumnWatchNextResults;
       if (!("secondaryResults" in recommendations)) {
-        console.log("Error: Recommendation bar not found.");
+        global.sendvb("Error: Recommendation bar not found.");
         return savedRecommended;
       }
       recommendations = recommendations.secondaryResults.secondaryResults.results;
 
     } else {
-      let pureData = await makeRequest(config, timeout, 1);
+      let pureData = await makeRequest(config, timeout, 1, 2);
       if (pureData === -1) return savedRecommended;
 
       recommendations = pureData.data.onResponseReceivedEndpoints[0].appendContinuationItemsAction.continuationItems;
@@ -60,8 +60,8 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
     for (r in recommendations) {
 
       if (counter >= settings.lim || matchCounter >= settings.limfilter) {
-        clearLastLine();
-        console.log("Recommendations scraped: " + counter);
+        if (global.verbose >= 3) clearLastLine();
+        global.sendvb(3, "Recommendations scraped: " + counter);
         return savedRecommended;
       }
 
@@ -94,8 +94,8 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
 
     }
 
-    clearLastLine();
-    console.log("Recommendations scraped: " + counter);
+    if (global.verbose >= 3) clearLastLine();
+    global.sendvb(3, "Recommendations scraped: " + counter);
     if (counter >= settings.lim || matchCounter >= settings.limfilter)
       return savedRecommended;
 
@@ -128,8 +128,18 @@ function getRecommendedData(innerVideo, ignore) {
   if (!ignore.title)
     singleRecommended.title = innerVideo.title.simpleText;
 
-  if (!ignore.views)
-    singleRecommended.views = innerVideo.viewCountText.simpleText;
+  if (!ignore.views) {
+    if ("viewCountText" in innerVideo) {
+
+      singleRecommended.views = "";
+      if (live) {
+        for (run in innerVideo.viewCountText.runs)
+          singleRecommended.views += innerVideo.viewCountText.runs[run].text;
+      } else
+        singleRecommended.views = innerVideo.viewCountText.simpleText;
+
+    }
+  }
 
   if (!ignore.duration) {
     singleRecommended.duration = "";
@@ -294,12 +304,12 @@ async function collectRecommended(settings, config, timeout, videoResponse) {
 
   let continuation_id = ""; //Initialized in the scraping function
 
-  console.log("\n");
+  global.sendvb(2, "\n");
   let savedRecommended = await scrapeRecommended(inner_api_key, continuation_id, videoResponse, config, timeout, settings);
-  console.log("Complete");
+  global.sendvb(2, "Complete");
 
   if (savedRecommended.length === 0)
-    console.log("No recommendations found.");
+    global.sendvb(2, "No recommendations found.");
 
   return savedRecommended;
 }

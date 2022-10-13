@@ -29,8 +29,8 @@ const cmd = {
   
     "meta": {
       aliases: ["meta"],
-      simpleDescription: "Module for scraping metadata from a YouTube video",
-      description: "The module for retrieving inner video information (the title, uploader, description, " +
+      simpleDescription: "Submodule for scraping metadata from a YouTube video",
+      description: "The submodule for retrieving inner video information (the title, uploader, description, " +
       "etc).",
       examples: ["meta [argument 1] [argument 2] ... #"],
       cli: meta_cli,
@@ -39,8 +39,8 @@ const cmd = {
 
     "comments": {
       aliases: ["comments"],
-      simpleDescription: "Module for scraping comments from a YouTube video",
-      description: "The module for retrieving comment data inside a YouTube video. Will be ignored if 0 " +
+      simpleDescription: "Submodule for scraping comments from a YouTube video",
+      description: "The submodule for retrieving comment data inside a YouTube video. Will be ignored if 0 " +
       "comments are found.",
       examples: ["comments [argument 1] [argument 2] ... #"],
       cli: comment_cli,
@@ -49,8 +49,8 @@ const cmd = {
 
     "chat": {
       aliases: ["chat"],
-      simpleDescription: "Module for scraping live chat replay from a YouTube video",
-      description: "The module for retrieving chat data from a past livestream/premiere. Will be ignored " +
+      simpleDescription: "Submodule for scraping live chat replay from a YouTube video",
+      description: "The submodule for retrieving chat data from a past livestream/premiere. Will be ignored " +
       "if the video was not live in the past (and if it is an ongoing livestream.)",
       examples: ["chat [argument 1] [argument 2] ... #"],
       cli: chat_cli,
@@ -59,8 +59,8 @@ const cmd = {
 
     "recommended": {
       aliases: ["recommended"],
-      simpleDescription: "Module for scraping recommendations for a YouTube video",
-      description: "The module for retrieving recommended videos. The amount of recommendations heavily depends " +
+      simpleDescription: "Submodule for scraping recommendations for a YouTube video",
+      description: "The submodule for retrieving recommended videos. The amount of recommendations heavily depends " +
       "on the video type, its uploader, and the time of access.",
       examples: ["recommended [argument 1] [argument 2] ... #"],
       cli: recommended_cli,
@@ -86,7 +86,7 @@ const cmd = {
 
 }
 
-subscribeDmodule(validModules, cmd.commands);
+subscribeDmodule(validModules, cmd.commands, "video");
 subscribeMeta(cmd.commands);
 
 

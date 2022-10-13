@@ -219,7 +219,7 @@ function outputHelpAll(cmd) {
 //Wrapper function for creating requests; returns the request upon success or -1
 //upon faliure
 //*********************************************************************************
-async function makeRequest(config, timeout, retry = 0) {
+async function makeRequest(config, timeout, retry = 0, verbosityLevel = 4) {
 
   let storeData = undefined;
   if ("data" in config && config.method == "GET") {
@@ -248,7 +248,7 @@ async function makeRequest(config, timeout, retry = 0) {
   if (result === 1)
     return resp;
 
-  console.log("\nUnexpected status code: " + resp.status + " " + resp.statusText);
+  global.sendvb(verbosityLevel, "\nUnexpected status code: " + resp.status + " " + resp.statusText);
   return -1;
 }
 

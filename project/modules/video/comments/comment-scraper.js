@@ -29,7 +29,7 @@ function verifyResponse(resp) {
 
   let initialData = helpers.safeSplit(resp.data, "var ytInitialData = ", 1);
   if (initialData.length < 2) {
-    console.log("\nAn unexpected error occurred.\nNo comments found.");
+    global.sendvb(2, "\nAn unexpected error occurred.\nNo comments found.");
     return -1;
   }
 
@@ -49,7 +49,7 @@ function verifyResponse(resp) {
     }
 
     if (live) {
-      console.log("\nLivestream ongoing.\nNo comments found.");
+      global.sendvb(2, "\nLivestream ongoing.\nNo comments found.");
       return -1;
     }
   }
@@ -62,7 +62,7 @@ function verifyResponse(resp) {
   for (c in contents) {
 
     if ("messageRenderer" in contents[c]) { //Background promo renderer is handled by video scraper
-      console.log("\nError: " + contents[c].messageRenderer.text.runs[0].text);
+      global.sendvb(2, "\nError: " + contents[c].messageRenderer.text.runs[0].text);
       requestError = true;
       break;
     } else if ("continuationItemRenderer" in contents[c])
@@ -70,7 +70,7 @@ function verifyResponse(resp) {
   }
 
   if (requestError) {
-    console.log("No comments found.");
+    global.sendvb(2, "No comments found.");
     return -1;
   }
 
@@ -94,7 +94,7 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
     hasContinuation = false;
     config.data.continuation = continuation_id; //Chaining requests
 
-    let resp = await makeRequest(config, timeout, 1)
+    let resp = await makeRequest(config, timeout, 1, 2)
     if (resp === -1) return savedComments;
 
     //Parse recieved data
@@ -107,7 +107,7 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
         continuation_id = newestSection.serviceEndpoint.continuationCommand.token;
         config.data.continuation = continuation_id;
 
-        resp = await makeRequest(config, timeout, 1);
+        resp = await makeRequest(config, timeout, 1, 2);
         if (resp === -1) return savedComments;
 
         comments = resp.data.onResponseReceivedEndpoints[1].reloadContinuationItemsCommand.continuationItems;
@@ -181,8 +181,8 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
         savedComments.push(singleComment);
     }
 
-    clearLastLine();
-    console.log("Comments scraped: " + counter);
+    if (global.verbose >= 3) clearLastLine();
+    global.sendvb(3, "Comments scraped: " + counter);
   }
 
   return savedComments;
@@ -204,7 +204,7 @@ async function scrapeReplies(continuation_id, config, timeout, counter, matchCou
     hasContinuation = false;
     config.data.continuation = continuation_id; //Chaining requests
 
-    let resp = await makeRequest(config, timeout, 1);
+    let resp = await makeRequest(config, timeout, 1, 2);
     if (resp === -1) return [counter, matchCounter, savedComments];
 
 
@@ -246,8 +246,8 @@ async function scrapeReplies(continuation_id, config, timeout, counter, matchCou
       counter++;
     }
 
-    clearLastLine();
-    console.log("Comments scraped: " + counter);
+    if (global.verbose >= 3) clearLastLine();
+    global.sendvb(3, "Comments scraped: " + counter);
   }
 
   return [counter, matchCounter, savedComments];
@@ -424,12 +424,12 @@ async function collectComments(settings, config, timeout, videoResponse) {
 
   reformatConfig(inner_api_key, continuation_id, config);
   
-  console.log("\n");
+  global.sendvb(2, "\n");
   let savedComments = await scrapeComments(continuation_id, config, timeout, settings);
-  console.log("Complete");
+  global.sendvb(2, "Complete");
 
   if (savedComments.length === 0) {
-    console.log("No comments found.");
+    global.sendvb(2, "No comments found.");
   }
 
   return savedComments;

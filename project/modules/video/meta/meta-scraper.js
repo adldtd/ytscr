@@ -22,7 +22,7 @@ function scrapeMetadata(config, settings, resp) {
 
   let innerData = helpers.safeSplit(resp.data, "var ytInitialData = ", 1);
   if (innerData.length < 2) {
-    console.log("\nAn unexpected error occurred.\nNo metadata found.");
+    global.sendvb(2, "\nAn unexpected error occurred.\nNo metadata found.");
     return -1;
   }
   innerData = JSON.parse(helpers.safeSplit(innerData[1], ";</script><script nonce", 1)[0]);
@@ -170,9 +170,9 @@ function scrapeMetadata(config, settings, resp) {
 
 async function collectMeta(settings, config, timeout, videoResponse) {
 
-  console.log("");
+  global.sendvb(2, "");
   let savedMeta = scrapeMetadata(config, settings, videoResponse);
-  console.log("Complete");
+  global.sendvb(2, "Complete");
   return savedMeta;
 }
 

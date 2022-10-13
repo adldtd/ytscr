@@ -1,4 +1,3 @@
-const fs = require("fs");
 const path = require("path");
 const makeRequest = require(path.join(__dirname, "..", "..", "..", "common", "helpers")).makeRequest;
 const clearLastLine = require(path.join(__dirname, "..", "..", "..", "common", "helpers")).clearLastLine;
@@ -17,7 +16,7 @@ function verifyResponse(resp) {
 
   let initialData = helpers.safeSplit(resp.data, "var ytInitialData = ", 1);
   if (initialData.length < 2) {
-    console.log("\nAn unexpected error occurred.\nNo messages found.");
+    global.sendvb(2, "\nAn unexpected error occurred.\nNo messages found.");
     return -1;
   }
 
@@ -26,19 +25,19 @@ function verifyResponse(resp) {
     
     let bar = initialData.contents.twoColumnWatchNextResults.conversationBar;
     if (!("liveChatRenderer" in bar)) {
-      console.log("\n" + bar.conversationBarRenderer.availabilityMessage.messageRenderer.text.runs[0].text);
-      console.log("No messages found.");
+      global.sendvb(2, "\n" + bar.conversationBarRenderer.availabilityMessage.messageRenderer.text.runs[0].text);
+      global.sendvb(2, "No messages found.");
       return -1;
     }
 
     let live = ("isReplay" in bar.liveChatRenderer) ? !bar.liveChatRenderer.isReplay : true;
     if (live) {
-      console.log("\nLivestream still going; cannot retrieve past chat data.\nNo messages found.")
+      global.sendvb(2, "\nLivestream still going; cannot retrieve past chat data.\nNo messages found.")
       return -1;
     }
 
   } else {
-    console.log("\nChat bar not found.\nNo messages found.");
+    global.sendvb(2, "\nChat bar not found.\nNo messages found.");
     return -1;
   }
 
@@ -62,14 +61,14 @@ async function scrapeReplayInitialResponse(inner_api_key, continuation_id, confi
 
   let location = chatResp.data.indexOf('>window["ytInitialData"] = {"responseContext":{');
   if (location === -1) {
-    console.log("\nAn unexpected error occurred.");
+    global.sendvb(2, "\nAn unexpected error occurred.");
     return -1;
   }
   let pureData = chatResp.data.substring(location + 27);
 
   pureData = helpers.safeSplit(pureData, ";</script><yt-live-chat-app>", 1, true);
   if (pureData.length < 2) {
-    console.log("\nAn unexpected error occured.");
+    global.sendvb(2, "\nAn unexpected error occured.");
     return -1;
   }
 
@@ -136,8 +135,8 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
 
       //To make sure the counter does not go over a limit, and that no extraneous requests (after limit is reached) are made
       if (counter >= settings.lim || matchCounter >= settings.limfilter) {
-        clearLastLine();
-        console.log("Messages scraped: " + counter);
+        if (global.verbose >= 3) clearLastLine();
+        global.sendvb(3, "Messages scraped: " + counter);
         hasContinuation = false;
         return savedMessages;
       } else if (m === messages.length)
@@ -182,8 +181,8 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
       }
     }
 
-    clearLastLine();
-    console.log("Messages scraped: " + counter);
+    if (global.verbose >= 3) clearLastLine();
+    global.sendvb(3, "Messages scraped: " + counter);
 
   }
 
@@ -343,12 +342,12 @@ async function collectChat(settings, config, timeout, videoResponse) {
   let continuation_id = helpers.safeSplit(videoResponse.data, '"liveChatRenderer":{"continuations":[{"reloadContinuationData":{"continuation":"', 1)[1];
   continuation_id = helpers.safeSplit(continuation_id, '"', 1)[0];
 
-  console.log("\n");
+  global.sendvb(2, "\n");
   let savedMessages = await scrapeReplayChat(inner_api_key, continuation_id, config, timeout, settings);
-  console.log("Complete");
+  global.sendvb(2, "Complete");
 
   if (savedMessages.length === 0)
-    console.log("No messages found.");
+    global.sendvb(2, "No messages found.");
 
   return savedMessages;
 

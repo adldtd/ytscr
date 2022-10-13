@@ -8,6 +8,7 @@ const errors = require(path.join(__dirname, "errors"));
  /* Default module command pack; meant to reduce code bloat between first-call modules */
 /**************************************************************************************/
 
+innerModule = "";
 
 const commands = {
 
@@ -58,6 +59,23 @@ const commands = {
     examples: ["--output \"C:/Users/admin/scraped.json\"", "-o C:/scrapes/scraped"],
     call: outputCall,
     numArgs: 1
+  },
+
+  "--verbose":
+  {
+    aliases: ["--verbose"],
+    simpleDescription: "The amount of information the program will print",
+    description: "Takes in an integer value, which specifies what the program will print during execution. " +
+    "Range is from 0-3.",
+    validValues: {
+      "0": "Only prints CLI errors to the terminal, nothing else",
+      "1": "Prints the scraping start message, main module errors, and the save output; no headers or progress",
+      "2": "Prints submodule headers and submodule errors; no progress",
+      "3": "Prints progress - default option"
+    },
+    examples: ["--verbose 0"],
+    call: verboseCall,
+    numArgs: 1
   }
 }
 
@@ -72,12 +90,12 @@ function focusCall(parsed, currentState, settings) {
 
       if (!currentState.video.firstFocusCalled) { //The first focus called disables all other modules
         currentState.video.firstFocusCalled = true;
-        for (md in settings.video.focus) {
+        for (md in settings[innerModule].focus) {
           if (md !== a)
-            settings.video.focus[md] = false;
+            settings[innerModule].focus[md] = false;
         }
       } else
-        settings.video.focus[a] = true;
+        settings[innerModule].focus[a] = true;
       currentState.video.focusList[a] = ""; //To detect collisions with --exclude
 
     } else
@@ -96,7 +114,7 @@ function excludeCall(parsed, currentState, settings) {
     if (!(a in currentState.video.focusList)) {
       if (!(a in currentState.video.modulesCalled)) {
 
-        settings.video.focus[a] = false;
+        settings[innerModule].focus[a] = false;
         currentState.video.excludeList[a] = ""; //To detect collisions with --focus and calling modules
 
       } else
@@ -110,7 +128,7 @@ function excludeCall(parsed, currentState, settings) {
 }
 
 function noprettyCall(parsed, currentState, settings) {
-  settings.video.prettyprint = false;
+  settings[innerModule].prettyprint = false;
 }
 
 function outputCall(parsed, currentState, settings) {
@@ -118,7 +136,7 @@ function outputCall(parsed, currentState, settings) {
   let c = parsed.command; let a = parsed.args[0];
   let forwardSlashSplit = true;
   
-  if (settings.video.output !== "") {
+  if (settings[innerModule].output !== "") {
     currentState.error = errors.errorCodesNums(2, c, 1, 2);
     return;
   }
@@ -152,7 +170,23 @@ function outputCall(parsed, currentState, settings) {
   if (filename.substring(filename.length - 5) !== ".json")
     filename += ".json"; //Force the filetype
 
-  settings.video.output = filepath + (forwardSlashSplit ? "/" : "\\") + filename;
+  settings[innerModule].output = filepath + (forwardSlashSplit ? "/" : "\\") + filename;
+}
+
+function verboseCall(parsed, currentState, settings) {
+
+  let c = parsed.command; let a = parsed.args[0];
+
+  if (!(toString(settings[innerModule].verbose) in parsed.commandBox.validValues)) { //If this statement is false, --verbose was already specified
+    if (a in parsed.commandBox.validValues) {
+      settings[innerModule].verbose = parseInt(a);
+      global.verbose = settings[innerModule].verbose;
+    } else {
+      currentState.error = errors.errorCodes(3, c, a);
+      helpers.outputValidValues(c, parsed.commandBox.validValues)
+    }
+  } else
+    currentState.error = errors.errorsCodesNums(2, c, 1, 2);
 }
 
 //--------------------------------------------------------------------- "Registration" functions
@@ -169,7 +203,7 @@ function verifyDmodule(innerState, innerSettings) {
   if (!("focusList" in innerState && "excludeList" in innerState && "modulesCalled" in innerState && "firstFocusCalled" in innerState))
     stateError = true;
 
-  if (!("prettyprint" in innerSettings && "focus" in innerSettings && "output" in innerSettings && "timeout" in innerSettings))
+  if (!("prettyprint" in innerSettings && "verbose" in innerSettings && "focus" in innerSettings && "output" in innerSettings && "timeout" in innerSettings))
     settingsError = true;
 
   if (stateError && settingsError)
@@ -185,8 +219,9 @@ function verifyDmodule(innerState, innerSettings) {
  * @param {Object} modules Contains the names of modules as keys in an object
  * @param {Object} cmdCommands The "command" section of a cmd object
  */
-function subscribeDmodule(modules, cmdCommands) {
+function subscribeDmodule(modules, cmdCommands, innerMod) {
 
+  innerModule = innerMod;
   for (c in commands) {
 
     //Shallow copy; shouldn't matter as later code shouldn't modify any embedded objects or arrays in cmd

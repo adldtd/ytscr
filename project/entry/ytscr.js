@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 const cli = require(__dirname + "/cli").cli;
+const path = require("path");
+const gl = require(path.join(__dirname, "..", "common", "globals"));
 
 (async () => { //Main
 
