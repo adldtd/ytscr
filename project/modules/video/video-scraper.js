@@ -91,6 +91,7 @@ async function scrapeVideoModule(settings) {
       global.sendvb(2, "\n ------------ Scraping " + md + "... ------------");
 
       settings[md].save = true;
+
       let res = await scrapeCommand(settings[md], config, settings.video.timeout, videoResp);
       if (res !== -1) savedData[md] = res;
     }

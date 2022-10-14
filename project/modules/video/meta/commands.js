@@ -17,6 +17,7 @@ var attributes = {"id": "",
                   "views": "",
                   "likes": "",
                   "published": "",
+                  "durationMs": "",
                   "comments": "",
                   "uploader": "",
                   "subscribers": "",
@@ -67,6 +68,9 @@ const cmd = {
     },
     "published": {
       simpleDescription: "Publish/stream date"
+    },
+    "durationMs": {
+      simpleDescription: "Video duration in ms"
     },
     "comments": {
       simpleDescription: "Num. comments"

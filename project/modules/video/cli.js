@@ -41,6 +41,7 @@ function cli(args, index) {
         views: false,
         likes: false,
         published: false,
+        durationMs: false,
         comments: false,
         uploader: false,
         subscribers: false,

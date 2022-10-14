@@ -46,8 +46,8 @@ function cli(args) {
     }
 
   } else {
-    console.log("Error: No modules/commands provided")
-    return -1;
+    helpers.outputHelpAll(cmd);
+    return 1;
   }
 
   return -1;

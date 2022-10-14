@@ -2,6 +2,9 @@ const path = require("path");
 const helpers = require(path.join(__dirname, "..", "..", "..", "common", "helpers"));
 
 
+//*********************************************************************************
+//Main scraping function; extracts data from a video response and HTML data
+//*********************************************************************************
 function scrapeMetadata(config, settings, resp) {
 
   let savedMeta = {
@@ -13,12 +16,21 @@ function scrapeMetadata(config, settings, resp) {
     views: "",
     likes: "",
     published: "",
+    durationMs: "",
     comments: "",
     uploader: "",
     subscribers: "",
     channelId: "",
     pfp: ""
   };
+
+  if (!settings.ignore["durationMs"]) {
+    let durationData = helpers.safeSplit(resp.data, '"approxDurationMs":"', 1);
+    if (durationData.length >= 2) {
+      durationData = helpers.safeSplit(durationData[1], '"', 1)[0];
+      savedMeta.durationMs = durationData;
+    }
+  }
 
   let innerData = helpers.safeSplit(resp.data, "var ytInitialData = ", 1);
   if (innerData.length < 2) {
@@ -168,7 +180,12 @@ function scrapeMetadata(config, settings, resp) {
   return savedMeta;
 }
 
-async function collectMeta(settings, config, timeout, videoResponse) {
+
+//*********************************************************************************
+//Scraping entry function; takes in the initial HTML response in textResponse to
+//process certain information
+//*********************************************************************************
+async function collectMeta(settings, config, timeout, videoResponse, textResponse = "") {
 
   global.sendvb(2, "");
   let savedMeta = scrapeMetadata(config, settings, videoResponse);
