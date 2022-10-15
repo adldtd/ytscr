@@ -53,7 +53,12 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
       let pureData = await makeRequest(config, timeout, 1, 2);
       if (pureData === -1) return savedRecommended;
 
-      recommendations = pureData.data.onResponseReceivedEndpoints[0].appendContinuationItemsAction.continuationItems;
+      try {
+        recommendations = pureData.data.onResponseReceivedEndpoints[0].appendContinuationItemsAction.continuationItems;
+      } catch {
+        console.log(pureData.data);
+        process.exit(0);
+      }
     }
 
     //Iterate through videos
@@ -111,16 +116,6 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
 function getRecommendedData(innerVideo, ignore) {
 
   let singleRecommended = {};
-  let live = false;
-
-  if ("badges" in innerVideo) {
-    for (badge in innerVideo.badges) {
-      if (innerVideo.badges[badge].metadataBadgeRenderer.label === "LIVE") {
-        live = true;
-        break;
-      }
-    }
-  }
 
   if (!ignore.id)
     singleRecommended.id = innerVideo.videoId;
@@ -129,27 +124,25 @@ function getRecommendedData(innerVideo, ignore) {
     singleRecommended.title = innerVideo.title.simpleText;
 
   if (!ignore.views) {
+    singleRecommended.views = "";
     if ("viewCountText" in innerVideo) {
-
-      singleRecommended.views = "";
-      if (live) {
+      if ("runs" in innerVideo.viewCountText) {
         for (run in innerVideo.viewCountText.runs)
           singleRecommended.views += innerVideo.viewCountText.runs[run].text;
       } else
         singleRecommended.views = innerVideo.viewCountText.simpleText;
-
     }
   }
 
   if (!ignore.duration) {
     singleRecommended.duration = "";
-    if (!live)
+    if ("lengthText" in innerVideo && "simpleText" in innerVideo.lengthText)
       singleRecommended.duration = innerVideo.lengthText.simpleText;
   }
 
   if (!ignore.published) {
     singleRecommended.published = "";
-    if (!live)
+    if ("publishedTimeText" in innerVideo)
       singleRecommended.published = innerVideo.publishedTimeText.simpleText;
   }
 

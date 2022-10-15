@@ -52,8 +52,15 @@ function scrapeMetadata(config, settings, resp) {
           savedMeta.title += primaryData.title.runs[run].text;
       }
 
-      if (!settings.ignore["views"])
-        savedMeta.views = primaryData.viewCount.videoViewCountRenderer.viewCount.simpleText;
+      if (!settings.ignore["views"]) {
+        let viewData = primaryData.viewCount.videoViewCountRenderer.viewCount;
+        if ("simpleText" in viewData)
+          savedMeta.views = viewData.simpleText;
+        else if ("runs" in viewData) {
+          for (run in viewData.runs)
+            savedMeta.views += viewData.runs[run].text;
+        }
+      }
 
       if (!settings.ignore["published"])
         savedMeta.published = primaryData.dateText.simpleText;
@@ -91,10 +98,12 @@ function scrapeMetadata(config, settings, resp) {
         for (button in buttonData) {
 
           if ("toggleButtonRenderer" in buttonData[button] && buttonData[button].toggleButtonRenderer.defaultIcon.iconType === "LIKE") {
-            if (!buttonData[button].toggleButtonRenderer.isDisabled)
+
+            //If the button is not disabled, and there is an actual like count available
+            if (!buttonData[button].toggleButtonRenderer.isDisabled && ("accessibility" in buttonData[button].toggleButtonRenderer.defaultText))
               savedMeta.likes = buttonData[button].toggleButtonRenderer.defaultText.accessibility.accessibilityData.label;
             else
-              savedMeta.likes = "Likes have been disabled for this video.";
+              savedMeta.likes = "";
             break;
           }
         }

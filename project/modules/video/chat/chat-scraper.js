@@ -32,7 +32,7 @@ function verifyResponse(resp) {
 
     let live = ("isReplay" in bar.liveChatRenderer) ? !bar.liveChatRenderer.isReplay : true;
     if (live) {
-      global.sendvb(2, "\nLivestream still going; cannot retrieve past chat data.\nNo messages found.")
+      global.sendvb(2, "\nLivestream ongoing; cannot retrieve past chat data.\nNo messages found.")
       return -1;
     }
 

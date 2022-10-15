@@ -24,7 +24,11 @@ function verifyResponse(resp) {
   }
   initialData = initialData.contents;
 
-  let contents = initialData[initialData.length - 1].itemSectionRenderer.contents;
+  
+  let contents = initialData[initialData.length - 1];
+  if (!("itemSectionRenderer" in contents && "contents" in contents.itemSectionRenderer)) //Livestream
+    return 0; //Break early
+
   let requestError = false;
   for (c in contents) {
 
