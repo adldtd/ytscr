@@ -97,14 +97,18 @@ function scrapeMetadata(config, settings, resp) {
         let buttonData = primaryData.videoActions.menuRenderer.topLevelButtons;
         for (button in buttonData) {
 
-          if ("toggleButtonRenderer" in buttonData[button] && buttonData[button].toggleButtonRenderer.defaultIcon.iconType === "LIKE") {
+          if ("segmentedLikeDislikeButtonRenderer" in buttonData[button]) {
 
-            //If the button is not disabled, and there is an actual like count available
-            if (!buttonData[button].toggleButtonRenderer.isDisabled && ("accessibility" in buttonData[button].toggleButtonRenderer.defaultText))
-              savedMeta.likes = buttonData[button].toggleButtonRenderer.defaultText.accessibility.accessibilityData.label;
-            else
-              savedMeta.likes = "";
-            break;
+            likeData = buttonData[button].segmentedLikeDislikeButtonRenderer.likeButton;
+            if ("toggleButtonRenderer" in likeData && likeData.toggleButtonRenderer.defaultIcon.iconType === "LIKE") {
+
+              //If the button is not disabled, and there is an actual like count available
+              if (!likeData.toggleButtonRenderer.isDisabled && ("accessibility" in likeData.toggleButtonRenderer.defaultText))
+                savedMeta.likes = likeData.toggleButtonRenderer.defaultText.accessibility.accessibilityData.label;
+              else
+                savedMeta.likes = "";
+              break;
+            }
           }
         }
       }

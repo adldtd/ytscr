@@ -142,11 +142,15 @@ async function scrapeReplayChat(inner_api_key, continuation_id, config, timeout,
       } else if (m === messages.length)
         break;
 
-      let innerMessage = messages[m].replayChatItemAction.actions[0].addChatItemAction.item;
+      let innerMessage = messages[m].replayChatItemAction.actions[0];
+      if (!("addChatItemAction" in innerMessage)) //Not a written message
+        continue;
+      
+      innerMessage = innerMessage.addChatItemAction.item;
       if (!("liveChatTextMessageRenderer" in innerMessage)) //Not a written message
         continue;
+      
       innerMessage = innerMessage.liveChatTextMessageRenderer;
-    
       if (!("authorName" in innerMessage)) //Not a written message
         continue;
 
