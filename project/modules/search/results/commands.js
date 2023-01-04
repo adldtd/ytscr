@@ -1,0 +1,203 @@
+const path = require("path");
+const { subscribeFilterable } = require("../../../common/subscribe-filterable");
+const { subscribeMeta } = require("../../../common/subscribe-meta")
+const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
+
+
+const attributesVideos = {id: "str",
+                          title: "str",
+                          shortDescription: "str",
+                          views: "num",
+                          duration: "num",
+                          published: "str",
+                          thumbnail: "str",
+                          uploader: "str",
+                          channelId: "str"};
+
+const attributesShorts = {id: "str",
+                          title: "str",
+                          views: "num",
+                          thumbnail: "str"};
+
+const attributesChannels = {name: "str",
+                            verified: "str",
+                            subscribers: "num",
+                            shortDescription: "str",
+                            channelId: "str"};
+
+const attributesPlaylists = {id: "str",
+                             title: "str",
+                             size: "num",
+                             shortVideos: "str",
+                             updated: "str",
+                             uploader: "str",
+                             channelId: "str"};
+
+const attributesMovies = {id: "str",
+                          title: "str",
+                          shortDescription: "str",
+                          duration: "num",
+                          year: "num",
+                          type: "str",
+                          contentHeaders: "str",
+                          uploader: "str",
+                          channelId: "str"};
+
+
+const cmd = {
+
+  videos: {
+    commands: {
+      "-l": {redirect: "--lim"},
+      "--lim": {
+        aliases: ["--lim", "-l"],
+        simpleDescription: "Limits the amount of videos scraped",
+        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
+        "as a positive integer. If this argument is not present, the scraper will not stop until all videos are " +
+        "retrieved. NOTE: The value entered limits the scraper based on how many videos were checked, " +
+        "not how many matched the filters (see limfilter).",
+        examples: ["--lim 100", "-l=27"],
+        call: limCall,
+        numArgs: 1
+      }
+    },
+
+    attributes: {id: "The video ID",
+                 title: "The video title",
+                 shortDescription: "Snippet of the description",
+                 views: "Num. views",
+                 duration: "Length of the video",
+                 published: "An approximate publish date (distance from the current date)",
+                 thumbnail: "Link to the video thumbnail",
+                 uploader: "The name of the video uploader",
+                 channelId: "The uploader's channel ID"}
+  },
+
+  shorts: {
+    commands: {
+      "-l": {redirect: "--lim"},
+      "--lim": {
+        aliases: ["--lim", "-l"],
+        simpleDescription: "Limits the amount of shorts scraped",
+        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
+        "as a positive integer. If this argument is not present, the scraper will not stop until all shorts are " +
+        "retrieved. NOTE: The value entered limits the scraper based on how many shorts were checked, " +
+        "not how many matched the filters (see limfilter).",
+        examples: ["--lim 100", "-l=27"],
+        call: limCall,
+        numArgs: 1
+      }
+    },
+
+    attributes: {id: "The short (video) ID",
+                 title: "The name of the short",
+                 views: "Num. views",
+                 thumbnail: "Link to the short's thumbnail"}
+  },
+
+  channels: {
+    commands: {
+      "-l": {redirect: "--lim"},
+      "--lim": {
+        aliases: ["--lim", "-l"],
+        simpleDescription: "Limits the amount of channels scraped",
+        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
+        "as a positive integer. If this argument is not present, the scraper will not stop until all channels are " +
+        "retrieved. NOTE: The value entered limits the scraper based on how many channels were checked, " +
+        "not how many matched the filters (see limfilter).",
+        examples: ["--lim 100", "-l=27"],
+        call: limCall,
+        numArgs: 1
+      }
+    },
+
+    attributes: {name: "The name of the channel",
+                 verified: "Whether the channel is verified",
+                 subscribers: "Num. subscribers",
+                 shortDescription: "Snippet of the channel's bio",
+                 channelId: "The channel ID"}
+  },
+
+  playlists: {
+    commands: {
+      "-l": {redirect: "--lim"},
+      "--lim": {
+        aliases: ["--lim", "-l"],
+        simpleDescription: "Limits the amount of playlists scraped",
+        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
+        "as a positive integer. If this argument is not present, the scraper will not stop until all playlists are " +
+        "retrieved. NOTE: The value entered limits the scraper based on how many playlists were checked, " +
+        "not how many matched the filters (see limfilter).",
+        examples: ["--lim 100", "-l=27"],
+        call: limCall,
+        numArgs: 1
+      }
+    },
+
+    attributes: {id: "The playlist ID",
+                 title: "The name of the playlist",
+                 size: "Num. videos in the playlist",
+                 shortVideos: "A short info list of the first videos of the playlist",
+                 updated: "Approximate time of the last change was made to the list (distance from current date)",
+                 uploader: "The name of the video uploader",
+                 channelId: "The uploader's channel ID"}
+  },
+
+  movies: {
+    commands: {
+      "-l": {redirect: "--lim"},
+      "--lim": {
+        aliases: ["--lim", "-l"],
+        simpleDescription: "Limits the amount of movies scraped",
+        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
+        "as a positive integer. If this argument is not present, the scraper will not stop until all movies are " +
+        "retrieved. NOTE: The value entered limits the scraper based on how many movies were checked, " +
+        "not how many matched the filters (see limfilter).",
+        examples: ["--lim 100", "-l=27"],
+        call: limCall,
+        numArgs: 1
+      }
+    },
+
+    attributes: {id: "The video ID",
+                 title: "The movie title",
+                 shortDescription: "Snippet of the movie description",
+                 duration: "Length of the movie",
+                 year: "The year the movie was made",
+                 type: "The movie's category (action, horror, etc.)",
+                 contentHeaders: "A list of headers for the movie (\"Free with Ads\", \"PG-13\", etc.)",
+                 uploader: "The name of the video uploader",
+                 channelId: "The uploader's channel ID"}
+  }
+}
+
+
+subscribeFilterable(attributesVideos, cmd.videos.commands);
+subscribeFilterable(attributesShorts, cmd.shorts.commands);
+subscribeFilterable(attributesChannels, cmd.channels.commands);
+subscribeFilterable(attributesPlaylists, cmd.playlists.commands);
+subscribeFilterable(attributesMovies, cmd.movies.commands);
+subscribeMeta(cmd.videos.commands);
+subscribeMeta(cmd.shorts.commands);
+subscribeMeta(cmd.channels.commands);
+subscribeMeta(cmd.playlists.commands);
+subscribeMeta(cmd.movies.commands);
+
+
+function limCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+
+  if (!innerState.inFilter) {
+    if (!isNaN(parseInt(a))) {
+      a = parseInt(a);
+      if (a > 0)
+        innerSettings.lim = a;
+      else
+        currentState.error = errors.errorCodes(15, c, a);
+    } else
+      currentState.error = errors.errorCodes(16, c, a);
+  } else
+    currentState.error = errors.errorCodes(2, c);
+}
+
+
+module.exports.cmd = cmd;

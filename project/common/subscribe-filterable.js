@@ -65,7 +65,6 @@ const commands = {
     description: "Used exclusively in a filter object; the value entered is the attribute to inspect and filter. " +
     "Values that are listed as \"num\" are numerical; in that case \"match\" must be defined as an integer.",
     validValues: undefined, //Later defined in the register function
-    examples: ["--check text", "--check=votes"],
     call: checkCall,
     numArgs: 1
   },
@@ -130,7 +129,6 @@ const commands = {
     "attribute will not be saved, printed, and cannot be filtered during execution. May be defined an " +
     "indefinite amount of times, each with a different attribute.",
     validValues: undefined,
-    examples: ["--ignore=\"id\"", "--ignore text"],
     call: ignoreCall,
     numArgs: 1
   }

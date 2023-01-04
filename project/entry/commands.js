@@ -1,6 +1,7 @@
 const path = require("path");
 
 const video_cli = require(path.join(__dirname, "..", "modules", "video", "cli")).cli;
+const search_cli = require("../modules/search/cli").cli;
 
 const video_scraper = require(path.join(__dirname, "..", "modules", "video", "video-scraper")).scrape;
 
@@ -26,19 +27,17 @@ const cmd = {
       scrape: video_scraper
     },
 
-    /*
     "search": {
       aliases: ["search"],
-      simpleDescription: "Module for scraping data from a YouTube search",
+      simpleDescription: "(EXPERIMENTAL) Module for scraping data from a YouTube search",
       description: "The module for retrieving info queried by a YouTube search. Requires a search term as " +
       "input (see \"search --help --input\" for a more detailed description.) Records fetched videos, " +
-      "playlists, channels, and movies (unlike other modules, all of this information is stored in a " +
-      "collective list.) NOTE: Search data is highly dependent on location (IP address) and time.",
+      "shorts, playlists, channels, and movies (unlike other modules, all of this information is stored in a " +
+      "collective list.) NOTE: Search data can be highly dependent on location (IP address) and time.",
       examples: ["search -i \"hit the road jack\""],
-      cli: undefined,
+      cli: search_cli,
       scrape: undefined //////////////////////////////////////////////////////////////TODO
     }
-    */
 
   },
 

@@ -186,25 +186,30 @@ function outputHelpAll(cmd) {
     let section = cmd[s];
     
     for (c in section) {
-      if ("simpleDescription" in section[c]) {
-        
-        let names;
-        if (!attrMode) {
-          names = section[c].aliases[0];
-          for (let i = 1; i < section[c].aliases.length; i++)
-            names += ", " + section[c].aliases[i];
-        } else
-          names = c;
+      let text = "";
+      if (typeof(section[c]) === "string")
+        text = section[c];
+      else if ("simpleDescription" in section[c])
+        text = section[c].simpleDescription;
+      else
+        continue;
 
-        let spaces = "";
-        let numSpaces = buffer_space - names.length;
-        if (numSpaces > 0)
-          spaces = " ".repeat(numSpaces);
-        else
-          spaces = " ";
+      let names;
+      if (!attrMode) {
+        names = section[c].aliases[0];
+        for (let i = 1; i < section[c].aliases.length; i++)
+          names += ", " + section[c].aliases[i];
+      } else
+        names = c;
 
-        console.log(names + spaces + section[c].simpleDescription);
-      }
+      let spaces = "";
+      let numSpaces = buffer_space - names.length;
+      if (numSpaces > 0)
+        spaces = " ".repeat(numSpaces);
+      else
+        spaces = " ";
+
+      console.log(names + spaces + text);
     }
 
     console.log(""); //New line

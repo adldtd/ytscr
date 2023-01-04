@@ -8,7 +8,7 @@ const errors = require(path.join(__dirname, "errors"));
  /* Default module command pack; meant to reduce code bloat between first-call modules */
 /**************************************************************************************/
 
-innerModule = "";
+var innerModule = "";
 
 const commands = {
 
@@ -86,17 +86,17 @@ function focusCall(parsed, currentState, settings) {
   let c = parsed.command; let a = parsed.args[0];
 
   if (a in parsed.commandBox.validValues) {
-    if (!(a in currentState.video.excludeList)) {
+    if (!(a in currentState[innerModule].excludeList)) {
 
-      if (!currentState.video.firstFocusCalled) { //The first focus called disables all other modules
-        currentState.video.firstFocusCalled = true;
+      if (!currentState[innerModule].firstFocusCalled) { //The first focus called disables all other modules
+        currentState[innerModule].firstFocusCalled = true;
         for (md in settings[innerModule].focus) {
           if (md !== a)
             settings[innerModule].focus[md] = false;
         }
       } else
         settings[innerModule].focus[a] = true;
-      currentState.video.focusList[a] = ""; //To detect collisions with --exclude
+      currentState[innerModule].focusList[a] = ""; //To detect collisions with --exclude
 
     } else
       currentState.error = errors.errorCodesConflict(1, c, "--exclude", a);
@@ -111,11 +111,11 @@ function excludeCall(parsed, currentState, settings) {
   let c = parsed.command; let a = parsed.args[0];
 
   if (a in parsed.commandBox.validValues) {
-    if (!(a in currentState.video.focusList)) {
-      if (!(a in currentState.video.modulesCalled)) {
+    if (!(a in currentState[innerModule].focusList)) {
+      if (!(a in currentState[innerModule].modulesCalled)) {
 
         settings[innerModule].focus[a] = false;
-        currentState.video.excludeList[a] = ""; //To detect collisions with --focus and calling modules
+        currentState[innerModule].excludeList[a] = ""; //To detect collisions with --focus and calling modules
 
       } else
         currentState.error = errors.errorCodesConflict(2, c, "", a);
