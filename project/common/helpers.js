@@ -306,9 +306,55 @@ function safeSplit(str, find, times, backwards = false) {
   returnArray.push(str);
   if (backwards) returnArray.reverse();
   return returnArray;
-
 }
 
+//*********************************************************************************
+//Gets an embedded JSON string and converts it to an object; expects the start to
+//be the character "{" and ends when its appropriate "}" is reached
+//*********************************************************************************
+function retrieveJSON(str) {
+
+  let bracketStack = 1; //Starts with the first character
+  let quoteStack = 0;
+  let quoteType = null;
+  let lastBackslash = false;
+  let i = 1;
+
+  while (i < str.length) {
+    let chara = str[i++];
+
+    if (chara === "{" || chara === "}") {
+      if (quoteStack === 0) {
+        bracketStack += (chara === "{") ? 1 : -1;
+        if (bracketStack === 0) break; //Finished parsing
+      }
+    } else if (chara === '"' && !lastBackslash) {
+      if (quoteType === null) {
+        quoteStack += 1;
+        quoteType = '"';
+      } else if (quoteType === '"') { //Quote type aligns; means we can exit
+        quoteStack -= 1;
+        quoteType = null;
+      }
+    } else if (chara === "'" && !lastBackslash) {
+      if (quoteType === null) {
+        quoteStack += 1;
+        quoteType = "'";
+      } else if (quoteType === "'") { //Quote type aligns; means we can exit
+        quoteStack -= 1;
+        quoteType = null;
+      }
+    } else if (chara === "\\") {
+      lastBackslash = true;
+      continue;
+    }
+
+    lastBackslash = false;
+  }
+
+  let object = JSON.parse(str.substring(0, i));
+  return object;
+}
 
 //*********************************************************************************
 //Converts the % encoded characters in a URL to normal chars
@@ -349,6 +395,7 @@ module.exports.outputHelpAll = outputHelpAll;
 module.exports.makeRequest = makeRequest;
 module.exports.handleSaveJSON = handleSaveJSON;
 module.exports.safeSplit = safeSplit;
+module.exports.retrieveJSON = retrieveJSON;
 module.exports.unencodeURL = unencodeURL;
 module.exports.validFileName = validFileName;
 module.exports.clearLastLine = clearLastLine;
