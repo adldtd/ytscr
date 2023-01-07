@@ -6,6 +6,8 @@ const cmd = require(__dirname + "/commands").cmd;
 const verifyDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).verifyDmodule;
 const verifyFilterable = require(path.join(__dirname, "..", "..", "common", "subscribe-filterable")).verifyFilterable;
 
+const THIS_MODULE = "search";
+
 
 //*********************************************************************************
 //Search module CLI; passes currentState onward to other CLIs
@@ -172,7 +174,7 @@ function cli(args, index) {
     };
   
   
-    verifyDmodule(currentState.search, settings.search); /////////////////////Debugging
+    verifyDmodule(currentState[THIS_MODULE], settings[THIS_MODULE]); /////////////////////Debugging
     verifyFilterable(currentState.videos, settings.videos); /////////////////////Debugging
     verifyFilterable(currentState.shorts, settings.shorts); /////////////////////Debugging
     verifyFilterable(currentState.channels, settings.channels); /////////////////////Debugging
@@ -196,7 +198,7 @@ function cli(args, index) {
       } else {
   
         if (parsed.command === "#")
-          currentState.error = errors.errorCodesScope(0, "search"); //To help avoid user confusion
+          currentState.error = errors.errorCodesScope(0, THIS_MODULE); //To help avoid user confusion
         else if (parsed.command === "--help" || parsed.command === "-h") {
           
           if (parsed.args.length === 0) {
@@ -208,7 +210,7 @@ function cli(args, index) {
           }
   
         } else //Default; non-meta commands
-          parsed.commandBox.call(parsed, currentState, settings);
+          parsed.commandBox.call(parsed, currentState, currentState[THIS_MODULE], settings, settings[THIS_MODULE]);
       }
   
       if (currentState.error)
@@ -233,7 +235,7 @@ function cli(args, index) {
       return -1;
   
     if (settings.search.output === "") { //Default destination
-      let filename = "search_" + settings.search.input.split("?v=", 2)[1] + ".json";
+      let filename = THIS_MODULE + "_" + settings.search.input.split("?v=", 2)[1] + ".json";
       settings.search.output = path.join(__dirname, "..", "..", "SAVES", filename);
     }
   

@@ -212,14 +212,13 @@ const cmd = {
 
 
 var commands = cmd.commands;
-subscribeDmodule(validModules, commands, "search");
+subscribeDmodule(validModules, commands);
 subscribeMeta(commands);
 
 
-function inputCall(parsed, currentState, settings) {
+function inputCall(parsed, currentState, innerState, settings, innerSettings) {
 
   let c = parsed.command; let a = parsed.args[0];
-  innerSettings = settings.search;
   
   if (innerSettings.input === "") {
     if (a !== "")
@@ -230,15 +229,14 @@ function inputCall(parsed, currentState, settings) {
     currentState.error = errors.errorCodes(-1, c);
 }
 
-function seperateCall(parsed, currentState, settings) {
-  currentState.search.seperate = true;
+function seperateCall(parsed, currentState, innerState, settings, innerSettings) {
+  innerSettings.seperate = true;
 }
 
 //Call for all commands which accept one unique (originally === ""), must-be-valid input
-function genericValidityOneTimeCall(parsed, currentState, settings) {
+function genericValidityOneTimeCall(parsed, currentState, innerState, settings, innerSettings) {
 
   let c = parsed.command; let a = parsed.args[0];
-  innerSettings = settings.search;
 
   c = ("redirect" in commands[c]) ? commands[c].redirect : c;
   //This assumes the name of the variable inside innerSettings is equal to the command name, minus the dashes
@@ -255,10 +253,9 @@ function genericValidityOneTimeCall(parsed, currentState, settings) {
     currentState.error = errors.errorCodes(-1, c);
 }
 
-function featuresCall(parsed, currentState, settings) {
+function featuresCall(parsed, currentState, innerState, settings, innerSettings) {
 
   let c = parsed.command; let a = parsed.args[0];
-  innerSettings = settings.search;
 
   if (a in commands["--features"].validValues)
     innerSettings.features[a] = "";
@@ -266,10 +263,9 @@ function featuresCall(parsed, currentState, settings) {
     currentState.error = errors.errorCodes(3, c, a);
 }
 
-function limCall(parsed, currentState, settings) {
+function limCall(parsed, currentState, innerState, settings, innerSettings) {
 
   let c = parsed.command; let a = parsed.args[0];
-  innerSettings = settings.search;
 
   if (!isNaN(parseInt(a))) {
     a = parseInt(a);

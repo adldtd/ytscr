@@ -86,25 +86,25 @@ const cmd = {
 
 }
 
-subscribeDmodule(validModules, cmd.commands, "video");
+subscribeDmodule(validModules, cmd.commands);
 subscribeMeta(cmd.commands);
 
 
-function inputCall(parsed, currentState, settings) {
+function inputCall(parsed, currentState, innerState, settings, innerSettings) {
 
   let command = parsed.command;
   let argument = parsed.args[0];
 
-  if (settings.video.input === "") {
+  if (innerSettings.input === "") {
       
     if (argument.substring(0, 32) === "https://www.youtube.com/watch?v=" || argument.substring(0, 24) === "www.youtube.com/watch?v=" || argument.substring(0, 20) === "youtube.com/watch?v=") {
-      settings.video.input = argument;
+      innerSettings.input = argument;
     } else if (argument.substring(0, 31) === "https://www.youtube.com/shorts/" || argument.substring(0, 23) === "www.youtube.com/shorts/" || argument.substring(0, 19) === "youtube.com/shorts/") {
-      settings.video.input = "https://youtube.com/watch?v=" + argument.split("shorts/", 2)[1]; //YouTube shorts are converted to videos this way
+      innerSettings.input = "https://youtube.com/watch?v=" + argument.split("shorts/", 2)[1]; //YouTube shorts are converted to videos this way
     } else if (argument.substring(0, 17) === "https://youtu.be/" || argument.substring(0, 9) === "youtu.be/") {
-      settings.video.input = "https://youtube.com/watch?v=" + argument.split(".be/", 2)[1];
+      innerSettings.input = "https://youtube.com/watch?v=" + argument.split(".be/", 2)[1];
     } else if (argument.length === 11) { //Pure video ID
-      settings.video.input = "https://youtube.com/watch?v=" + argument;
+      innerSettings.input = "https://youtube.com/watch?v=" + argument;
     } else
       currentState.error = errors.errorCodes(-2, command, argument);
         

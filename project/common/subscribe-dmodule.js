@@ -8,7 +8,6 @@ const errors = require(path.join(__dirname, "errors"));
  /* Default module command pack; meant to reduce code bloat between first-call modules */
 /**************************************************************************************/
 
-var innerModule = "";
 
 const commands = {
 
@@ -81,22 +80,22 @@ const commands = {
 
 //--------------------------------------------------------------------- CLI state modification functions
 
-function focusCall(parsed, currentState, settings) {
+function focusCall(parsed, currentState, innerState, settings, innerSettings) {
 
   let c = parsed.command; let a = parsed.args[0];
 
   if (a in parsed.commandBox.validValues) {
-    if (!(a in currentState[innerModule].excludeList)) {
+    if (!(a in innerSettings.excludeList)) {
 
-      if (!currentState[innerModule].firstFocusCalled) { //The first focus called disables all other modules
-        currentState[innerModule].firstFocusCalled = true;
-        for (md in settings[innerModule].focus) {
+      if (!innerSettings.firstFocusCalled) { //The first focus called disables all other modules
+        innerState.firstFocusCalled = true;
+        for (md in innerSettings.focus) {
           if (md !== a)
-            settings[innerModule].focus[md] = false;
+            innerSettings.focus[md] = false;
         }
       } else
-        settings[innerModule].focus[a] = true;
-      currentState[innerModule].focusList[a] = ""; //To detect collisions with --exclude
+        innerSettings.focus[a] = true;
+      innerState.focusList[a] = ""; //To detect collisions with --exclude
 
     } else
       currentState.error = errors.errorCodesConflict(1, c, "--exclude", a);
@@ -106,16 +105,16 @@ function focusCall(parsed, currentState, settings) {
   }
 }
 
-function excludeCall(parsed, currentState, settings) {
+function excludeCall(parsed, currentState, innerState, settings, innerSettings) {
 
   let c = parsed.command; let a = parsed.args[0];
 
   if (a in parsed.commandBox.validValues) {
-    if (!(a in currentState[innerModule].focusList)) {
-      if (!(a in currentState[innerModule].modulesCalled)) {
+    if (!(a in innerState.focusList)) {
+      if (!(a in innerState.modulesCalled)) {
 
-        settings[innerModule].focus[a] = false;
-        currentState[innerModule].excludeList[a] = ""; //To detect collisions with --focus and calling modules
+        innerSettings.focus[a] = false;
+        innerState.excludeList[a] = ""; //To detect collisions with --focus and calling modules
 
       } else
         currentState.error = errors.errorCodesConflict(2, c, "", a);
@@ -127,16 +126,16 @@ function excludeCall(parsed, currentState, settings) {
   }
 }
 
-function noprettyCall(parsed, currentState, settings) {
-  settings[innerModule].prettyprint = false;
+function noprettyCall(parsed, currentState, innerState, settings, innerSettings) {
+  innerSettings.prettyprint = false;
 }
 
-function outputCall(parsed, currentState, settings) {
+function outputCall(parsed, currentState, innerState, settings, innerSettings) {
 
   let c = parsed.command; let a = parsed.args[0];
   let forwardSlashSplit = true;
   
-  if (settings[innerModule].output !== "") {
+  if (innerSettings.output !== "") {
     currentState.error = errors.errorCodesNums(2, c, 1, 2);
     return;
   }
@@ -170,17 +169,17 @@ function outputCall(parsed, currentState, settings) {
   if (filename.substring(filename.length - 5) !== ".json")
     filename += ".json"; //Force the filetype
 
-  settings[innerModule].output = filepath + (forwardSlashSplit ? "/" : "\\") + filename;
+  innerSettings.output = filepath + (forwardSlashSplit ? "/" : "\\") + filename;
 }
 
-function verboseCall(parsed, currentState, settings) {
+function verboseCall(parsed, currentState, innerState, settings, innerSettings) {
 
   let c = parsed.command; let a = parsed.args[0];
 
-  if (!(toString(settings[innerModule].verbose) in parsed.commandBox.validValues)) { //If this statement is false, --verbose was already specified
+  if (!(toString(innerSettings.verbose) in parsed.commandBox.validValues)) { //If this statement is false, --verbose was already specified
     if (a in parsed.commandBox.validValues) {
-      settings[innerModule].verbose = parseInt(a);
-      global.verbose = settings[innerModule].verbose;
+      innerSettings.verbose = parseInt(a);
+      global.verbose = innerSettings.verbose;
     } else {
       currentState.error = errors.errorCodes(3, c, a);
       helpers.outputValidValues(c, parsed.commandBox.validValues)
@@ -219,9 +218,8 @@ function verifyDmodule(innerState, innerSettings) {
  * @param {Object} modules Contains the names of modules as keys in an object
  * @param {Object} cmdCommands The "command" section of a cmd object
  */
-function subscribeDmodule(modules, cmdCommands, innerMod) {
+function subscribeDmodule(modules, cmdCommands) {
 
-  innerModule = innerMod;
   for (c in commands) {
 
     //Shallow copy; shouldn't matter as later code shouldn't modify any embedded objects or arrays in cmd

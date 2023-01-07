@@ -4,6 +4,7 @@ const video_cli = require(path.join(__dirname, "..", "modules", "video", "cli"))
 const search_cli = require("../modules/search/cli").cli;
 
 const video_scraper = require(path.join(__dirname, "..", "modules", "video", "video-scraper")).scrape;
+const search_scraper = require("../modules/search/search-scraper").scrape;
 
 
   /*******************************************************************/
@@ -36,7 +37,7 @@ const cmd = {
       "collective list.) NOTE: Search data can be highly dependent on location (IP address) and time.",
       examples: ["search -i \"hit the road jack\""],
       cli: search_cli,
-      scrape: undefined //////////////////////////////////////////////////////////////TODO
+      scrape: search_scraper //////////////////////////////////////////////////////////////TODO
     }
 
   },
