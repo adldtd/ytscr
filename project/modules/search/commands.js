@@ -143,11 +143,12 @@ const cmd = {
     "-tp": {redirect: "--type"},
     "--type": {
       aliases: ["--type", "-tp"],
-      simpleDescription: "Part of the filters section; forces all results to be of a specific type",
+      simpleDescription: "Part of the filters section; forces results to be of (or related to) a specific type",
       description: "A command which takes in the type of result to be retrieved, which YouTube uses to " +
       "automatically filter searching. Only one choice may be selected. By default, no type is specified, " +
-      "meaning YouTube can return results of any type. NOTE: This is not at all similar to the \"--ignore\" " +
-      "commad (\"--type\" tells YouTube to filter, while \"--ignore\" filters only after data has been recieved.)",
+      "meaning YouTube can return results of any type. NOTE: This is not at all similar to the \"--exclude\" " +
+      "command; the latter tends to be more \"restrictive\" (for example, doing \"--type movie\" without " +
+      "\"--exclude videos\" may result in some videos being saved.)",
       validValues: validTypes,
       examples: ["--type movie", "-tp \"video\""],
       call: genericValidityOneTimeCall,

@@ -23,6 +23,7 @@ const attributesChannels = {name: "str",
                             verified: "str",
                             subscribers: "num",
                             shortDescription: "str",
+                            picture: "str",
                             channelId: "str"};
 
 const attributesPlaylists = {id: "str",
@@ -30,6 +31,7 @@ const attributesPlaylists = {id: "str",
                              size: "num",
                              shortVideos: "str",
                              updated: "str",
+                             thumbnail: "str",
                              uploader: "str",
                              channelId: "str"};
 
@@ -38,7 +40,7 @@ const attributesMovies = {id: "str",
                           shortDescription: "str",
                           duration: "num",
                           year: "num",
-                          type: "str",
+                          category: "str",
                           contentHeaders: "str",
                           uploader: "str",
                           channelId: "str"};
@@ -115,6 +117,7 @@ const cmd = {
                  verified: "Whether the channel is verified",
                  subscribers: "Num. subscribers",
                  shortDescription: "Snippet of the channel's bio",
+                 picture: "Channel's profile picture",
                  channelId: "The channel ID"}
   },
 
@@ -138,9 +141,10 @@ const cmd = {
                  title: "The name of the playlist",
                  size: "Num. videos in the playlist",
                  shortVideos: "A short info list of the first videos of the playlist",
-                 updated: "Approximate time of the last change was made to the list (distance from current date)",
-                 uploader: "The name of the video uploader",
-                 channelId: "The uploader's channel ID"}
+                 updated: "Approximate time of the last change made to the list (distance from current date)",
+                 thumbnail: "The video thumbnail used for the playlist",
+                 uploader: "The name of the playlist's creator",
+                 channelId: "The creator's channel ID"}
   },
 
   movies: {
@@ -164,7 +168,7 @@ const cmd = {
                  shortDescription: "Snippet of the movie description",
                  duration: "Length of the movie",
                  year: "The year the movie was made",
-                 type: "The movie's category (action, horror, etc.)",
+                 category: "The movie's category (action, horror, etc.)",
                  contentHeaders: "A list of headers for the movie (\"Free with Ads\", \"PG-13\", etc.)",
                  uploader: "The name of the video uploader",
                  channelId: "The uploader's channel ID"}

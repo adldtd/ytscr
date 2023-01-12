@@ -87,6 +87,7 @@ function cli(args, index) {
                   verified: false,
                   subscribers: false,
                   shortDescription: false,
+                  picture: false,
                   channelId: false}
       },
 
@@ -103,6 +104,7 @@ function cli(args, index) {
                   size: false,
                   shortVideos: false,
                   updated: false,
+                  thumbnail: false,
                   uploader: false,
                   channelId: false}
       },
@@ -120,7 +122,7 @@ function cli(args, index) {
                   shortDescription: false,
                   duration: false,
                   year: false,
-                  type: false,
+                  category: false,
                   contentHeaders: false,
                   uploader: false,
                   channelId: false}
@@ -235,7 +237,7 @@ function cli(args, index) {
       return -1;
   
     if (settings.search.output === "") { //Default destination
-      let filename = THIS_MODULE + "_" + settings.search.input.split("?v=", 2)[1] + ".json";
+      let filename = THIS_MODULE + "_" + settings.search.input + ".json";
       settings.search.output = path.join(__dirname, "..", "..", "SAVES", filename);
     }
   

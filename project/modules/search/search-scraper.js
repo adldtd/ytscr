@@ -3,6 +3,8 @@ const path = require("path");
 const fs = require("fs");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 
+const results_scraper = require("./results/results-scraper").scrape;
+
 
   /**********************************************************************************************/
  /* The handler for the search module and all of its submodules; calls other scraping commands */
@@ -129,8 +131,6 @@ async function applyFilters(config, innerData, innerSettings, timeout) {
             if (!firstFilter) {
               global.sendvb(0, "(This was after applying the following {filter group}: {filter} values):\n")
 
-              //if (appliedFilters[apf] !== "")
-              //  global.sendvb(0, apf + ":\t\t" + appliedFilters[apf].substring(2));
               let maxLength = 0;
               for (let apf in appliedFilters) { //Preprocessing
                 if (apf.length > maxLength && appliedFilters[apf] !== "")
@@ -157,6 +157,9 @@ async function applyFilters(config, innerData, innerSettings, timeout) {
 
     }
   }
+
+  if (!firstFilter)
+    global.sendvb(2, "\nComplete");
 
   return innerData;
 
@@ -198,7 +201,21 @@ async function scrapeSearchModule(settings) {
   innerData = await applyFilters(config, innerData, innerSettings, timeout);
   if (innerData === -1) return -1;
 
-  console.log(innerData);
+  //The main scraping modules
+  global.sendvb(2, "\n ------------ Collecting results... ------------");
+  let savedResults = await results_scraper(settings, config, timeout, innerData);
+
+  if (savedResults !== -1) {
+    if (settings.search.seperate) {
+      for (let key in savedResults)
+        savedData[key] = savedResults[key];
+    } else
+      savedData["results"] = savedResults;
+  }
+
+  let finalDestination = helpers.handleSaveJSON(settings.search.output, savedData, settings.search.prettyprint);
+  global.sendvb(1, "\nSaved as " + finalDestination + "\n");
+
 }
 
 
