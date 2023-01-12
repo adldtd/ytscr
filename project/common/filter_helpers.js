@@ -63,3 +63,8 @@ function durationToSec(duration) {
   
   return time;
 }
+
+
+module.exports.crunchViewCount = crunchViewCount;
+module.exports.crunchSimpleViews = crunchSimpleViews;
+module.exports.durationToSec = durationToSec;

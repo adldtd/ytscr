@@ -49,18 +49,18 @@ async function applyFilters(config, innerData, innerSettings, timeout) {
                        features: "Features",
                        sort: "Sort by"};
 
-  let choiceToValue = {"lastHour": "Last hour",
-                       "today": "Today",
-                       "thisWeek": "This week",
-                       "thisMonth": "This month",
-                       "thisYear": "This year",
-                       "video": "Video",
-                       "channel": "Channel",
-                       "playlist": "Playlist",
-                       "movie": "Movie",
-                       "under4": "Under 4 minutes",
-                       "4-20": "4 - 20 minutes",
-                       "over20": "Over 20 minutes",
+  let choiceToValue = {"LastHour": "Last hour",
+                       "Today": "Today",
+                       "ThisWeek": "This week",
+                       "ThisMonth": "This month",
+                       "ThisYear": "This year",
+                       "Video": "Video",
+                       "Channel": "Channel",
+                       "Playlist": "Playlist",
+                       "Movie": "Movie",
+                       "Under4Minutes": "Under 4 minutes",
+                       "4-20Minutes": "4 - 20 minutes",
+                       "Over20Minutes": "Over 20 minutes",
                        "Live": "Live",
                        "4K": "4K",
                        "HD": "HD",
@@ -72,10 +72,10 @@ async function applyFilters(config, innerData, innerSettings, timeout) {
                        "HDR": "HDR",
                        "Location": "Location",
                        "Purchased": "Purchased",
-                       "relevance": "Relevance",
-                       "uploadDate": "Upload date",
-                       "viewCount": "View count",
-                       "rating": "Rating"};
+                       "Relevance": "Relevance",
+                       "UploadDate": "Upload date",
+                       "ViewCount": "View count",
+                       "Rating": "Rating"};
 
   let url = config.data.context.client.originalUrl;
   let graftUrl = config.data.context.client.mainAppWebInfo.graftUrl;

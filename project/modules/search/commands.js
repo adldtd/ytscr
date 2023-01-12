@@ -10,20 +10,20 @@ const results_cli = require("./results/cli").cli;
 
 var validModules = {videos: "", shorts: "", channels: "", playlists: "", movies: ""};
 
-var validTimeFrames = {lastHour: "",
-                       today: "",
-                       thisWeek: "",
-                       thisMonth: "",
-                       thisYear: ""};
+var validTimeFrames = {LastHour: "",
+                       Today: "",
+                       ThisWeek: "",
+                       ThisMonth: "",
+                       ThisYear: ""};
 
-var validTypes = {video: "",
-                  channel: "",
-                  playlist: "",
-                  movie: ""};
+var validTypes = {Video: "",
+                  Channel: "",
+                  Playlist: "",
+                  Movie: ""};
 
-var validDurations = {"under4": "Under 4 minutes",
-                      "4-20": "4-20 minutes",
-                      "over20": "Over 20 minutes"};
+var validDurations = {"Under4Minutes": "Under 4 minutes",
+                      "4-20Minutes": "4-20 minutes",
+                      "Over20Minutes": "Over 20 minutes"};
 
 var validFeatures = {"Live": "Livestream",
                      "4K": "4K Video",
@@ -37,10 +37,10 @@ var validFeatures = {"Live": "Livestream",
                      "Location": "",
                      "Purchased": ""};
 
-var validMetrics = {relevance: "",
-                    uploadDate: "Sorts from most recent to least",
-                    viewCount: "Sorts from highest views to lowest",
-                    rating: "Sorts from least likes to most"};
+var validMetrics = {Relevance: "",
+                    UploadDate: "Sorts from most recent to least",
+                    ViewCount: "Sorts from highest views to lowest",
+                    Rating: "Sorts from least likes to most"};
 
 
 const cmd = {
@@ -135,7 +135,7 @@ const cmd = {
       "searching. Only one choice may be specified. By default, no fixed frame is specified, meaning YouTube " +
       "can return videos within any time frame.",
       validValues: validTimeFrames,
-      examples: ["--tframe lastHour", "-tfr \"thisMonth\""],
+      examples: ["--tframe LastHour", "-tfr \"ThisMonth\""],
       call: genericValidityOneTimeCall,
       numArgs: 1
     },
@@ -150,7 +150,7 @@ const cmd = {
       "command; the latter tends to be more \"restrictive\" (for example, doing \"--type movie\" without " +
       "\"--exclude videos\" may result in some videos being saved.)",
       validValues: validTypes,
-      examples: ["--type movie", "-tp \"video\""],
+      examples: ["--type Movie", "-tp \"Video\""],
       call: genericValidityOneTimeCall,
       numArgs: 1
     },
@@ -163,7 +163,7 @@ const cmd = {
       "Only one choice may be selected. By default, no duration is specified - YouTube can return videos of any " +
       "duration. NOTE: This command is only \"valid\" for video and movie results.",
       validValues: validDurations,
-      examples: ["--duration 4-20", "-dur \"over20\""],
+      examples: ["--duration 4-20Minutes", "-dur \"Over20Minutes\""],
       call: genericValidityOneTimeCall,
       numArgs: 1
     },
@@ -190,7 +190,7 @@ const cmd = {
       "choice may be selected. By default, YouTube sorts by \"relevance\", which is highly dependent on " +
       "time, as well as the user's location. NOTE: Most of the search metrics only apply to videos and movies.",
       validValues: validMetrics,
-      examples: ["--sort rating", "-st \"uploadDate\""],
+      examples: ["--sort Rating", "-st \"UploadDate\""],
       call: genericValidityOneTimeCall,
       numArgs: 1
     },

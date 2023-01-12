@@ -26,6 +26,32 @@ async function scrapeResults(settings, config, timeout, searchData) {
   let typeCounter = {videos: 0, shorts: 0, channels: 0, playlists: 0, movies: 0};
   let matchCounter = 0;
   let typeMatchCounter = {videos: 0, shorts: 0, channels: 0, playlists: 0, movies: 0};
+
+  //The following code is for the modules' limiters to "work together" (for example, if videos --lim 50 and
+  //playlists --lim 5 is specified, the scraper keeps going until 50 videos and 5 playlists are scraped,
+  //instead of stopping when only one goal is reached.)
+  let totalCounter = 0;
+  let typeCap = Number.POSITIVE_INFINITY;
+  for (let module in modules) {
+    module = modules[module];
+    if (settings[module].lim !== Number.POSITIVE_INFINITY) {
+      if (typeCap === Number.POSITIVE_INFINITY)
+        typeCap = 0;
+      ++typeCap;
+    }
+  }
+
+  let totalMatchCounter = 0;
+  let typeMatchCap = Number.POSITIVE_INFINITY;
+  for (let module in modules) {
+    module = modules[module];
+    if (settings[module].limfilter !== Number.POSITIVE_INFINITY) {
+      if (typeMatchCap === Number.POSITIVE_INFINITY)
+        typeMatchCap = 0;
+      ++typeMatchCap;
+    }
+  }
+
   let finished = false;
 
 
@@ -65,13 +91,13 @@ async function scrapeResults(settings, config, timeout, searchData) {
         if (items.index >= items.list.length)
           stack.pop();
 
-				let singleResult = null;
         let match = true;
         let type = "";
 
+        //Categorize response piece
 				if ("videoRenderer" in result) {
           type = "videos";
-					singleResult = retrieveVideo(result.videoRenderer, settings);
+          result = result.videoRenderer;
 
 				} else if ("shelfRenderer" in result) {
           let newItems = result.shelfRenderer.content.verticalListRenderer.items;
@@ -80,7 +106,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
 
         } else if ("reelItemRenderer" in result) {
           type = "shorts";
-          singleResult = retrieveShort(result.reelItemRenderer, settings);
+          result = result.reelItemRenderer;
 
 				} else if ("reelShelfRenderer" in result) {
           let newItems = result.reelShelfRenderer.items;
@@ -89,25 +115,29 @@ async function scrapeResults(settings, config, timeout, searchData) {
 
 				} else if ("channelRenderer" in result) {
           type = "channels";
-					singleResult = retrieveChannel(result.channelRenderer, settings);
+          result = result.channelRenderer;
 
 				} else if ("playlistRenderer" in result) {
           type = "playlists";
-					singleResult = retrievePlaylist(result.playlistRenderer, settings);
+          result = result.playlistRenderer;
 
 				} else if ("movieRenderer" in result) {
           type = "movies";
-					singleResult = retrieveMovie(result.movieRenderer, settings);
+          result = result.movieRenderer;
 
 				} else
           continue;
 
+        //Collect data from response (if limit not exceeded or module not focused)
+        if (!settings.search.focus[type] || typeCounter[type] >= settings[type].lim || typeMatchCounter[type] >= settings[type].limfilter) continue;
+        let singleResult = retrieveResult(result, settings, type);
         match = resultMatches(singleResult, settings[type].filter, type);
         
         if (match) {
           if (settings[type].printfilter)
             printResult(singleResult, type);
-          matchCounter++;
+          ++matchCounter;
+          ++typeMatchCounter[type];
         }
 
         if (!settings[type].savefilter || match) {
@@ -117,14 +147,21 @@ async function scrapeResults(settings, config, timeout, searchData) {
             collectedResults.push(singleResult);
         }
 
-        if (typeMatchCounter[type] >= settings[type].limfilter) {
+        if (typeMatchCounter[type] >= settings[type].limfilter)
+          ++totalMatchCounter;
+
+        ++counter;
+        ++typeCounter[type];
+
+        if (counter >= settings.search.lim || typeCounter[type] >= settings[type].lim)
+          ++totalCounter;
+
+        //If either counters reach the specified limit, scraping stops
+        if (counter >= settings.search.lim || matchCounter >= settings.search.limfilter) {
           finished = true;
           break;
         }
-
-        counter++;
-
-        if (counter >= settings.search.lim || typeCounter[type] >= settings[type].lim) {
+        if (totalCounter >= typeCap || totalMatchCounter >= typeMatchCap) {
           finished = true;
           break;
         }
@@ -151,6 +188,24 @@ async function scrapeResults(settings, config, timeout, searchData) {
 
 }
 
+
+//*********************************************************************************
+//General function for results of different types
+//*********************************************************************************
+function retrieveResult(innerData, settings, type) {
+  switch (type) {
+    case "videos":
+      return retrieveVideo(innerData, settings);
+    case "shorts":
+      return retrieveShort(innerData, settings);
+    case "channels":
+      return retrieveChannel(innerData, settings);
+    case "playlists":
+      return retrievePlaylist(innerData, settings);
+    case "movies":
+      return retrieveMovie(innerData, settings);
+  }
+}
 
 function retrieveVideo(innerData, settings) {
 	let singleVideo = {};

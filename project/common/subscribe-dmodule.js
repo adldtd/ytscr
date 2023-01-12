@@ -85,9 +85,9 @@ function focusCall(parsed, currentState, innerState, settings, innerSettings) {
   let c = parsed.command; let a = parsed.args[0];
 
   if (a in parsed.commandBox.validValues) {
-    if (!(a in innerSettings.excludeList)) {
+    if (!(a in innerState.excludeList)) {
 
-      if (!innerSettings.firstFocusCalled) { //The first focus called disables all other modules
+      if (!innerState.firstFocusCalled) { //The first focus called disables all other modules
         innerState.firstFocusCalled = true;
         for (md in innerSettings.focus) {
           if (md !== a)
