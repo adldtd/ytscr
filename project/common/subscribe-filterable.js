@@ -170,12 +170,14 @@ function limfilterCall(c, a, currentState, innerState, moduleSettings, innerSett
 
 function filterCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
 
+  let commands = this.commands;
+
   if (!innerState.inFilter) {
-    if (a in commands.filter.validValues)
+    if (a in commands["--filter"].validValues)
       innerState.inFilter = true;
     else {
       currentState.error = errors.errorCodes(3, c, a);
-      helpers.outputValidValues(c, commands.filter.validValues);
+      helpers.outputValidValues(c, commands["--filter"].validValues);
     }
   } else
     currentState.error = errors.errorCodes(2, c);
@@ -183,15 +185,17 @@ function filterCall(c, a, currentState, innerState, moduleSettings, innerSetting
 
 function checkCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
 
+  let commands = this.commands;
+
   if (innerState.inFilter) {
-    if (a in commands.check.validValues) {
+    if (a in commands["--check"].validValues) {
       if (!("check" in innerState.currentFilter))
         innerState.currentFilter.check = a;
       else
         currentState.error = errors.errorCodes(5, c);
     } else {
       currentState.error = errors.errorCodes(3, c, a);
-      helpers.outputValidValues(c, commands.check.validValues);
+      helpers.outputValidValues(c, commands["--check"].validValues);
     }
   } else
     currentState.error = errors.errorCodes(4, a);
@@ -228,6 +232,8 @@ function casesensitiveCall(c, a, currentState, innerState, moduleSettings, inner
 
 function closingbracketCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
 
+  let commands = this.commands;
+
   if (!innerState.inFilter) { //Error: Filter not closed
     currentState.error = errors.errorCodes(6, c);
     return;
@@ -236,23 +242,23 @@ function closingbracketCall(c, a, currentState, innerState, moduleSettings, inne
     currentState.error = errors.errorCodes(7, c);
     return;
   }
-  if (!(innerState.currentFilter.check in commands.check.validValues)) { //Error: Check invalid value
+  if (!(innerState.currentFilter.check in commands["--check"].validValues)) { //Error: Check invalid value
     currentState.error = errors.errorCodes(3, "check", innerState.currentFilter.check);
-    helpers.outputValidValues("--check", commands.check.validValues);
+    helpers.outputValidValues("--check", commands["--check"].validValues);
     return;
   }
 
   //Work with different "check" types: string and numerical
-  if (commands.check.validValues[innerState.currentFilter.check] === "num") {
+  if (commands["--check"].validValues[innerState.currentFilter.check] === "num") {
 
     if (!("compare" in innerState.currentFilter)) { //Compare becomes a required command when check is numerical
       currentState.error = errors.errorCodes(8, c, innerState.currentFilter.check);
       return;
     }
     //See if the compare value is valid, and is ONLY valid for a numerical checker (no "in")
-    if (!(innerState.currentFilter.compare in commands.compare.validValues) || innerState.currentFilter.compare === "in") {
+    if (!(innerState.currentFilter.compare in commands["--compare"].validValues) || innerState.currentFilter.compare === "in") {
       currentState.error = errors.errorCodes(9, c, innerState.currentFilter.compare);
-      helpers.outputValidValues("--compare", commands.compare.validValues, {"in":""});
+      helpers.outputValidValues("--compare", commands["--compare"].validValues, {"in":""});
       return;
     }
     if (isNaN(parseInt(innerState.currentFilter.match))) { //Error: Match value entered was NaN
@@ -260,22 +266,22 @@ function closingbracketCall(c, a, currentState, innerState, moduleSettings, inne
       return;
     }
 
-  } else if (commands.check.validValues[innerState.currentFilter.check] === "str") {
+  } else if (commands["--check"].validValues[innerState.currentFilter.check] === "str") {
 
     if (!("compare" in innerState.currentFilter)) {
       innerState.currentFilter.compare = "in"; //Compare is not required for a string checker; defaults to in
     
     //See if the compare value is valid, and is ONLY valid for a string checker (only "in" or "eq")
-    } else if (!(innerState.currentFilter.compare in commands.compare.validValues) || (innerState.currentFilter.compare !== "eq" && innerState.currentFilter.compare !== "in")) {
+    } else if (!(innerState.currentFilter.compare in commands["--compare"].validValues) || (innerState.currentFilter.compare !== "eq" && innerState.currentFilter.compare !== "in")) {
       currentState.error = errors.errorCodes(11, c, innerState.currentFilter.compare);
-      helpers.outputValidValues("--compare", commands.compare.validValues, {"less":"", "greater":"", "lesseq":"", "greatereq":""});
+      helpers.outputValidValues("--compare", commands["--compare"].validValues, {"less":"", "greater":"", "lesseq":"", "greatereq":""});
       return;
     }
     
   }
 
   //Error: The value for "check" was marked as ignored
-  if (!innerSettings.include[innerState.currentFilter.check]) {
+  if (innerSettings.ignore[innerState.currentFilter.check]) {
     currentState.error = errors.errorCodes(12, c, innerState.currentFilter.check);
     return;
   }
@@ -289,15 +295,17 @@ function closingbracketCall(c, a, currentState, innerState, moduleSettings, inne
 
 function ignoreCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
 
+  let commands = this.commands;
+
   if (!innerState.inFilter) {
-    if (a in commands.ignore.validValues) {
+    if (a in commands["--ignore"].validValues) {
       if (!(a in innerState.usedFilterCheckValues))
         innerSettings.include[a] = false;
       else
         currentState.error = errors.errorCodes(12, c, a);
     } else {
       currentState.error = errors.errorCodes(3, c, a);
-      helpers.outputValidValues(c, commands.ignore.validValues);
+      helpers.outputValidValues(c, commands["--ignore"].validValues);
     }
   } else
     currentState.error = errors.errorCodes(2, c);
@@ -341,6 +349,8 @@ function subscribeFilterable(attributes, cmdCommands) {
     cmdCommands[c] = Object.assign({}, commands[c]);
     if (c === "--check" || c === "--ignore")
       cmdCommands[c].validValues = attributes;
+    if ("call" in commands[c])
+      cmdCommands[c].call = commands[c].call.bind({commands: cmdCommands});
 
   }
 }

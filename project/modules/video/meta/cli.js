@@ -3,6 +3,7 @@ const helpers = require(path.join(__dirname, "..", "..", "..", "common", "helper
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
 
 const cmd = require(__dirname + "/commands").cmd;
+const THIS_MODULE = "meta";
 
 
 //*********************************************************************************
@@ -31,7 +32,7 @@ function cli(args, currentState, settings) {
       }
 
     } else //Default; non-meta commands
-      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState.meta, settings.video, settings.meta);
+      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState[THIS_MODULE], settings.video, settings[THIS_MODULE]);
 
     if (currentState.error)
       return -1;

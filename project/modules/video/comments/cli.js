@@ -3,6 +3,7 @@ const helpers = require(path.join(__dirname, "..", "..", "..", "common", "helper
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
 
 const cmd = require(__dirname + "/commands").cmd;
+const THIS_MODULE = "comments";
 
 
 //*********************************************************************************
@@ -19,8 +20,8 @@ function cli(args, currentState, settings) {
 
     if (parsed.command === "#") {
 
-      if (currentState.comments.inFilter) {
-        currentState.error = errors.errorCodesScope(3, "comments");
+      if (currentState[THIS_MODULE].inFilter) {
+        currentState.error = errors.errorCodesScope(3, THIS_MODULE);
         return -1;
       }
       return 0; //Exit scope safely
@@ -36,7 +37,7 @@ function cli(args, currentState, settings) {
       }
 
     } else //Default; non-meta commands
-      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState.comments, settings.video, settings.comments);
+      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState[THIS_MODULE], settings.video, settings[THIS_MODULE]);
 
     if (currentState.error)
       return -1;
@@ -45,6 +46,10 @@ function cli(args, currentState, settings) {
   if (!settings.comments.replies && settings.comments.nrf)
     console.log("WARNING: -nrf is specified alongside --noreply, making the former redundant (no replies will be saved).")
 
+  if (currentState[THIS_MODULE].inFilter) {
+    currentState.error = errors.errorCodesScope(2, "--filter");
+    return -1;
+  }
   return 0; //No errors and no stopping commands called
 }
 

@@ -44,6 +44,10 @@ function cli(args, currentState, settings, module) { //Needs a module for cmd to
       return -1;
   }
 
+  if (currentState[module].inFilter) {
+    currentState.error = errors.errorCodesScope(2, "--filter");
+    return -1;
+  }
   return 0; //No errors and no stopping commands called
 }
 

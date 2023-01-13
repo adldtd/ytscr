@@ -3,6 +3,7 @@ const helpers = require(path.join(__dirname, "..", "..", "..", "common", "helper
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
 
 const cmd = require(__dirname + "/commands").cmd;
+const THIS_MODULE = "recommended";
 
 
 //*********************************************************************************
@@ -18,6 +19,11 @@ function cli(args, currentState, settings) {
     currentState.index = parsed.currentIndex;
 
     if (parsed.command === "#") {
+
+      if (currentState[THIS_MODULE].inFilter) {
+        currentState.error = errors.errorCodesScope(3, THIS_MODULE);
+        return -1;
+      }
       return 0; //Exit scope safely
 
     } else if (parsed.command === "--help" || parsed.command === "-h") {
@@ -31,12 +37,16 @@ function cli(args, currentState, settings) {
       }
 
     } else //Default; non-meta commands
-      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState.recommended, settings.video, settings.recommended);
+      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState[THIS_MODULE], settings.video, settings[THIS_MODULE]);
 
     if (currentState.error)
       return -1;
   }
 
+  if (currentState[THIS_MODULE].inFilter) {
+    currentState.error = errors.errorCodesScope(2, "--filter");
+    return -1;
+  }
   return 0; //No errors and no stopping commands called
 }
 
