@@ -313,7 +313,7 @@ function commentMatches(singleComment, filter) {
 
       let commentCheck = singleComment[condition.check];
       let conditionMatch = condition.match;
-      if ("caseSensitive" in condition ? !condition.caseSensitive : true) {
+      if ("casesensitive" in condition ? !condition.casesensitive : true) {
         commentCheck = commentCheck.toLowerCase();
         conditionMatch = conditionMatch.toLowerCase();
       }

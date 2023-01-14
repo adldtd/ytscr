@@ -225,7 +225,7 @@ function compareCall(c, a, currentState, innerState, moduleSettings, innerSettin
 
 function casesensitiveCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
   if (innerState.inFilter)
-    innerState.currentFilter.caseSensitive = true;
+    innerState.currentFilter.casesensitive = true;
   else
     currentState.error = errors.errorCodes(4, c);
 }

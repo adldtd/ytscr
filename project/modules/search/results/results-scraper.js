@@ -462,6 +462,7 @@ function resultMatches(singleResult, filter, type) {
       let conditionMatch = condition.match;
 
       for (let rC in resultCheck) { //Treat data as a list of items
+        rC = resultCheck[rC];
 
         if ("casesensitive" in condition ? !condition.casesensitive : true) {
           rC = rC.toLowerCase();
@@ -482,12 +483,17 @@ function resultMatches(singleResult, filter, type) {
       let resultCheck = null;
       if (condition.check === "views") { //Check if the views were scraped from a video or short
         if (singleResult["views"] !== "")
-          resultCheck = (type === "video") ? filterHelpers.crunchViewCount(singleResult["views"]) : filterHelpers.crunchSimpleViews(singleResult["views"]);
+          resultCheck = (type === "videos") ? filterHelpers.crunchViewCount(singleResult["views"]) : filterHelpers.crunchSimpleViews(singleResult["views"]);
         else
           resultCheck = 0;
       } else
         resultCheck = (singleResult[condition.check] !== "") ? numAttributeFunctions[condition.check](singleResult[condition.check]) : 0;
-      
+
+      //if (isNaN(resultCheck)) {
+      //  console.log(condition);
+      //  throw new Error("NaN caught");
+      //}
+
       switch (condition.compare) {
         case "less":
           returnMatch = resultCheck < parseInt(condition.match);
