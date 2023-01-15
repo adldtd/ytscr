@@ -52,6 +52,11 @@ async function scrapeResults(settings, config, timeout, searchData) {
     }
   }
 
+  let collectedResultsHolder = null;
+  let sectionTitle = "";
+  let inSection = false;
+  let popped = false;
+
   let finished = false;
 
 
@@ -88,8 +93,12 @@ async function scrapeResults(settings, config, timeout, searchData) {
 			while (stack.length !== 0) {
         let items = stack[stack.length - 1];
 				let result = items.list[items.index++];
-        if (items.index >= items.list.length)
+
+        popped = false;
+        if (items.index >= items.list.length) {
           stack.pop();
+          popped = true;
+        }
 
         let match = true;
         let type = "";
@@ -100,8 +109,15 @@ async function scrapeResults(settings, config, timeout, searchData) {
           result = result.videoRenderer;
 
 				} else if ("shelfRenderer" in result) {
-          let newItems = result.shelfRenderer.content.verticalListRenderer.items;
-          stack.push({list: newItems, index: 0}); //We have recieved a new pack of items to go through on the stack
+          let section = result.shelfRenderer;
+          if (settings.search.savesections) {
+
+            collectedResultsHolder = collectedResults;
+            collectedResults = []; //Store the data in the section
+            sectionTitle = section.title.simpleText;
+            inSection = true;
+          }
+          stack.push({list: section.content.verticalListRenderer.items, index: 0}); //We have recieved a new pack of items to go through on the stack
           continue;
 
         } else if ("reelItemRenderer" in result) {
@@ -109,8 +125,15 @@ async function scrapeResults(settings, config, timeout, searchData) {
           result = result.reelItemRenderer;
 
 				} else if ("reelShelfRenderer" in result) {
-          let newItems = result.reelShelfRenderer.items;
-          stack.push({list: newItems, index: 0});
+          let section = result.reelShelfRenderer;
+          if (settings.search.savesections) {
+
+            collectedResultsHolder = collectedResults;
+            collectedResults = []; //Store the data in the section
+            sectionTitle = section.title.simpleText;
+            inSection = true;
+          }
+          stack.push({list: section.items, index: 0});
           continue;
 
 				} else if ("channelRenderer" in result) {
@@ -147,13 +170,21 @@ async function scrapeResults(settings, config, timeout, searchData) {
             collectedResults.push(singleResult);
         }
 
+        if (popped && inSection) { //Append section data
+          let sectionData = {header: sectionTitle, results: collectedResults};
+          collectedResults = collectedResultsHolder;
+          collectedResultsHolder = null;
+          collectedResults.push(sectionData);
+          inSection = false;
+        }
+
         if (typeMatchCounter[type] >= settings[type].limfilter)
           ++totalMatchCounter;
 
         ++counter;
         ++typeCounter[type];
 
-        if (counter >= settings.search.lim || typeCounter[type] >= settings[type].lim)
+        if (typeCounter[type] >= settings[type].lim)
           ++totalCounter;
 
         //If either counters reach the specified limit, scraping stops
@@ -234,10 +265,23 @@ function retrieveVideo(innerData, settings) {
     }
 	}
 
+  if (!ignore.badges) {
+    singleVideo.badges = [];
+    if ("badges" in innerData) {
+      for (let badge in innerData.badges)
+        singleVideo.badges.push(innerData.badges[badge].metadataBadgeRenderer.label);
+    }
+  }
+
   if (!ignore.views) {
     singleVideo.views = "";
-    if ("viewCountText" in innerData)
-      singleVideo.views = innerData.viewCountText.simpleText;
+    if ("viewCountText" in innerData) {
+      if ("runs" in innerData.viewCountText) {
+        for (let run in innerData.viewCountText.runs)
+          singleVideo.views += innerData.viewCountText.runs[run].text;
+      } else
+        singleVideo.views = innerData.viewCountText.simpleText;
+    }
   }
 
   if (!ignore.duration) {
@@ -261,6 +305,25 @@ function retrieveVideo(innerData, settings) {
     singleVideo.uploader = "";
     for (let run in innerData.ownerText.runs)
       singleVideo.uploader += innerData.ownerText.runs[run].text;
+  }
+
+  if (!ignore.verified) {
+    singleVideo.verified = "false";
+    if ("ownerBadges" in innerData) {
+      let badges = innerData.ownerBadges;
+      for (let badge in badges) {
+        badge = badges[badge];
+        if (badge.metadataBadgeRenderer.style === "BADGE_STYLE_TYPE_VERIFIED") {
+          singleVideo.verified = "true";
+          break;
+        }
+      }
+    }
+  }
+
+  if (!ignore.profilePicture) {
+    let thumbnails = innerData.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.thumbnail.thumbnails;
+    singleVideo.profilePicture = thumbnails[thumbnails.length - 1].url;
   }
 
   if (!ignore.channelId) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIND OUT IF THIS SOLUTION IS SAFE
@@ -302,13 +365,15 @@ function retrieveChannel(innerData, settings) {
     singleChannel.name = innerData.title.simpleText;
   
   if (!ignore.verified) {
-    let badges = innerData.ownerBadges;
     singleChannel.verified = "false";
-    for (let badge in badges) {
-      badge = badges[badge];
-      if (badge.metadataBadgeRenderer.style === "BADGE_STYLE_TYPE_VERIFIED") {
-        singleChannel.verified = "true";
-        break;
+    if ("ownerBadges" in innerData) {
+      let badges = innerData.ownerBadges;
+      for (let badge in badges) {
+        badge = badges[badge];
+        if (badge.metadataBadgeRenderer.style === "BADGE_STYLE_TYPE_VERIFIED") {
+          singleChannel.verified = "true";
+          break;
+        }
       }
     }
   }
@@ -380,6 +445,20 @@ function retrievePlaylist(innerData, settings) {
       singlePlaylist.uploader += runs[run].text;
   }
 
+  if (!ignore.verified) {
+    singlePlaylist.verified = "false";
+    if ("ownerBadges" in innerData) {
+      let badges = innerData.ownerBadges;
+      for (let badge in badges) {
+        badge = badges[badge];
+        if (badge.metadataBadgeRenderer.style === "BADGE_STYLE_TYPE_VERIFIED") {
+          singlePlaylist.verified = "true";
+          break;
+        }
+      }
+    }
+  }
+
   if (!ignore.channelId) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIND OUT IF THIS SOLUTION IS SAFE
     singlePlaylist.channelId = innerData.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId;
   
@@ -409,18 +488,28 @@ function retrieveMovie(innerData, settings) {
       singleMovie.shortDescription += "\n" + innerData.bottomMetadataItems[item].simpleText;
   }
 
-  if (!ignore.duration)
-    singleMovie.duration = innerData.lengthText.simpleText;
+  if (!ignore.duration) {
+    if ("lengthText" in innerData)
+      singleMovie.duration = innerData.lengthText.simpleText;
+    else
+      singleMovie.duration = "";
+  }
 
   if (!ignore.year) {
-    let splitInfo = helpers.safeSplit(innerData.topMetadataItems[0].simpleText, "• ", 1);
     singleMovie.year = "";
-    if (splitInfo.length !== 1) //Year found
-      singleMovie.year = splitInfo[1];
+    if ("topMetadataItems" in innerData) {
+      let splitInfo = helpers.safeSplit(innerData.topMetadataItems[0].simpleText, "• ", 1);
+      if (splitInfo.length !== 1) //Year found
+        singleMovie.year = splitInfo[1];
+    }
   }
   
-  if (!ignore.category) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIND OUT IF THIS SOLUTION IS SAFE
-    singleMovie.category = helpers.safeSplit(innerData.topMetadataItems[0].simpleText, " •", 1)[0];
+  if (!ignore.category) { //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIND OUT IF THIS SOLUTION IS SAFE
+    if ("topMetadataItems" in innerData)
+      singleMovie.category = helpers.safeSplit(innerData.topMetadataItems[0].simpleText, " •", 1)[0];
+    else
+      singleMovie.category = "";
+  }
 
   if (!ignore.contentHeaders) {
     singleMovie.contentHeaders = [];
@@ -433,6 +522,20 @@ function retrieveMovie(innerData, settings) {
     singleMovie.uploader = "";
     for (let run in runs)
       singleMovie.uploader += runs[run].text;
+  }
+
+  if (!ignore.verified) {
+    singleMovie.verified = "false";
+    if ("ownerBadges" in innerData) {
+      let badges = innerData.ownerBadges;
+      for (let badge in badges) {
+        badge = badges[badge];
+        if (badge.metadataBadgeRenderer.style === "BADGE_STYLE_TYPE_VERIFIED") {
+          singleMovie.verified = "true";
+          break;
+        }
+      }
+    }
   }
 
   if (!ignore.channelId) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIND OUT IF THIS SOLUTION IS SAFE

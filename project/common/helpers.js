@@ -263,6 +263,7 @@ async function makeRequest(config, timeout, retry = 0, verbosityLevel = 4) {
 //*********************************************************************************
 function handleSaveJSON(file, information, prettyprint) {
 
+  console.log(file);
   file = safeSplit(file, ".json", 1, true)[0];
 
   //Keep probing until it is safe to save

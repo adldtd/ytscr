@@ -127,6 +127,18 @@ const cmd = {
       numArgs: 0
     },
 
+    "-savesec": {redirect: "--savesections"},
+    "--savesections": {
+      aliases: ["--savesections", "-savesec"],
+      simpleDescription: "Saves section names/data during result scraping",
+      description: "A flag which tells the scraper to save information \"sections\" while collecting data. " +
+      "When returning results, YouTube sometimes wraps results into seperate packs (i.e. \"People also " +
+      "watched\"). This flag causes the program to retain that info, wrapping saved results in nested lists. " +
+      "NOTE: This flag is mutually exclusive with --seperate.",
+      call: savesectionsCall,
+      numArgs: 0
+    },
+
     "-tfr": {redirect: "--tframe"},
     "--tframe": {
       aliases: ["--tframe", "-tfr"],
@@ -231,7 +243,17 @@ function inputCall(parsed, currentState, innerState, settings, innerSettings) {
 }
 
 function seperateCall(parsed, currentState, innerState, settings, innerSettings) {
-  innerSettings.seperate = true;
+  if (!innerSettings.savesections)
+    innerSettings.seperate = true;
+  else
+    currentState.error = errors.errorCodesConflict(0, parsed.command, "--savesections");
+}
+
+function savesectionsCall(parsed, currentState, innerState, settings, innerSettings) {
+  if (!innerSettings.seperate)
+    innerSettings.savesections = true;
+  else
+    currentState.error = errors.errorCodesConflict(0, parsed.command, "--seperate");
 }
 
 //Call for all commands which accept one unique (originally === ""), must-be-valid input

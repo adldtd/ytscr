@@ -20,7 +20,9 @@ function cli(args, index) {
       search: {
         input: "",
         prettyprint: true,
+
         seperate: false,
+        savesections: false,
   
         focus: {
           videos: true,
@@ -51,14 +53,17 @@ function cli(args, index) {
 
         filter: [],
         ignore: {id: false,
-                  title: false,
-                  shortDescription: false,
-                  views: false,
-                  duration: false,
-                  published: false,
-                  thumbnail: false,
-                  uploader: false,
-                  channelId: false}
+                 title: false,
+                 shortDescription: false,
+                 badges: false,
+                 views: false,
+                 duration: false,
+                 published: false,
+                 thumbnail: false,
+                 uploader: false,
+                 verified: false,
+                 profilePicture: false,
+                 channelId: false}
       },
 
       shorts: {
@@ -106,6 +111,7 @@ function cli(args, index) {
                   updated: false,
                   thumbnail: false,
                   uploader: false,
+                  verified: false,
                   channelId: false}
       },
 
@@ -125,6 +131,7 @@ function cli(args, index) {
                   category: false,
                   contentHeaders: false,
                   uploader: false,
+                  verified: false,
                   channelId: false}
       }
       

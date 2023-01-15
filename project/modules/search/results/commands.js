@@ -7,11 +7,14 @@ const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"
 const attributesVideos = {id: "str",
                           title: "str",
                           shortDescription: "str",
+                          badges: "str",
                           views: "num",
                           duration: "num",
                           published: "str",
                           thumbnail: "str",
                           uploader: "str",
+                          verified: "str",
+                          profilePicture: "str",
                           channelId: "str"};
 
 const attributesShorts = {id: "str",
@@ -33,6 +36,7 @@ const attributesPlaylists = {id: "str",
                              updated: "str",
                              thumbnail: "str",
                              uploader: "str",
+                             verified: "str",
                              channelId: "str"};
 
 const attributesMovies = {id: "str",
@@ -43,6 +47,7 @@ const attributesMovies = {id: "str",
                           category: "str",
                           contentHeaders: "str",
                           uploader: "str",
+                          verified: "str",
                           channelId: "str"};
 
 
@@ -67,11 +72,14 @@ const cmd = {
     attributes: {id: "The video ID",
                  title: "The video title",
                  shortDescription: "Snippet of the description",
+                 badges: "A list of items describing the content of the video",
                  views: "Num. views",
                  duration: "Length of the video",
                  published: "An approximate publish date (distance from the current date)",
                  thumbnail: "Link to the video thumbnail",
                  uploader: "The name of the video uploader",
+                 verified: "Whether the uploader is verified",
+                 profilePicture: "The uploader's profile picture",
                  channelId: "The uploader's channel ID"}
   },
 
@@ -144,6 +152,7 @@ const cmd = {
                  updated: "Approximate time of the last change made to the list (distance from current date)",
                  thumbnail: "The video thumbnail used for the playlist",
                  uploader: "The name of the playlist's creator",
+                 verified: "Whether the creator is verified",
                  channelId: "The creator's channel ID"}
   },
 
@@ -171,6 +180,7 @@ const cmd = {
                  category: "The movie's category (action, horror, etc.)",
                  contentHeaders: "A list of headers for the movie (\"Free with Ads\", \"PG-13\", etc.)",
                  uploader: "The name of the video uploader",
+                 verified: "Whether the uploader is verified",
                  channelId: "The uploader's channel ID"}
   }
 }
