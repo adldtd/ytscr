@@ -4,6 +4,11 @@ const { subscribeMeta } = require("../../../common/subscribe-meta")
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
 
 
+  /**********************************************************************************/
+ /* Arguments + commands and corresponding functions for the search results module */
+/**********************************************************************************/
+
+
 const attributesVideos = {id: "str",
                           title: "str",
                           shortDescription: "str",

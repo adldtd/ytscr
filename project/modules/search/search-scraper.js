@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 
+const meta_scraper = require("./meta/meta-scraper").scrape;
 const results_scraper = require("./results/results-scraper").scrape;
 
 
@@ -201,18 +202,36 @@ async function scrapeSearchModule(settings) {
   innerData = await applyFilters(config, innerData, innerSettings, timeout);
   if (innerData === -1) return -1;
 
-  //The main scraping modules
-  global.sendvb(2, "\n ------------ Collecting results... ------------");
-  let savedResults = await results_scraper(settings, config, timeout, innerData);
-
-  if (savedResults !== -1) {
-    if (settings.search.seperate) {
-      for (let key in savedResults)
-        savedData[key] = savedResults[key];
-    } else
-      savedData["results"] = savedResults;
+  //************************************************************************The main scraping modules
+  let resultModules = ["videos", "shorts", "channels", "playlists", "movies"];
+  let focusResults = false;
+  for (let result in resultModules) {
+    result = resultModules[result];
+    focusResults = (focusResults || settings.search.focus[result]);
+    if (focusResults) break;
   }
 
+  //Meta module
+  if (settings.search.focus.meta) {
+    global.sendvb(2, "\n ------------ Scraping meta... ------------");
+    let savedMeta = await meta_scraper(settings, config, timeout, innerData);
+    if (savedMeta !== -1) savedData.meta = savedMeta;
+  }
+
+  //Results mega-module
+  if (focusResults) {
+    global.sendvb(2, "\n ------------ Scraping results... ------------");
+    let savedResults = await results_scraper(settings, config, timeout, innerData);
+
+    if (savedResults !== -1) {
+      if (settings.search.seperate) {
+        for (let key in savedResults)
+          savedData[key] = savedResults[key];
+      } else
+        savedData["results"] = savedResults;
+    }
+  }
+  
   let finalDestination = helpers.handleSaveJSON(settings.search.output, savedData, settings.search.prettyprint);
   global.sendvb(1, "\nSaved as " + finalDestination + "\n");
 

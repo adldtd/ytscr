@@ -5,10 +5,11 @@ const helpers = require("../../common/helpers")
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
 
+const meta_cli = require("./meta/cli").cli;
 const results_cli = require("./results/cli").cli;
 
 
-var validModules = {videos: "", shorts: "", channels: "", playlists: "", movies: ""};
+var validModules = {meta: "", videos: "", shorts: "", channels: "", playlists: "", movies: ""};
 
 var validTimeFrames = {LastHour: "",
                        Today: "",
@@ -47,20 +48,20 @@ const cmd = {
   
   modules: {
 
-    /*"meta": {
+    "meta": {
       aliases: ["meta"],
-      simpleDescription: "",
-      description: "",
-      examples: "",
-      cli: undefined,
+      simpleDescription: "Submodule for search metadata",
+      description: "A submodule that focuses on the metadata surrounding search results.",
+      examples: ["meta [argument1] [argument2] ... #"],
+      cli: meta_cli,
       scrape: undefined
-    },*/
+    },
 
     "videos": {
       aliases: ["videos"],
       simpleDescription: "Submodule for working with video results",
       description: "A submodule that focuses on retrieved videos. Part of the greater \"results\" section.",
-      examples: "videos [argument1] [argument2] ... #",
+      examples: ["videos [argument1] [argument2] ... #"],
       cli: results_cli,
       scrape: undefined
     },
@@ -71,6 +72,7 @@ const cmd = {
       description: "A submodule that focuses on retrieved YouTube shorts. Part of the greater \"results\" " +
       "section. NOTE: Shorts are technically videos, just in this case they tend to have less search information " +
       "- thus they are made seperate.",
+      examples: ["shorts [argument1] [argument2] ... #"],
       cli: results_cli,
       scrape: undefined
     },
@@ -79,6 +81,7 @@ const cmd = {
       aliases: ["channels"],
       simpleDescription: "Submodule for working with channel results",
       description: "A submodule that focuses on retrieved channels. Part of the greater \"results\" section.",
+      examples: ["channels [argument1] [argument2] ... #"],
       cli: results_cli,
       scrape: undefined
     },
@@ -87,6 +90,7 @@ const cmd = {
       aliases: ["playlists"],
       simpleDescription: "Submodule for working with playlist results",
       description: "A submodule that focuses on retrieved playlists. Part of the greater \"results\" section.",
+      examples: ["playlists [argument1] [argument2] ... #"],
       cli: results_cli,
       scrape: undefined
     },
@@ -95,6 +99,7 @@ const cmd = {
       aliases: ["movies"],
       simpleDescription: "Submodule for working with movie results",
       description: "A submodule that focuses on retrieved movies. Part of the greater \"results\" section.",
+      examples: ["movies [argument1] [argument2] ... #"],
       cli: results_cli,
       scrape: undefined
     }
@@ -107,9 +112,8 @@ const cmd = {
     "--input": {
       aliases: ["--input", "-i"],
       simpleDescription: "The term/sentence to be searched",
-      description: "A command which takes in a search query as input. Results depend heavily on external " +
-      "factors, such as your location, or your IP address. NOTE: Certain queries may automatically return 0 " +
-      "results.",
+      description: "A command which takes in a search query as input. Results may depend heavily on external " +
+      "factors, such as your location, or your IP address. Certain queries will have no results.",
       examples: ["--input chess", "-i \"Me at the zoo\""],
       call: inputCall,
       numArgs: 1

@@ -630,14 +630,22 @@ function printResult(singleResult, type) {
   console.log("-------------------------------------------------------------------");
   for (att in singleResult) {
     if (att === "id") {
-      if (type === "video")
+      if (type === "videos")
         console.log("link: https://www.youtube.com/watch?v=" + singleResult[att]);
       else //Playlist
         console.log("link: https://www.youtube.com/playlist?list=" + singleResult[att])
     }
     else if (att === "channelId")
       console.log("channel: " + "https://youtube.com/channel/" + singleResult[att]);
-    else
+    else if (att === "badges" || att === "shortVideos" || att === "contentHeaders") {
+      let printStr = att + ": ";
+      if (singleResult[att].length > 0) {
+        for (let item in singleResult[att])
+          printStr += item + ", ";
+        console.log(printStr.substring(0, printStr.length - 2));
+      } else
+        console.log(printStr);
+    } else
       console.log(att + ": " + singleResult[att]);
   }
   console.log("-------------------------------------------------------------------\n\n");

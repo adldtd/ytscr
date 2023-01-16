@@ -25,6 +25,7 @@ function cli(args, index) {
         savesections: false,
   
         focus: {
+          meta: true,
           videos: true,
           shorts: true,
           channels: true,
@@ -42,6 +43,11 @@ function cli(args, index) {
         output: "",
         verbose: 4,
         timeout: 1000
+      },
+
+      meta: {
+        ignore: {estimatedResults: false,
+                 predictions: false}
       },
 
       videos: {
@@ -148,6 +154,10 @@ function cli(args, index) {
         excludeList: {},
         modulesCalled: {},
         firstFocusCalled: false
+      },
+
+      meta: {
+
       },
 
       videos: {
