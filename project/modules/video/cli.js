@@ -95,22 +95,51 @@ function cli(args, index) {
     },
 
     recommended: {
-      savefilter: false,
-      printfilter: false,
-
+      seperate: false,
       lim: Number.POSITIVE_INFINITY,
-      limfilter: Number.POSITIVE_INFINITY,
 
-      filter: [],
-      ignore: {
-        id: false,
-        title: false,
-        views: false,
-        duration: false,
-        published: false,
-        thumbnail: false,
-        uploader: false,
-        channelId: false
+      focus: {
+        videos: true,
+        playlists: true
+      },
+
+
+      videos: {
+        savefilter: false,
+        printfilter: false,
+
+        lim: Number.POSITIVE_INFINITY,
+        limfilter: Number.POSITIVE_INFINITY,
+
+        filter: [],
+        ignore: {
+          id: false,
+          title: false,
+          views: false,
+          duration: false,
+          published: false,
+          thumbnail: false,
+          uploader: false,
+          channelId: false
+        }
+      },
+
+      playlists: {
+        savefilter: false,
+        printfilter: false,
+
+        lim: Number.POSITIVE_INFINITY,
+        limfilter: Number.POSITIVE_INFINITY,
+
+        filter: [],
+        ignore: {
+          id: false,
+          title: false,
+          size: false,
+          thumbnail: false,
+          uploader: false,
+          channelId: false
+        }
       }
     }
 
@@ -146,9 +175,23 @@ function cli(args, index) {
     },
 
     recommended: {
-      usedFilterCheckValues: {},
-      inFilter: false,
-      currentFilter: {}
+      focusList: {},
+      excludeList: {},
+      modulesCalled: {},
+      firstFocusCalled: false,
+
+
+      videos: {
+        usedFilterCheckValues: {},
+        inFilter: false,
+        currentFilter: {}
+      },
+
+      playlists: {
+        usedFilterCheckValues: {},
+        inFilter: false,
+        currentFilter: {}
+      }
     }
 
   };
@@ -157,7 +200,8 @@ function cli(args, index) {
   verifyDmodule(currentState[THIS_MODULE], settings[THIS_MODULE]); /////////////////////Debugging
   verifyFilterable(currentState.comments, settings.comments); /////////////////////Debugging
   verifyFilterable(currentState.chat, settings.chat); /////////////////////Debugging
-  verifyFilterable(currentState.recommended, settings.recommended); /////////////////////Debugging
+  verifyFilterable(currentState.recommended.videos, settings.recommended.videos); /////////////////////Debugging
+  verifyFilterable(currentState.recommended.playlists, settings.recommended.playlists); /////////////////////Debugging
   
 
   //Loop through the CLI

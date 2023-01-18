@@ -11,8 +11,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
 	let collectedResults = null;
 	if (settings.search.seperate) {
 		collectedResults = {};
-		for (module in modules) {
-      module = modules[module];
+		for (module in settings.search.focus) {
 			if (settings.search.focus[module])
 				collectedResults[module] = [];
 		}
@@ -24,7 +23,6 @@ async function scrapeResults(settings, config, timeout, searchData) {
 
   let counter = 0;
   let typeCounter = {videos: 0, shorts: 0, channels: 0, playlists: 0, movies: 0};
-  let matchCounter = 0;
   let typeMatchCounter = {videos: 0, shorts: 0, channels: 0, playlists: 0, movies: 0};
 
   //The following code is for the modules' limiters to "work together" (for example, if videos --lim 50 and
@@ -159,7 +157,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
         if (match) {
           if (settings[type].printfilter)
             printResult(singleResult, type);
-          ++matchCounter;
+          //++matchCounter;
           ++typeMatchCounter[type];
         }
 
@@ -188,7 +186,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
           ++totalCounter;
 
         //If either counters reach the specified limit, scraping stops
-        if (counter >= settings.search.lim || matchCounter >= settings.search.limfilter) {
+        if (counter >= settings.search.lim) {
           finished = true;
           break;
         }

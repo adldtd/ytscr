@@ -20,6 +20,10 @@ Currently, the tool contains two implemented modules: `video` and `search`. List
 
 -  `recommended`: Gets recommendations
 
+    -  `videos`: Deals with video/videolike recommendations
+
+    -  `playlists`: Deals with playlist recommendations
+
 -  `chat`: Gets previous chat messages (if livestream or premiere)
 
 `search`: Retrieves information from a YouTube search

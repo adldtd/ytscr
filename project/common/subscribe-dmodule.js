@@ -230,6 +230,20 @@ function subscribeDmodule(modules, cmdCommands) {
   }
 }
 
+function subscribeDmoduleSimple(modules, cmdCommands) { //Only add focus and exclude commands
+
+  let subCommands = ["-fc", "--focus", "-e", "--exclude"];
+  for (c in subCommands) {
+
+    c = subCommands[c];
+    cmdCommands[c] = Object.assign({}, commands[c]);
+    if (c === "--focus" || c === "--exclude")
+      cmdCommands[c].validValues = modules;
+    
+  }
+}
+
 
 module.exports.verifyDmodule = verifyDmodule;
 module.exports.subscribeDmodule = subscribeDmodule;
+module.exports.subscribeDmoduleSimple = subscribeDmoduleSimple;

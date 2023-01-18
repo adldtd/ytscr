@@ -300,7 +300,7 @@ function ignoreCall(c, a, currentState, innerState, moduleSettings, innerSetting
   if (!innerState.inFilter) {
     if (a in commands["--ignore"].validValues) {
       if (!(a in innerState.usedFilterCheckValues))
-        innerSettings.include[a] = false;
+        innerSettings.ignore[a] = true;
       else
         currentState.error = errors.errorCodes(12, c, a);
     } else {

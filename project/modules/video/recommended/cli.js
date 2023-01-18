@@ -18,35 +18,36 @@ function cli(args, currentState, settings) {
     if (currentState.error) return -1;
     currentState.index = parsed.currentIndex;
 
-    if (parsed.command === "#") {
+    if (parsed.isModule) {
 
-      if (currentState[THIS_MODULE].inFilter) {
-        currentState.error = errors.errorCodesScope(3, THIS_MODULE);
-        return -1;
-      }
-      return 0; //Exit scope safely
+      currentState.recommended.modulesCalled[parsed.command] = "";
+      let result = parsed.commandBox.cli(args, currentState, settings, parsed.command); //Results CLI needs a specific module name
+      if (result === -1 || result === 1) return result;
 
-    } else if (parsed.command === "--help" || parsed.command === "-h") {
-    
-      if (parsed.args.length === 0) {
-        helpers.outputHelpAll(cmd);
-        return 1;
-      } else {
-        let result = helpers.parseHelp(cmd, currentState, parsed);
-        return result; //Either 1 (success) or -1 (failure)
-      }
+    } else {
 
-    } else //Default; non-meta commands
-      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState[THIS_MODULE], settings.video, settings[THIS_MODULE]);
+      if (parsed.command === "#") {
+        return 0; //Exit scope safely
+
+      } else if (parsed.command === "--help" || parsed.command === "-h") {
+      
+        if (parsed.args.length === 0) {
+          helpers.outputHelpAll(cmd);
+          return 1;
+        } else {
+          let result = helpers.parseHelp(cmd, currentState, parsed);
+          return result; //Either 1 (success) or -1 (failure)
+        }
+
+      } else //Default; non-meta commands
+        parsed.commandBox.call(parsed, currentState, currentState[THIS_MODULE], settings, settings[THIS_MODULE]);
+
+    }
 
     if (currentState.error)
       return -1;
   }
 
-  if (currentState[THIS_MODULE].inFilter) {
-    currentState.error = errors.errorCodesScope(2, "--filter");
-    return -1;
-  }
   return 0; //No errors and no stopping commands called
 }
 
