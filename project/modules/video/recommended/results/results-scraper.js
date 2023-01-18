@@ -124,13 +124,13 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
       let match = recommendedMatches(singleRecommended, settings[type].filter);
 
       if (match) {
-        if (settings.printfilter)
-          printRecommendation(singleRecommended);
+        if (settings[type].printfilter)
+          printRecommendation(singleRecommended, type);
         //++matchCounter;
         ++typeMatchCounter[type];
       }
 
-      if (!settings.savefilter || match) {
+      if (!settings[type].savefilter || match) {
         if (!settings.seperate)
           savedRecommended.push(singleRecommended);
         else
@@ -372,14 +372,17 @@ function durationToSec(duration) {
 //*********************************************************************************
 //Print the data from a recommended video to the console
 //*********************************************************************************
-function printRecommendation(singleRecommended) {
+function printRecommendation(singleRecommended, type) {
 
   clearLastLine();
   console.log("-------------------------------------------------------------------");
   for (att in singleRecommended) {
-    if (att === "id")
-      console.log("link: https://www.youtube.com/watch?v=" + singleRecommended[att]);
-    else if (att === "channelId")
+    if (att === "id") {
+      if (type === "videos")
+        console.log("link: https://www.youtube.com/watch?v=" + singleRecommended[att]);
+      else
+        console.log("link: https://www.youtube.com/playlist?list=" + singleRecommended[att]);
+    } else if (att === "channelId")
       console.log("channel: " + "https://youtube.com/channel/" + singleRecommended[att]);
     else
       console.log(att + ": " + singleRecommended[att]);

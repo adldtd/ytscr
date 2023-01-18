@@ -624,7 +624,7 @@ function resultMatches(singleResult, filter, type) {
 
 function printResult(singleResult, type) {
 
-  clearLastLine();
+  helpers.clearLastLine();
   console.log("-------------------------------------------------------------------");
   for (att in singleResult) {
     if (att === "id") {
@@ -638,8 +638,10 @@ function printResult(singleResult, type) {
     else if (att === "badges" || att === "shortVideos" || att === "contentHeaders") {
       let printStr = att + ": ";
       if (singleResult[att].length > 0) {
-        for (let item in singleResult[att])
+        for (let item in singleResult[att]) {
+          item = singleResult[att][item];
           printStr += item + ", ";
+        }
         console.log(printStr.substring(0, printStr.length - 2));
       } else
         console.log(printStr);
