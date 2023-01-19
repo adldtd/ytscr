@@ -324,8 +324,26 @@ function retrieveVideo(innerData, settings) {
     singleVideo.profilePicture = thumbnails[thumbnails.length - 1].url;
   }
 
-  if (!ignore.channelId) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIND OUT IF THIS SOLUTION IS SAFE
-    singleVideo.channelId = innerData.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId;
+  if (!ignore.handle) {
+    singleVideo.handle = "";
+    for (run in innerData.longBylineText.runs) {
+      if ("navigationEndpoint" in innerData.longBylineText.runs[run] && "browseEndpoint" in innerData.longBylineText.runs[run].navigationEndpoint) {
+        let link = innerData.longBylineText.runs[run].navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+        if (link[1] === "@") singleVideo.handle = link;
+        break;
+      }
+    }
+  }
+
+  if (!ignore.channelId) {
+    singleVideo.channelId = "";
+    for (run in innerData.longBylineText.runs) {
+      if ("navigationEndpoint" in innerData.longBylineText.runs[run] && "browseEndpoint" in innerData.longBylineText.runs[run].navigationEndpoint) {
+        singleVideo.channelId = innerData.longBylineText.runs[run].navigationEndpoint.browseEndpoint.browseId;
+        break;
+      }
+    }
+  }
 
   return singleVideo;
 }
@@ -396,6 +414,11 @@ function retrieveChannel(innerData, settings) {
     singleChannel.picture = thumbnails[thumbnails.length - 1].url;
   }
 
+  if (!ignore.handle) {
+    let link = innerData.navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+    singleChannel.handle = (link[1] === "@") ? link : "";
+  }
+
   if (!ignore.channelId)
     singleChannel.channelId = innerData.channelId;
   
@@ -457,8 +480,26 @@ function retrievePlaylist(innerData, settings) {
     }
   }
 
-  if (!ignore.channelId) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIND OUT IF THIS SOLUTION IS SAFE
-    singlePlaylist.channelId = innerData.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId;
+  if (!ignore.handle) {
+    singlePlaylist.handle = "";
+    for (run in innerData.longBylineText.runs) {
+      if ("navigationEndpoint" in innerData.longBylineText.runs[run] && "browseEndpoint" in innerData.longBylineText.runs[run].navigationEndpoint) {
+        let link = innerData.longBylineText.runs[run].navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+        if (link[1] === "@") singlePlaylist.handle = link;
+        break;
+      }
+    }
+  }
+
+  if (!ignore.channelId) {
+    singlePlaylist.channelId = "";
+    for (run in innerData.longBylineText.runs) {
+      if ("navigationEndpoint" in innerData.longBylineText.runs[run] && "browseEndpoint" in innerData.longBylineText.runs[run].navigationEndpoint) {
+        singlePlaylist.channelId = innerData.longBylineText.runs[run].navigationEndpoint.browseEndpoint.browseId;
+        break;
+      }
+    }
+  }
   
   return singlePlaylist;
 }
@@ -536,8 +577,28 @@ function retrieveMovie(innerData, settings) {
     }
   }
 
-  if (!ignore.channelId) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIND OUT IF THIS SOLUTION IS SAFE
-    singleMovie.channelId = innerData.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId;
+  /*if (!ignore.handle) {
+    singleMovie.handle = "";
+    for (run in innerData.longBylineText.runs) {
+      if ("navigationEndpoint" in innerData.longBylineText.runs[run] && "browseEndpoint" in innerData.longBylineText.runs[run].navigationEndpoint) {
+        if ("canonicalBaseUrl" in innerData.longBylineText.runs[run].navigationEndpoint.browseEndpoint) {
+          let link = innerData.longBylineText.runs[run].navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+          if (link[1] === "@") singleMovie.handle = link;
+        }
+        break;
+      }
+    }
+  }*/
+
+  if (!ignore.channelId) {
+    singleMovie.channelId = "";
+    for (run in innerData.longBylineText.runs) {
+      if ("navigationEndpoint" in innerData.longBylineText.runs[run] && "browseEndpoint" in innerData.longBylineText.runs[run].navigationEndpoint) {
+        singleMovie.channelId = innerData.longBylineText.runs[run].navigationEndpoint.browseEndpoint.browseId;
+        break;
+      }
+    }
+  }
 
   return singleMovie;
 }

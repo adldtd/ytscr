@@ -20,6 +20,7 @@ function scrapeMetadata(config, settings, resp) {
     comments: "",
     uploader: "",
     subscribers: "",
+    handle: "",
     channelId: "",
     pfp: ""
   };
@@ -151,6 +152,14 @@ function scrapeMetadata(config, settings, resp) {
           let runs = ownerData.title.runs;
           for (run in runs)
             savedMeta.uploader += runs[run].text;
+        }
+
+        if (!settings.ignore["handle"]) {
+          let link = ownerData.navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+          if (link[1] === "@")
+            savedMeta.handle = ownerData.navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+          else
+            savedMeta.handle = "";
         }
     
         if (!settings.ignore["channelId"])

@@ -292,8 +292,8 @@ function getCommentData(innerComment, ignore = {}) { //Condenses a retrieved com
     singleComment.picture = thumbnails[thumbnails.length - 1.].url; //Always goes for the biggest thumbnail
   }
 
-  if (!ignore.channel)
-    singleComment.channel = innerComment.authorEndpoint.browseEndpoint.browseId;
+  if (!ignore.channelId)
+    singleComment.channelId = innerComment.authorEndpoint.browseEndpoint.browseId;
 
   return singleComment;
 }
@@ -381,7 +381,7 @@ function printComment(singleComment, config) {
   for (att in singleComment) {
     if (att === "id")
       console.log("link: " + config.data.context.client.originalUrl + "&lc=" + singleComment[att]);
-    else if (att === "channel")
+    else if (att === "channelId")
       console.log("channel: " + "https://youtube.com/channel/" + singleComment[att]);
     else
       console.log(att + ": " + singleComment[att]);
@@ -397,7 +397,7 @@ function printReply(singleComment, config) {
   for (att in singleComment) {
     if (att === "id")
       console.log("\tlink: " + config.data.context.client.originalUrl + "&lc=" + singleComment[att]);
-    else if (att === "channel")
+    else if (att === "channelId")
       console.log("\tchannel: " + "https://youtube.com/channel/" + singleComment[att]);
     else
       console.log("\t" + att + ": " + singleComment[att]);

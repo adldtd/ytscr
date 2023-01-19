@@ -20,6 +20,7 @@ const attributesVideos = {id: "str",
                           uploader: "str",
                           verified: "str",
                           profilePicture: "str",
+                          handle: "str",
                           channelId: "str"};
 
 const attributesShorts = {id: "str",
@@ -32,6 +33,7 @@ const attributesChannels = {name: "str",
                             subscribers: "num",
                             shortDescription: "str",
                             picture: "str",
+                            handle: "str",
                             channelId: "str"};
 
 const attributesPlaylists = {id: "str",
@@ -42,6 +44,7 @@ const attributesPlaylists = {id: "str",
                              thumbnail: "str",
                              uploader: "str",
                              verified: "str",
+                             handle: "str",
                              channelId: "str"};
 
 const attributesMovies = {id: "str",
@@ -85,6 +88,7 @@ const cmd = {
                  uploader: "The name of the video uploader",
                  verified: "Whether the uploader is verified",
                  profilePicture: "The uploader's profile picture",
+                 handle: "The uploader's channel handle",
                  channelId: "The uploader's channel ID"}
   },
 
@@ -131,6 +135,7 @@ const cmd = {
                  subscribers: "Num. subscribers",
                  shortDescription: "Snippet of the channel's bio",
                  picture: "Channel's profile picture",
+                 handle: "The channel handle",
                  channelId: "The channel ID"}
   },
 
@@ -158,6 +163,7 @@ const cmd = {
                  thumbnail: "The video thumbnail used for the playlist",
                  uploader: "The name of the playlist's creator",
                  verified: "Whether the creator is verified",
+                 handle: "The creator's channel handle",
                  channelId: "The creator's channel ID"}
   },
 

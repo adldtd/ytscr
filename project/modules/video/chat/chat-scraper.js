@@ -222,15 +222,14 @@ function getMessageData(innerMessage, timestamp, ignore = {}) {
       timestamp = timestampTextToMsec(innerMessage.timestampText.simpleText); //Less accurate than standard msec
     singleMessage.timestamp = timestamp;
   }
-  //singleMessage.timestamp = innerMessage.timestampText.simpleText;
 
   if ("picture" in ignore ? !ignore.picture : true) {
     let pictures = innerMessage.authorPhoto.thumbnails;
     singleMessage.picture = pictures[pictures.length - 1].url;
   }
 
-  if ("channel" in ignore ? !ignore.channel : true)
-    singleMessage.channel = innerMessage.authorExternalChannelId;
+  if ("channelId" in ignore ? !ignore.channelId : true)
+    singleMessage.channelId = innerMessage.authorExternalChannelId;
 
   return singleMessage;
 }
@@ -322,7 +321,7 @@ function printMessage(singleMessage) {
   clearLastLine();
   console.log("-------------------------------------------------------------------");
   for (att in singleMessage) {
-    if (att === "channel")
+    if (att === "channelId")
       console.log("channel: " + "https://youtube.com/channel/" + singleMessage[att]);
     else
       console.log(att + ": " + singleMessage[att]);

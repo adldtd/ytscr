@@ -69,6 +69,7 @@ function cli(args, index) {
                  uploader: false,
                  verified: false,
                  profilePicture: false,
+                 handle: false,
                  channelId: false}
       },
 
@@ -95,11 +96,12 @@ function cli(args, index) {
 
         filter: [],
         ignore: {name: false,
-                  verified: false,
-                  subscribers: false,
-                  shortDescription: false,
-                  picture: false,
-                  channelId: false}
+                 verified: false,
+                 subscribers: false,
+                 shortDescription: false,
+                 picture: false,
+                 handle: false,
+                 channelId: false}
       },
 
       playlists: {
@@ -111,14 +113,15 @@ function cli(args, index) {
 
         filter: [],
         ignore: {id: false,
-                  title: false,
-                  size: false,
-                  shortVideos: false,
-                  updated: false,
-                  thumbnail: false,
-                  uploader: false,
-                  verified: false,
-                  channelId: false}
+                 title: false,
+                 size: false,
+                 shortVideos: false,
+                 updated: false,
+                 thumbnail: false,
+                 uploader: false,
+                 verified: false,
+                 handle: false,
+                 channelId: false}
       },
 
       movies: {
@@ -130,15 +133,15 @@ function cli(args, index) {
 
         filter: [],
         ignore: {id: false,
-                  title: false,
-                  shortDescription: false,
-                  duration: false,
-                  year: false,
-                  category: false,
-                  contentHeaders: false,
-                  uploader: false,
-                  verified: false,
-                  channelId: false}
+                 title: false,
+                 shortDescription: false,
+                 duration: false,
+                 year: false,
+                 category: false,
+                 contentHeaders: false,
+                 uploader: false,
+                 verified: false,
+                 channelId: false}
       }
       
     }

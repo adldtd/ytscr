@@ -2,6 +2,7 @@ const path = require("path");
 const makeRequest = require(path.join(__dirname, "..", "..", "..", "..", "common", "helpers")).makeRequest;
 const clearLastLine = require(path.join(__dirname, "..", "..", "..", "..", "common", "helpers")).clearLastLine;
 const helpers = require(path.join(__dirname, "..", "..", "..", "..", "common", "helpers"));
+const filter_helpers = require(path.join(__dirname, "..", "..", "..", "..", "common", "filter_helpers"));
 
 
 //*********************************************************************************
@@ -223,6 +224,17 @@ function getVideoData(innerVideo, settings) {
       singleVideo.uploader += innerVideo.longBylineText.runs[run].text;
   }
 
+  if (!ignore.handle) {
+    singleVideo.handle = "";
+    for (run in innerVideo.longBylineText.runs) {
+      if ("navigationEndpoint" in innerVideo.longBylineText.runs[run] && "browseEndpoint" in innerVideo.longBylineText.runs[run].navigationEndpoint) {
+        let link = innerVideo.longBylineText.runs[run].navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+        if (link[1] === "@") singleVideo.handle = link;
+        break;
+      }
+    }
+  }
+
   if (!ignore.channelId) {
     singleVideo.channelId = "";
     for (run in innerVideo.longBylineText.runs) {
@@ -264,8 +276,26 @@ function getPlaylistData(innerPlaylist, settings) {
       singlePlaylist.uploader += innerPlaylist.longBylineText.runs[run].text;
   }
 
-  if (!ignore.channelId) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIND OUT IF THIS SOLUTION IS SAFE
-    singlePlaylist.channelId = innerPlaylist.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId;
+  if (!ignore.handle) {
+    singlePlaylist.handle = "";
+    for (run in innerPlaylist.longBylineText.runs) {
+      if ("navigationEndpoint" in innerPlaylist.longBylineText.runs[run] && "browseEndpoint" in innerPlaylist.longBylineText.runs[run].navigationEndpoint) {
+        let link = innerPlaylist.longBylineText.runs[run].navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+        if (link[1] === "@") singlePlaylist.handle = link;
+        break;
+      }
+    }
+  }
+
+  if (!ignore.channelId) {
+    singlePlaylist.channelId = "";
+    for (run in innerPlaylist.longBylineText.runs) {
+      if ("navigationEndpoint" in innerPlaylist.longBylineText.runs[run] && "browseEndpoint" in innerPlaylist.longBylineText.runs[run].navigationEndpoint) {
+        singlePlaylist.channelId = innerPlaylist.longBylineText.runs[run].navigationEndpoint.browseEndpoint.browseId;
+        break;
+      }
+    }
+  }
 
   return singlePlaylist;
 }
@@ -298,9 +328,9 @@ function recommendedMatches(singleRecommended, filter) {
       
       let recommendedCheck;
       if (condition.check === "views")
-        recommendedCheck = crunchViewCount(singleRecommended["views"]);
+        recommendedCheck = filter_helpers.crunchViewCount(singleRecommended["views"]);
       else if (condition.check === "duration")
-        recommendedCheck = durationToSec(singleRecommended["duration"]);
+        recommendedCheck = filter_helpers.durationToSec(singleRecommended["duration"]);
       else
         recommendedCheck = parseInt(singleRecommended["size"]);
 
@@ -330,44 +360,6 @@ function recommendedMatches(singleRecommended, filter) {
   return returnMatch;
 }
 
-//*********************************************************************************
-//Condense a view count into a pure number
-//*********************************************************************************
-function crunchViewCount(views) {
-  views = views.split(" ", 1)[0];
-  if (isNaN(parseInt(views))) //"No views," should work for different languages
-    return 0;
-
-  let num = 0;
-  let places = views.split(",");
-  let modifier = 1;
-
-  for (let i = places.length - 1; i >= 0; i--) {
-    num += parseInt(places[i]) * modifier;
-    modifier *= Math.pow(10, places[i].length);
-  }
-
-  return num;
-}
-
-//*********************************************************************************
-//Converts video runtime into seconds
-//*********************************************************************************
-function durationToSec(duration) {
-  
-  let time = 0;
-  let divisions = duration.split(":");
-
-  for (let i = 0; i < divisions.length; i++)
-    divisions[i] = parseInt(divisions[i]);
-
-  if (divisions.length === 3) //hh:mm::ss
-    time = (divisions[0] * 3600) + (divisions[1] * 60) + divisions[2];
-  else if (divisions.length === 2) //mm:ss
-    time = (divisions[0] * 60) + divisions[1];
-  
-  return time;
-}
 
 //*********************************************************************************
 //Print the data from a recommended video to the console

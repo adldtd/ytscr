@@ -47,6 +47,7 @@ function cli(args, index) {
         comments: false,
         uploader: false,
         subscribers: false,
+        handle: false,
         channelId: false,
         pfp: false
       }
@@ -70,7 +71,7 @@ function cli(args, index) {
         published: false,
         votes: false,
         picture: false,
-        channel: false
+        channelId: false
       }
     },
 
@@ -90,7 +91,7 @@ function cli(args, index) {
         id: false,
         timestamp: false,
         picture: false,
-        channel: false
+        channelId: false
       }
     },
 
@@ -120,6 +121,7 @@ function cli(args, index) {
           published: false,
           thumbnail: false,
           uploader: false,
+          handle: false,
           channelId: false
         }
       },
@@ -138,6 +140,7 @@ function cli(args, index) {
           size: false,
           thumbnail: false,
           uploader: false,
+          handle: false,
           channelId: false
         }
       }

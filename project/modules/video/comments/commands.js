@@ -10,12 +10,12 @@ const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "
 /****************************************************************************/
 
 var attributes = {"author": "str", //List of data the module will scrape; reused by different commands
-                "text": "str",
-                "id": "str",
-                "published": "str",
-                "votes": "num",
-                "picture": "str",
-                "channel": "str"};
+                  "text": "str",
+                  "id": "str",
+                  "published": "str",
+                  "votes": "num",
+                  "picture": "str",
+                  "channelId": "str"};
 
 
 const cmd = {
@@ -91,7 +91,7 @@ const cmd = {
     "picture": {
       simpleDescription: "The author's profile picture"
     },
-    "channel": {
+    "channelId": {
       simpleDescription: "The author's channel ID"
     }
   }

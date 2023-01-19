@@ -12,6 +12,7 @@ const attributesVideos = {id: "str",
                           published: "str",
                           thumbnail: "str",
                           uploader: "str",
+                          handle: "str",
                           channelId: "str"};
 
 const attributesPlaylists = {id: "str",
@@ -19,6 +20,7 @@ const attributesPlaylists = {id: "str",
                              size: "num",
                              thumbnail: "str",
                              uploader: "str",
+                             handle: "str",
                              channelId: "str"};
 
 const cmd = {
@@ -46,6 +48,7 @@ const cmd = {
                  published: "Approximate publish date (distance from today)",
                  thumbnail: "Thumbnail of the video",
                  uploader: "The name of the video uploader",
+                 handle: "The uploader's channel handle",
                  channelId: "The uploader's channel ID"}
   },
 
@@ -70,6 +73,7 @@ const cmd = {
                  size: "Num. videos in the playlist",
                  thumbnail: "The video thumbnail used for the playlist",
                  uploader: "The name of the playlist's creator",
+                 handle: "The uploader's channel handle",
                  channelId: "The creator's channel ID"}
   }
 

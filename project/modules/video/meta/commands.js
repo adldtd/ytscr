@@ -21,6 +21,7 @@ var attributes = {"id": "",
                   "comments": "",
                   "uploader": "",
                   "subscribers": "",
+                  "handle": "",
                   "channelId": "",
                   "pfp": ""};
 
@@ -80,6 +81,9 @@ const cmd = {
     },
     "subscribers": {
       simpleDescription: "Num. subscribers"
+    },
+    "handle": {
+      simpleDescription: "Uploader's channel handle"
     },
     "channelId": {
       simpleDescription: "Uploader's channel ID"

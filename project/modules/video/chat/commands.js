@@ -14,7 +14,7 @@ const attributes = {"author": "str",
                     "id": "str",
                     "timestamp": "num",
                     "picture": "str",
-                    "channel": "str"};
+                    "channelId": "str"};
 
                     
 const cmd = {
@@ -65,7 +65,7 @@ const cmd = {
     "picture": {
       simpleDescription: "The author's profile picture"
     },
-    "channel": {
+    "channelId": {
       simpleDescription: "The author's channel ID"
     }
   }
