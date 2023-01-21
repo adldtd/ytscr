@@ -40,6 +40,8 @@ Currently, the tool contains two implemented modules: `video` and `search`. List
 
 -  `playlists`: Deals with playlist results
 
+-  `mixes`: Deals with YouTube Mix results
+
 -  `movies`: Deals with movie results
 
 `channel`: *Under construction.*

@@ -30,6 +30,7 @@ function cli(args, index) {
           shorts: true,
           channels: true,
           playlists: true,
+          mixes: true,
           movies: true
         },
 
@@ -116,12 +117,29 @@ function cli(args, index) {
                  title: false,
                  size: false,
                  shortVideos: false,
+                 shortVideoIds: false,
                  updated: false,
                  thumbnail: false,
                  uploader: false,
                  verified: false,
                  handle: false,
                  channelId: false}
+      },
+
+      mixes: {
+        savefilter: false,
+        printfilter: false,
+
+        lim: Number.POSITIVE_INFINITY,
+        limfilter: Number.POSITIVE_INFINITY,
+
+        filter: [],
+        ignore: {id: false,
+                 title: false,
+                 shortVideos: false,
+                 shortVideoIds: false,
+                 thumbnail: false,
+                 uploaders: false}
       },
 
       movies: {
@@ -187,6 +205,12 @@ function cli(args, index) {
         currentFilter: {}
       },
 
+      mixes: {
+        usedFilterCheckValues: {},
+        inFilter: false,
+        currentFilter: {}
+      },
+
       movies: {
         usedFilterCheckValues: {},
         inFilter: false,
@@ -201,6 +225,7 @@ function cli(args, index) {
     verifyFilterable(currentState.shorts, settings.shorts); /////////////////////Debugging
     verifyFilterable(currentState.channels, settings.channels); /////////////////////Debugging
     verifyFilterable(currentState.playlists, settings.playlists); /////////////////////Debugging
+    verifyFilterable(currentState.mixes, settings.mixes); /////////////////////Debugging
     verifyFilterable(currentState.movies, settings.movies); /////////////////////Debugging
     
   

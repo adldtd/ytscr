@@ -2,9 +2,6 @@ const helpers = require("../../../common/helpers");
 const filterHelpers = require("../../../common/filter_helpers");
 
 
-const modules = ["videos", "shorts", "channels", "playlists", "movies"];
-
-
 async function scrapeResults(settings, config, timeout, searchData) {
 
 	let initialData = true;
@@ -12,7 +9,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
 	if (settings.search.seperate) {
 		collectedResults = {};
 		for (module in settings.search.focus) {
-			if (settings.search.focus[module])
+			if (settings.search.focus[module] && module !== "meta")
 				collectedResults[module] = [];
 		}
 	} else
@@ -22,27 +19,29 @@ async function scrapeResults(settings, config, timeout, searchData) {
 	let hasContinuation = true;
 
   let counter = 0;
-  let typeCounter = {videos: 0, shorts: 0, channels: 0, playlists: 0, movies: 0};
-  let typeMatchCounter = {videos: 0, shorts: 0, channels: 0, playlists: 0, movies: 0};
+  let typeCounter = {};
+  let typeMatchCounter = {};
+
+  let totalCounter = 0;
+  let typeCap = Number.POSITIVE_INFINITY;
+  let totalMatchCounter = 0;
+  let typeMatchCap = Number.POSITIVE_INFINITY;
 
   //The following code is for the modules' limiters to "work together" (for example, if videos --lim 50 and
   //playlists --lim 5 is specified, the scraper keeps going until 50 videos and 5 playlists are scraped,
   //instead of stopping when only one goal is reached.)
-  let totalCounter = 0;
-  let typeCap = Number.POSITIVE_INFINITY;
-  for (let module in modules) {
-    module = modules[module];
+  for (module in settings.search.focus) {
+    if (module === "meta") continue;
+
+    typeCounter[module] = 0;
+    typeMatchCounter[module] = 0;
+
     if (settings[module].lim !== Number.POSITIVE_INFINITY) {
       if (typeCap === Number.POSITIVE_INFINITY)
         typeCap = 0;
       ++typeCap;
     }
-  }
 
-  let totalMatchCounter = 0;
-  let typeMatchCap = Number.POSITIVE_INFINITY;
-  for (let module in modules) {
-    module = modules[module];
     if (settings[module].limfilter !== Number.POSITIVE_INFINITY) {
       if (typeMatchCap === Number.POSITIVE_INFINITY)
         typeMatchCap = 0;
@@ -142,6 +141,10 @@ async function scrapeResults(settings, config, timeout, searchData) {
           type = "playlists";
           result = result.playlistRenderer;
 
+        } else if ("radioRenderer" in result) {
+          type = "mixes";
+          result = result.radioRenderer;
+
 				} else if ("movieRenderer" in result) {
           type = "movies";
           result = result.movieRenderer;
@@ -231,6 +234,8 @@ function retrieveResult(innerData, settings, type) {
       return retrieveChannel(innerData, settings);
     case "playlists":
       return retrievePlaylist(innerData, settings);
+    case "mixes":
+      return retrieveMix(innerData, settings);
     case "movies":
       return retrieveMovie(innerData, settings);
   }
@@ -443,8 +448,19 @@ function retrievePlaylist(innerData, settings) {
   if (!ignore.shortVideos) {
     let videos = innerData.videos;
     singlePlaylist.shortVideos = [];
-    for (let video in videos)
-      singlePlaylist.shortVideos.push(videos[video].childVideoRenderer.title.simpleText);
+    for (let video in videos) {
+      video = videos[video].childVideoRenderer;
+      singlePlaylist.shortVideos.push(video.title.simpleText + " • " + video.lengthText.simpleText);
+    }
+  }
+
+  if (!ignore.shortVideoIds) {
+    let videos = innerData.videos;
+    singlePlaylist.shortVideoIds = [];
+    for (let video in videos) {
+      video = videos[video].childVideoRenderer;
+      singlePlaylist.shortVideoIds.push(video.videoId);
+    }
   }
 
   if (!ignore.updated) {
@@ -502,6 +518,47 @@ function retrievePlaylist(innerData, settings) {
   }
   
   return singlePlaylist;
+}
+
+function retrieveMix(innerData, settings) {
+  let singleMix = {};
+  if (!settings.search.seperate)
+    singleMix.type = "mixes";
+  let ignore = settings.mixes.ignore;
+
+  if (!ignore.id)
+    singleMix.id = innerData.playlistId;
+
+  if (!ignore.title)
+    singleMix.title = innerData.title.simpleText;
+
+  if (!ignore.shortVideos) {
+    let videos = innerData.videos;
+    singleMix.shortVideos = [];
+    for (let video in videos) {
+      video = videos[video].childVideoRenderer;
+      singleMix.shortVideos.push(video.title.simpleText + " • " + video.lengthText.simpleText);
+    }
+  }
+
+  if (!ignore.shortVideoIds) {
+    let videos = innerData.videos;
+    singleMix.shortVideoIds = [];
+    for (let video in videos) {
+      video = videos[video].childVideoRenderer;
+      singleMix.shortVideoIds.push(video.videoId);
+    }
+  }
+
+  if (!ignore.thumbnail) {
+    let thumbnails = innerData.thumbnail.thumbnails;
+    singleMix.thumbnail = thumbnails[thumbnails.length - 1].url;
+  }
+
+  if (!ignore.uploaders)
+    singleMix.uploaders = innerData.longBylineText.simpleText;
+
+  return singleMix;
 }
 
 function retrieveMovie(innerData, settings) {
@@ -696,7 +753,7 @@ function printResult(singleResult, type) {
     }
     else if (att === "channelId")
       console.log("channel: " + "https://youtube.com/channel/" + singleResult[att]);
-    else if (att === "badges" || att === "shortVideos" || att === "contentHeaders") {
+    else if (att === "badges" || att === "shortVideos" || att === "shortVideoIds" || att === "contentHeaders") {
       let printStr = att + ": ";
       if (singleResult[att].length > 0) {
         for (let item in singleResult[att]) {

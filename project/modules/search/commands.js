@@ -9,7 +9,7 @@ const meta_cli = require("./meta/cli").cli;
 const results_cli = require("./results/cli").cli;
 
 
-var validModules = {meta: "", videos: "", shorts: "", channels: "", playlists: "", movies: ""};
+var validModules = {meta: "", videos: "", shorts: "", channels: "", playlists: "", mixes: "", movies: ""};
 
 var validTimeFrames = {LastHour: "",
                        Today: "",
@@ -91,6 +91,17 @@ const cmd = {
       simpleDescription: "Submodule for working with playlist results",
       description: "A submodule that focuses on retrieved playlists. Part of the greater \"results\" section.",
       examples: ["playlists [argument1] [argument2] ... #"],
+      cli: results_cli,
+      scrape: undefined
+    },
+
+    "mixes": {
+      aliases: ["mixes"],
+      simpleDescription: "Submodule for working with YouTube Mix results",
+      description: "A submodule that focuses on retrieved YouTube Mixes. Part of the greater \"results\" section. " +
+      "NOTE: Mixes are considered by YouTube as (infinite) playlists, though they tend to have less information " +
+      "alongside them - thus they are made seperate.",
+      examples: ["mixes [argument1] [argument2] ... #"],
       cli: results_cli,
       scrape: undefined
     },

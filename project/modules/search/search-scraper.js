@@ -203,10 +203,10 @@ async function scrapeSearchModule(settings) {
   if (innerData === -1) return -1;
 
   //************************************************************************The main scraping modules
-  let resultModules = ["videos", "shorts", "channels", "playlists", "movies"];
+  let nonResultModules = {meta: ""};
   let focusResults = false;
-  for (let result in resultModules) {
-    result = resultModules[result];
+  for (let result in settings.search.focus) {
+    if (result in nonResultModules) continue;
     focusResults = (focusResults || settings.search.focus[result]);
     if (focusResults) break;
   }

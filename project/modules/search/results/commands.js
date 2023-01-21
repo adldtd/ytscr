@@ -40,12 +40,20 @@ const attributesPlaylists = {id: "str",
                              title: "str",
                              size: "num",
                              shortVideos: "str",
+                             shortVideoIds: "str",
                              updated: "str",
                              thumbnail: "str",
                              uploader: "str",
                              verified: "str",
                              handle: "str",
                              channelId: "str"};
+
+const attributesMixes = {id: "str",
+                         title: "str",
+                         shortVideos: "str",
+                         shortVideoIds: "str",
+                         thumbnail: "str",
+                         uploaders: "str"};
 
 const attributesMovies = {id: "str",
                           title: "str",
@@ -159,12 +167,37 @@ const cmd = {
                  title: "The name of the playlist",
                  size: "Num. videos in the playlist",
                  shortVideos: "A short info list of the first videos of the playlist",
+                 shortVideoIds: "The corresponding video IDs for those first videos",
                  updated: "Approximate time of the last change made to the list (distance from current date)",
                  thumbnail: "The video thumbnail used for the playlist",
                  uploader: "The name of the playlist's creator",
                  verified: "Whether the creator is verified",
                  handle: "The creator's channel handle",
                  channelId: "The creator's channel ID"}
+  },
+
+  mixes: {
+    commands: {
+      "-l": {redirect: "--lim"},
+      "--lim": {
+        aliases: ["--lim", "-l"],
+        simpleDescription: "Limits the amount of mixes scraped",
+        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
+        "as a positive integer. If this argument is not present, the scraper will not stop until all mixes are " +
+        "retrieved. NOTE: The value entered limits the scraper based on how many mixes were checked, " +
+        "not how many matched the filters (see limfilter).",
+        examples: ["--lim 100", "-l=27"],
+        call: limCall,
+        numArgs: 1
+      }
+    },
+
+    attributes: {id: "The playlist ID",
+                 title: "The name of the mix",
+                 shortVideos: "A short info list of the first videos of the mix",
+                 shortVideoIds: "The corresponding video IDs for those first videos",
+                 thumbnail: "The video thumbnail used for the mix",
+                 uploaders: "A snippet of some of the uploaders included in the mix"}
   },
 
   movies: {
@@ -201,11 +234,13 @@ subscribeFilterable(attributesVideos, cmd.videos.commands);
 subscribeFilterable(attributesShorts, cmd.shorts.commands);
 subscribeFilterable(attributesChannels, cmd.channels.commands);
 subscribeFilterable(attributesPlaylists, cmd.playlists.commands);
+subscribeFilterable(attributesMixes, cmd.mixes.commands);
 subscribeFilterable(attributesMovies, cmd.movies.commands);
 subscribeMeta(cmd.videos.commands);
 subscribeMeta(cmd.shorts.commands);
 subscribeMeta(cmd.channels.commands);
 subscribeMeta(cmd.playlists.commands);
+subscribeMeta(cmd.mixes.commands);
 subscribeMeta(cmd.movies.commands);
 
 
