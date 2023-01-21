@@ -29,6 +29,15 @@ const cmd = {
       examples: ["playlists [argument1] [argument2] ... #"],
       cli: results_cli,
       scrape: undefined
+    },
+
+    mixes: {
+      aliases: ["mixes"],
+      simpleDescription: "Submodule for dealing with recommended YouTube Mixes",
+      description: "A submodule that focuses solely on recommeded mixes (infinite playlists).",
+      examples: ["mixes [argument1] [argument2] .. #"],
+      cli: results_cli,
+      scrape: undefined
     }
 
   },

@@ -111,6 +111,10 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
         type = "playlists";
         innerResult = innerResult.compactPlaylistRenderer;
 
+      } else if ("compactRadioRenderer" in innerResult) {
+        type = "mixes";
+        innerResult = innerResult.compactRadioRenderer;
+
       } else if ("continuationItemRenderer" in innerResult) {
         innerResult = innerResult.continuationItemRenderer;
         continuation_id = innerResult.continuationEndpoint.continuationCommand.token;
@@ -172,8 +176,10 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
 function getRecommendedData(innerResult, settings, type) {
   if (type === "videos")
     return getVideoData(innerResult, settings)
-  else
+  else if (type === "playlists")
     return getPlaylistData(innerResult, settings);
+  else
+    return getMixData(innerResult, settings);
 }
 
 function getVideoData(innerVideo, settings) {
@@ -297,8 +303,40 @@ function getPlaylistData(innerPlaylist, settings) {
     }
   }
 
+  if (!ignore.firstVideoId)
+    singlePlaylist.firstVideoId = innerPlaylist.navigationEndpoint.watchEndpoint.videoId;
+
   return singlePlaylist;
 }
+
+function getMixData(innerMix, settings) {
+
+  let singleMix = {};
+  let ignore = settings.mixes.ignore;
+
+  if (!settings.seperate)
+    singleMix.type = "mixes";
+
+  if (!ignore.id)
+    singleMix.id = innerMix.playlistId;
+
+  if (!ignore.title)
+    singleMix.title = innerMix.title.simpleText;
+
+  if (!ignore.thumbnail) {
+    let thumbnails = innerMix.thumbnail.thumbnails;
+    singleMix.thumbnail = thumbnails[thumbnails.length - 1].url;
+  }
+
+  if (!ignore.uploaders)
+    singleMix.uploaders = innerMix.longBylineText.simpleText;
+
+  if (!ignore.firstVideoId)
+    singleMix.firstVideoId = innerMix.navigationEndpoint.watchEndpoint.videoId;
+
+  return singleMix;
+}
+
 
 //*********************************************************************************
 //Checks if a recommendation matches a filter

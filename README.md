@@ -24,6 +24,8 @@ Currently, the tool contains two implemented modules: `video` and `search`. List
 
     -  `playlists`: Deals with playlist recommendations
 
+    -  `mixes`: Deals with YouTube Mix recommendations
+
 -  `chat`: Gets previous chat messages (if livestream or premiere)
 
 `search`: Retrieves information from a YouTube search

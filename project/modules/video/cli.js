@@ -101,7 +101,8 @@ function cli(args, index) {
 
       focus: {
         videos: true,
-        playlists: true
+        playlists: true,
+        mixes: true
       },
 
 
@@ -141,7 +142,25 @@ function cli(args, index) {
           thumbnail: false,
           uploader: false,
           handle: false,
-          channelId: false
+          channelId: false,
+          firstVideoId: false
+        }
+      },
+
+      mixes: {
+        savefilter: false,
+        printfilter: false,
+
+        lim: Number.POSITIVE_INFINITY,
+        limfilter: Number.POSITIVE_INFINITY,
+
+        filter: [],
+        ignore: {
+          id: false,
+          title: false,
+          thumbnail: false,
+          uploaders: false,
+          firstVideoId: false
         }
       }
     }
@@ -194,6 +213,12 @@ function cli(args, index) {
         usedFilterCheckValues: {},
         inFilter: false,
         currentFilter: {}
+      },
+
+      mixes: {
+        usedFilterCheckValues: {},
+        inFilter: false,
+        currentFilter: {}
       }
     }
 
@@ -205,7 +230,8 @@ function cli(args, index) {
   verifyFilterable(currentState.chat, settings.chat); /////////////////////Debugging
   verifyFilterable(currentState.recommended.videos, settings.recommended.videos); /////////////////////Debugging
   verifyFilterable(currentState.recommended.playlists, settings.recommended.playlists); /////////////////////Debugging
-  
+  verifyFilterable(currentState.recommended.mixes, settings.recommended.mixes); /////////////////////Debugging
+
 
   //Loop through the CLI
   while (currentState.index < args.length) {
