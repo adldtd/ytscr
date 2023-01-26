@@ -73,27 +73,13 @@ const cmd = {
 
   attributes: {
 
-    "author": {
-      simpleDescription: "The comment author's name"
-    },
-    "text": {
-      simpleDescription: "The comment's contents"
-    },
-    "id": {
-      simpleDescription: "The ID of the comment"
-    },
-    "published": {
-      simpleDescription: "When the comment was made"
-    },
-    "votes": {
-      simpleDescription: "Num. likes"
-    },
-    "picture": {
-      simpleDescription: "The author's profile picture"
-    },
-    "channelId": {
-      simpleDescription: "The author's channel ID"
-    }
+    "author": "The comment author's name",
+    "text": "The comment's contents",
+    "id": "The ID of the comment",
+    "published": "When the comment was made",
+    "votes": "Num. likes",
+    "picture": "The author's profile picture",
+    "channelId": "The author's channel ID"
   }
 
 };
@@ -103,31 +89,33 @@ subscribeFilterable(attributes, commands);
 subscribeMeta(commands);
 
 
-function newestCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
-
+function newestCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+  let c = parsed.command;
   if (!innerState.inFilter)
     innerSettings.newest = true;
   else
     currentState.error = errors.errorCodes(2, c);
 }
 
-function noreplyCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
-
+function noreplyCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+  let c = parsed.command;
   if (!innerState.inFilter)
     innerSettings.replies = false;
   else
     currentState.error = errors.errorCodes(2, c);
 }
 
-function nrfCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
-
+function nrfCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+  let c = parsed.command;
   if (!innerState.inFilter)
     innerSettings.nrf = false;
   else
     currentState.error = errors.errorCodes(2, c);
 }
 
-function limCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function limCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command; let a = parsed.args[0];
 
   if (!innerState.inFilter) {
     if (!isNaN(parseInt(a))) {

@@ -38,7 +38,7 @@ function cli(args, currentState, settings, module) { //Needs a module for cmd to
       }
 
     } else //Default; non-meta commands
-      parsed.commandBox.call(parsed.command, parsed.args[0], currentState, currentState[module], settings[CALLER], settings[module]);
+      parsed.commandBox.call(parsed, currentState, currentState[module], settings[CALLER], settings[module]);
 
     if (currentState.error)
       return -1;

@@ -46,52 +46,21 @@ const cmd = {
 
   attributes: {
     
-    "id": {
-      simpleDescription: "ID of the YouTube video"
-    },
-    "type": {
-      simpleDescription: "The type of the \"video\" entered"
-    },
-    "title": {
-      simpleDescription: "The video title"
-    },
-    "description": {
-      simpleDescription: "The video description"
-    },
-    "tags": {
-      simpleDescription: "An array of video tags"
-    },
-    "views": {
-      simpleDescription: "Num. views"
-    },
-    "likes": {
-      simpleDescription: "Num. likes"
-    },
-    "published": {
-      simpleDescription: "Publish/stream date"
-    },
-    "durationMs": {
-      simpleDescription: "Video duration in ms"
-    },
-    "comments": {
-      simpleDescription: "Num. comments"
-    },
-    "uploader": {
-      simpleDescription: "Name of uploader"
-    },
-    "subscribers": {
-      simpleDescription: "Num. subscribers"
-    },
-    "handle": {
-      simpleDescription: "Uploader's channel handle"
-    },
-    "channelId": {
-      simpleDescription: "Uploader's channel ID"
-    },
-    "pfp": {
-      simpleDescription: "Uploader's profile picture"
-    }
-
+    "id": "ID of the YouTube video",
+    "type": "The type of the \"video\" entered",
+    "title": "The video title",
+    "description": "The video description",
+    "tags": "An array of video tags",
+    "views": "Num. views",
+    "likes": "Num. likes",
+    "published": "Publish/stream date",
+    "durationMs": "Video duration in ms",
+    "comments": "Num. comments",
+    "uploader": "Name of uploader",
+    "subscribers": "Num. subscribers",
+    "handle": "Uploader's channel handle",
+    "channelId": "Uploader's channel ID",
+    "pfp": "Uploader's profile picture"
   }
 }
 
@@ -99,7 +68,9 @@ let commands = cmd.commands;
 subscribeMeta(commands);
 
 
-function ignoreCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function ignoreCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command; let a = parsed.args[0];
 
   if (a in commands["--ignore"].validValues)
     innerSettings.ignore[a] = true;

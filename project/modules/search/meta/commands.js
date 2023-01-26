@@ -41,7 +41,9 @@ let commands = cmd.commands;
 subscribeMeta(commands);
 
 
-function ignoreCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function ignoreCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command; let a = parsed.args[0];
 
   if (a in commands["--ignore"].validValues)
     innerSettings.ignore[a] = true;

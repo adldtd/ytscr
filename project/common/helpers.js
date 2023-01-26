@@ -14,7 +14,7 @@ const errors = require(__dirname + "/errors");
 
 //*********************************************************************************
 //Parses an argument as a command; returns an object with details on the command
-//itself, its arguments, and its validity; does not check for modules/submodules
+//itself, its arguments, and its validity; checks for modules/submodules
 //*********************************************************************************
 function parseArgs(args, index, cmd, currentState) {
 

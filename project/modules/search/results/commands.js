@@ -244,7 +244,9 @@ subscribeMeta(cmd.mixes.commands);
 subscribeMeta(cmd.movies.commands);
 
 
-function limCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function limCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command; let a = parsed.args[0];
 
   if (!innerState.inFilter) {
     if (!isNaN(parseInt(a))) {

@@ -137,23 +137,25 @@ const commands = {
 
 //--------------------------------------------------------------------- CLI state modification functions
 
-function savefilterCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
-
+function savefilterCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+  let c = parsed.command;
   if (!innerState.inFilter)
     innerSettings.savefilter = true;
   else
     currentState.error = errors.errorCodes(2, c);
 }
 
-function printfilterCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
-
+function printfilterCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+  let c = parsed.command;
   if (!innerState.inFilter)
     innerSettings.printfilter = true;
   else
     currentState.error = errors.errorCodes(2, c);
 }
 
-function limfilterCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function limfilterCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command; let a = parsed.args[0];
 
   if (!innerState.inFilter) {
     if (!isNaN(parseInt(a))) {
@@ -168,8 +170,9 @@ function limfilterCall(c, a, currentState, innerState, moduleSettings, innerSett
     currentState.error = errors.errorCodes(2, c);
 }
 
-function filterCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function filterCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
 
+  let c = parsed.command; let a = parsed.args[0];
   let commands = this.commands;
 
   if (!innerState.inFilter) {
@@ -183,8 +186,9 @@ function filterCall(c, a, currentState, innerState, moduleSettings, innerSetting
     currentState.error = errors.errorCodes(2, c);
 }
 
-function checkCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function checkCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
 
+  let c = parsed.command; let a = parsed.args[0];
   let commands = this.commands;
 
   if (innerState.inFilter) {
@@ -201,7 +205,9 @@ function checkCall(c, a, currentState, innerState, moduleSettings, innerSettings
     currentState.error = errors.errorCodes(4, a);
 }
 
-function matchCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function matchCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command; let a = parsed.args[0];
 
   if (innerState.inFilter) {
     if (!("match" in innerState.currentFilter))
@@ -212,7 +218,9 @@ function matchCall(c, a, currentState, innerState, moduleSettings, innerSettings
     currentState.error = errors.errorCodes(4, c);
 }
 
-function compareCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function compareCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command; let a = parsed.args[0];
 
   if (innerState.inFilter) {
     if (!("compare" in innerState.currentFilter)) //In order to reduce complexity, a is checked as a valid value at the end of the filter scope ("}")
@@ -223,15 +231,17 @@ function compareCall(c, a, currentState, innerState, moduleSettings, innerSettin
     currentState.error = errors.errorCodes(4, c);
 }
 
-function casesensitiveCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function casesensitiveCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+  let c = parsed.command;
   if (innerState.inFilter)
     innerState.currentFilter.casesensitive = true;
   else
     currentState.error = errors.errorCodes(4, c);
 }
 
-function closingbracketCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function closingbracketCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
 
+  let c = parsed.command;
   let commands = this.commands;
 
   if (!innerState.inFilter) { //Error: Filter not closed
@@ -293,8 +303,9 @@ function closingbracketCall(c, a, currentState, innerState, moduleSettings, inne
   innerState.inFilter = false;
 }
 
-function ignoreCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function ignoreCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
 
+  let c = parsed.command; let a = parsed.args[0];
   let commands = this.commands;
 
   if (!innerState.inFilter) {

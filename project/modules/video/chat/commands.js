@@ -50,24 +50,12 @@ const cmd = {
 
   attributes: {
 
-    "author": {
-      simpleDescription: "The author of the message"
-    },
-    "text": {
-      simpleDescription: "The message contents"
-    },
-    "id": {
-      simpleDescription: "The message's ID"
-    },
-    "timestamp": {
-      simpleDescription: "When the message was sent (in ms, from when the stream started)"
-    },
-    "picture": {
-      simpleDescription: "The author's profile picture"
-    },
-    "channelId": {
-      simpleDescription: "The author's channel ID"
-    }
+    "author": "The author of the message",
+    "text": "The message contents",
+    "id": "The message's ID",
+    "timestamp": "When the message was sent (in ms, from when the stream started)",
+    "picture": "The author's profile picture",
+    "channelId": "The author's channel ID"
   }
 
 }
@@ -77,14 +65,17 @@ subscribeFilterable(attributes, commands);
 subscribeMeta(commands);
 
 
-function topchatCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function topchatCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+  let c = parsed.command; 
   if (!innerState.inFilter)
     innerSettings.topchat = true;
   else
     currentState.error = errors.errorCodes(2, c);
 }
 
-function limCall(c, a, currentState, innerState, moduleSettings, innerSettings) {
+function limCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command; let a = parsed.args[0];
 
   if (!innerState.inFilter) {
     if (!isNaN(parseInt(a))) {
