@@ -2,6 +2,7 @@ const path = require("path");
 
 const video_cli = require(path.join(__dirname, "..", "modules", "video", "cli")).cli;
 const search_cli = require("../modules/search/cli").cli;
+const playlist_cli = require("../modules/playlist/cli").cli;
 
 const video_scraper = require(path.join(__dirname, "..", "modules", "video", "video-scraper")).scrape;
 const search_scraper = require("../modules/search/search-scraper").scrape;
@@ -33,11 +34,21 @@ const cmd = {
       simpleDescription: "Module for scraping data from a YouTube search",
       description: "The module for retrieving info queried by a YouTube search. Requires a search term as " +
       "input (see \"search --help --input\" for a more detailed description.) Records fetched videos, " +
-      "shorts, playlists, channels, and movies. Unlike other modules, all of this information is stored in a " +
+      "shorts, playlists, mixes, channels, and movies. Unlike other modules, all of this information is stored in a " +
       "collective list (by default). NOTE: Search data can be highly dependent on location (IP address) and time.",
       examples: ["search -i \"hit the road jack\""],
       cli: search_cli,
       scrape: search_scraper
+    },
+
+    "playlist": {
+      aliases: ["playlist"],
+      simpleDescription: "Module for scraping data from a YouTube playlist",
+      description: "The module for retrieving info inside a YouTube playlist. Requires a playlist link as input " +
+      "(see \"playlist --help --input\" for a more detailed description.) Records all (unhidden) videos listed.",
+      examples: ["playlist -i https://www.youtube.com/playlist?list=PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo"],
+      cli: playlist_cli,
+      scrape: undefined
     }
 
   },

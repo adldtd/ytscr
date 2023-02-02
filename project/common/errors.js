@@ -102,11 +102,14 @@ function errorCodes(code, arg, value = "") {
   
   switch (code) {
 
+    case -4:
+      console.log("Error: Invalid playlist link \"" + value + "\"");
+      break;
     case -3: //Bad search query
       console.log("Error: Bad search query \"" + value + "\"");
       break;
     case -2: //Bad link
-      console.log("Error: Invalid youtube link \"" + value + "\"");
+      console.log("Error: Invalid YouTube link \"" + value + "\"");
       break;
     case -1: //Multiple inputs
       console.log("Error: Must specify only one value for command \"" + arg + "\"");

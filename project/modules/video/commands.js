@@ -77,7 +77,7 @@ const cmd = {
       simpleDescription: "The video from which to scrape",
       description: "A command which takes in a video link as input. Required argument for scraping to function. " +
       "Can be either a direct link, a \"youtu.be\" link, a shorts link, or a pure video ID.",
-      examples: ["--input video"],
+      examples: ["--input <VIDEO LINK>"],
       call: inputCall,
       numArgs: 1
     }
