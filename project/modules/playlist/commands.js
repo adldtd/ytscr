@@ -7,6 +7,8 @@ const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscr
 
 const videos_cli = require("./videos/cli").cli;
 
+const videos_scrape = require("./videos/videos-scraper").scrape;
+
 
 var validModules = {/*meta: "",*/ videos: ""};
 
@@ -29,7 +31,7 @@ const cmd = {
       description: "A submodule that focuses on the videos contained in the playlist.",
       examples: ["videos [argument1] [argument2] ... #"],
       cli: videos_cli,
-      scrape: undefined
+      scrape: videos_scrape
     }
 
   },
@@ -65,7 +67,7 @@ function inputCall(parsed, currentState, innerState, settings, innerSettings) {
     if (a.substring(0, 38) === "https://www.youtube.com/playlist?list=" || a.substring(0, 30) === "www.youtube.com/playlist?list=" || a.substring(0, 26) === "youtube.com/playlist?list=") {
       innerSettings.input = a;
     } else if (a.length === 34) { //Pure playlist ID
-      innerSettings.input = "https://youtube.com/watch?v=" + a;
+      innerSettings.input = "https://www.youtube.com/playlist?list=" + a;
     } else
       currentState.error = errors.errorCodes(-4, c, a);
         

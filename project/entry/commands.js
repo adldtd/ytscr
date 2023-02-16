@@ -6,6 +6,7 @@ const playlist_cli = require("../modules/playlist/cli").cli;
 
 const video_scraper = require(path.join(__dirname, "..", "modules", "video", "video-scraper")).scrape;
 const search_scraper = require("../modules/search/search-scraper").scrape;
+const playlist_scraper = require("../modules/playlist/playlist-scraper").scrape;
 
 
   /*******************************************************************/
@@ -48,7 +49,7 @@ const cmd = {
       "(see \"playlist --help --input\" for a more detailed description.) Records all (unhidden) videos listed.",
       examples: ["playlist -i https://www.youtube.com/playlist?list=PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo"],
       cli: playlist_cli,
-      scrape: undefined
+      scrape: playlist_scraper
     }
 
   },

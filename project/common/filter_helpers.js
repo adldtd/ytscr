@@ -27,7 +27,7 @@ function crunchViewCount(views) {
 }
 
 //*********************************************************************************
-//Converts abbreviated views into numerical form; only works with english results
+//Converts abbreviated views into numerical form; only works with English results
 //*********************************************************************************
 function crunchSimpleViews(views) {
   views = helpers.safeSplit(views, " ", 1)[0];

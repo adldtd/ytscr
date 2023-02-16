@@ -19,7 +19,7 @@ function cli(args, index) {
       prettyprint: true,
 
       focus: {
-        meta: true,
+        //meta: true,
         videos: true
       },
 
@@ -136,7 +136,8 @@ function cli(args, index) {
     return -1;
 
   if (settings[THIS_MODULE].output === "") { //Default destination
-    let filename = THIS_MODULE + "_" + settings[THIS_MODULE].input + ".json";
+    let id = settings[THIS_MODULE].input.split("?list=")[1];
+    let filename = THIS_MODULE + "_" + id + ".json";
     settings[THIS_MODULE].output = path.join(__dirname, "..", "..", "SAVES", filename);
   }
 

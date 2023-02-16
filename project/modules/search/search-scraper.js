@@ -1,4 +1,3 @@
-const cmd = require(__dirname + "/commands").cmd;
 const path = require("path");
 const fs = require("fs");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
