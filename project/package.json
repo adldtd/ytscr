@@ -17,7 +17,7 @@
     "mime-types": "^2.1.35"
   },
   "scripts": {
-    "test": "jest --silent ./_tests"
+    "test": "jest --silent ./tests"
   },
   "keywords": [
     "youtube",
