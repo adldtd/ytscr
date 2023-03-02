@@ -87,8 +87,12 @@ async function scrapePlaylistModule(settings) {
     }
   }
 
-  let finalDestination = helpers.handleSaveJSON(settings.playlist.output, savedData, settings.playlist.prettyprint);
-  global.sendvb(1, "\nSaved as " + finalDestination + "\n");
+  if (settings.playlist.save) {
+    let finalDestination = helpers.handleSaveJSON(settings.playlist.output, savedData, settings.playlist.prettyprint);
+    global.sendvb(1, "\nSaved as " + finalDestination + "\n");
+  }
+
+  return savedData;
 
 }
 

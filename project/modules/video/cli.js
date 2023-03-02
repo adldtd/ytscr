@@ -30,7 +30,8 @@ function cli(args, index) {
 
       output: "",
       verbose: 4,
-      timeout: 1000
+      timeout: 1000,
+      save: true
     },
 
     meta: {

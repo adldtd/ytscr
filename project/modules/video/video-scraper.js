@@ -11,7 +11,7 @@ const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 
 function verifyResponse(resp) {
 
-  let initialData = helpers.safeSplit(resp.data, "var ytInitialData = ", 1);
+  let initialData = helpers.safeSplit(resp.data, "\">var ytInitialData = ", 1);
   if (initialData.length < 2) {
     global.sendvb(1, "\nAn unexpected error occurred.\nNo info retrievable.");
     return -1;
@@ -23,13 +23,13 @@ function verifyResponse(resp) {
     return -1;
   }
   initialData = initialData.contents;
-
   
   let contents = initialData[initialData.length - 1];
   if (!("itemSectionRenderer" in contents && "contents" in contents.itemSectionRenderer)) //Livestream
     return 0; //Break early
 
   let requestError = false;
+  contents = contents.itemSectionRenderer.contents;
   for (c in contents) {
 
     if ("backgroundPromoRenderer" in contents[c]) {
@@ -101,8 +101,12 @@ async function scrapeVideoModule(settings) {
     }
   }
 
-  let finalDestination = helpers.handleSaveJSON(settings.video.output, savedData, settings.video.prettyprint);
-  global.sendvb(1, "\nSaved as " + finalDestination + "\n");
+  if (settings.video.save) {
+    let finalDestination = helpers.handleSaveJSON(settings.video.output, savedData, settings.video.prettyprint);
+    global.sendvb(1, "\nSaved as " + finalDestination + "\n");
+  }
+
+  return savedData;
 
 }
 

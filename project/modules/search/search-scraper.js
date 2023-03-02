@@ -231,8 +231,12 @@ async function scrapeSearchModule(settings) {
     }
   }
   
-  let finalDestination = helpers.handleSaveJSON(settings.search.output, savedData, settings.search.prettyprint);
-  global.sendvb(1, "\nSaved as " + finalDestination + "\n");
+  if (settings.search.save) {
+    let finalDestination = helpers.handleSaveJSON(settings.search.output, savedData, settings.search.prettyprint);
+    global.sendvb(1, "\nSaved as " + finalDestination + "\n");
+  }
+
+  return savedData;
 
 }
 

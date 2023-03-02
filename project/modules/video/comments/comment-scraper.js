@@ -151,24 +151,28 @@ async function scrapeComments(continuation_id, config, timeout = 1000, settings 
       
       counter++;
 
-      if (settings.replies && "replies" in comments[c].commentThreadRenderer) {
+      if (settings.replies) {
+        singleComment.replies = [];
 
-        let oldSelectors = settings.filter; let oldMatchCounter = matchCounter;
-        if (!settings.nrf && match) {
-          settings.filter = [];
-          matchCounter = Number.NEGATIVE_INFINITY;
-        }
+        if ("replies" in comments[c].commentThreadRenderer) {
 
-        let replies_continuation_id = comments[c].commentThreadRenderer.replies.commentRepliesRenderer.contents[0].continuationItemRenderer.continuationEndpoint.continuationCommand.token;
-        let pack = await scrapeReplies(replies_continuation_id, config, timeout, counter, matchCounter, settings);
-        
-        counter = pack[0];
-        matchCounter = pack[1];
-        singleComment.replies = pack[2];
+          let oldSelectors = settings.filter; let oldMatchCounter = matchCounter;
+          if (!settings.nrf && match) {
+            settings.filter = [];
+            matchCounter = Number.NEGATIVE_INFINITY;
+          }
 
-        if (!settings.nrf && match) {
-          settings.filter = oldSelectors;
-          matchCounter = oldMatchCounter; //Any matches made in replies are ignored in NRF mode
+          let replies_continuation_id = comments[c].commentThreadRenderer.replies.commentRepliesRenderer.contents[0].continuationItemRenderer.continuationEndpoint.continuationCommand.token;
+          let pack = await scrapeReplies(replies_continuation_id, config, timeout, counter, matchCounter, settings);
+          
+          counter = pack[0];
+          matchCounter = pack[1];
+          singleComment.replies = pack[2];
+
+          if (!settings.nrf && match) {
+            settings.filter = oldSelectors;
+            matchCounter = oldMatchCounter; //Any matches made in replies are ignored in NRF mode
+          }
         }
       }
 
