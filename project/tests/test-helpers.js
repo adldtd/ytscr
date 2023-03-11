@@ -158,10 +158,10 @@ function diagComments(savedModule, ignore, limit, norp) {
 }
 
 //*********************************************************************************
-//Checks if the recommended module (in "stream" form) adheres with given options;
-//called during video testing
+//Checks if a module in the form of a data "stream" (i.e. search results,
+//recommendations) adheres with given options
 //*********************************************************************************
-function diagRecommended(savedModule, focus, ignore, limits, overallLimit) {
+function diagStream(savedModule, focus, ignore, limits, overallLimit) {
 
   let stream = savedModule;
   let limit = 0;
@@ -191,9 +191,8 @@ function diagRecommended(savedModule, focus, ignore, limits, overallLimit) {
   }
 }
 
-
 //*********************************************************************************
-//Checks if the submodules of the video modules adhere with given options
+//Checks if the submodules of the video module adhere with given options
 //*********************************************************************************
 function testVideo(savedData, focus, ignore, limits, norp) {
 
@@ -208,7 +207,7 @@ function testVideo(savedData, focus, ignore, limits, norp) {
     if (module === "recommended") { //Special case
 
       if (Array.isArray(savedData[module])) //Stream of data
-        diagRecommended(savedData[module], focus[module][1], ignore[module][1], limits[module][1]);
+        diagStream(savedData[module], focus[module][1], ignore[module][1], limits[module][1]);
       else {
 
         let innerFocus = focus[module][1];
@@ -227,6 +226,48 @@ function testVideo(savedData, focus, ignore, limits, norp) {
     
     } else if (module === "comments") {
       diagComments(savedData[module], ignore[module][1], limits[module][0], norp);
+    } else
+      diagStd(savedData[module], ignore[module][1], limits[module][0]);
+  }
+}
+
+
+//*********************************************************************************
+//Checks if the submodules of the search module adhere with given options
+//*********************************************************************************
+function testSearch(savedData, focus, ignore, limits, overallLimit, seperate) { //**************CHECK IF RESULTS MEGA MODULE IS INSIDE
+
+  if ("results" in savedData && seperate) //1st test
+    throw Error("Seperate specified, but aggregate module \"" + "results" + "\" found in saved data:\n" + JSON.stringify(savedData, null, 2));
+  
+  if (seperate) { //2nd test
+    for (let module in focus) {
+      if (module in savedData && !focus[module][0])
+        throw Error("Unfocused submodule \"" + module + "\" found in saved data:\n" + JSON.stringify(savedData, null, 2));
+      if (!(module in savedData) && focus[module][0])
+        throw Error("Focused submodule \"" + module + "\" could not be found in saved data:\n" + JSON.stringify(savedData, null, 2));
+    }
+  } else {
+    let focusResults = false;
+    for (let module in focus) {
+      if (module !== "meta")
+        focusResults = focusResults || focus[module][0];
+    }
+    
+    if ("results" in savedData && !focusResults)
+      throw Error("Unfocused submodule \"" + "results" + "\" found in saved data:\n" + JSON.stringify(savedData, null, 2));
+    if (!("results" in savedData) && focusResults)
+      throw Error("Focused submodule \"" + "results" + "\" could not be found in saved data:\n" + JSON.stringify(savedData, null, 2));
+  }
+
+  for (let module in focus) {
+    if (!(module in savedData)) continue;
+
+    if (module === "results") { //Greater results submodule; comprised of multiple submodule data
+      let memory = {focus: focus.meta, ignore: ignore.meta, limit: limits.meta};
+      delete focus.meta; delete ignore.meta; delete limits.meta;
+      diagStream(savedData[module], focus, ignore, limits, overallLimit);
+      focus.meta = memory.focus; ignore.meta = memory.ignore; limits.meta = memory.limit;
     } else
       diagStd(savedData[module], ignore[module][1], limits[module][0]);
   }
@@ -282,7 +323,8 @@ function printMapped(mappedSettings, spaces = 2, adder = 2) {
 module.exports.parse = parse;
 module.exports.getData = getData;
 module.exports.diagStd = diagStd;
-module.exports.diagRecommended = diagRecommended;
+module.exports.diagStream = diagStream;
 module.exports.testVideo = testVideo;
+module.exports.testSearch = testSearch;
 module.exports.mapVal = mapVal;
 module.exports.printMapped = printMapped;

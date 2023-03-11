@@ -185,7 +185,7 @@ async function scrapeSearchModule(settings) {
   };
 
   let timeout = innerSettings.timeout;
-  let url = "https://www.youtube.com/results?search_query=" + innerSettings.input;
+  let url = "https://www.youtube.com/results?search_query=" + encodeURI(innerSettings.input); //Allows the user to pass Unicode strings
   config.url = url;
   global.sendvb(1, "\nScraping from search query \"" + innerSettings.input + "\".");
 

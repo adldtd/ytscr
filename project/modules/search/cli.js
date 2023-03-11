@@ -281,7 +281,7 @@ function cli(args, index) {
   
     if (currentState.error)
       return -1;
-  
+
     if (settings.search.output === "") { //Default destination
       let filename = THIS_MODULE + "_" + settings.search.input + ".json";
       settings.search.output = path.join(__dirname, "..", "..", "SAVES", filename);
