@@ -259,7 +259,7 @@ function closingbracketCall(parsed, currentState, innerState, moduleSettings, in
   }
 
   //Work with different "check" types: string and numerical
-  if (commands["--check"].validValues[innerState.currentFilter.check] === "num") {
+  if (commands["--check"].validValues[innerState.currentFilter.check].type === "num") {
 
     if (!("compare" in innerState.currentFilter)) { //Compare becomes a required command when check is numerical
       currentState.error = errors.errorCodes(8, c, innerState.currentFilter.check);
@@ -276,7 +276,7 @@ function closingbracketCall(parsed, currentState, innerState, moduleSettings, in
       return;
     }
 
-  } else if (commands["--check"].validValues[innerState.currentFilter.check] === "str") {
+  } else if (commands["--check"].validValues[innerState.currentFilter.check].type === "str") {
 
     if (!("compare" in innerState.currentFilter)) {
       innerState.currentFilter.compare = "in"; //Compare is not required for a string checker; defaults to in

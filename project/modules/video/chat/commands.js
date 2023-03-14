@@ -9,12 +9,33 @@ const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "
  /* Arguments + commands and corresponding functions for the chat module */
 /************************************************************************/
 
-const attributes = {"author": "str",
-                    "text": "str",
-                    "id": "str",
-                    "timestamp": "num",
-                    "picture": "str",
-                    "channelId": "str"};
+const attributes =
+{
+  "author": {
+    type: "str",
+    simpleDescription: "The author of the message"
+  },
+  "text": {
+    type: "str",
+    simpleDescription: "The message contents"
+  },
+  "id": {
+    type: "str",
+    simpleDescription: "The message ID"
+  },
+  "timestamp": {
+    type: "num",
+    simpleDescription: "When the message was sent (in ms, from when the stream started)"
+  },
+  "picture": {
+    type: "str",
+    simpleDescription: "The author's profile picture"
+  },
+  "channelId": {
+    type: "str",
+    simpleDescription: "The author's channel ID"
+  }
+}
 
                     
 const cmd = {
@@ -48,15 +69,7 @@ const cmd = {
 
   },
 
-  attributes: {
-
-    "author": "The author of the message",
-    "text": "The message contents",
-    "id": "The message's ID",
-    "timestamp": "When the message was sent (in ms, from when the stream started)",
-    "picture": "The author's profile picture",
-    "channelId": "The author's channel ID"
-  }
+  attributes: attributes
 
 }
 

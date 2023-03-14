@@ -5,30 +5,110 @@ const subscribeFilterable = require(path.join(__dirname, "..", "..", "..", "..",
 const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "..", "common", "subscribe-meta")).subscribeMeta;errors
 
 
-const attributesVideos = {id: "str",
-                          title: "str",
-                          views: "num",
-                          duration: "num",
-                          published: "str",
-                          thumbnail: "str",
-                          uploader: "str",
-                          handle: "str",
-                          channelId: "str"};
+  /************************************************************************************************/
+ /* Arguments + commands and corresponding functions for submodules in the recommended submodule */
+/************************************************************************************************/
 
-const attributesPlaylists = {id: "str",
-                             title: "str",
-                             size: "num",
-                             thumbnail: "str",
-                             uploader: "str",
-                             handle: "str",
-                             channelId: "str",
-                             firstVideoId: "str"};
+const attributesVideos =
+{
+  id: {
+    type: "str",
+    simpleDescription: "The video ID"
+  },
+  title: {
+    type: "str",
+    simpleDescription: "The video title"
+  },
+  views: {
+    type: "num",
+    simpleDescription: "Num. views"
+  },
+  duration: {
+    type: "num",
+    simpleDescription: "Length of the video"
+  },
+  published: {
+    type: "str",
+    simpleDescription: "Approximate publish date (distance from today)"
+  },
+  thumbnail: {
+    type: "str",
+    simpleDescription: "Thumbnail of the video"
+  },
+  uploader: {
+    type: "str",
+    simpleDescription: "The name of the video uploader"
+  },
+  handle: {
+    type: "str",
+    simpleDescription: "The uploader's channel handle"
+  },
+  channelId: {
+    type: "str",
+    simpleDescription: "The uploader's channel ID"
+  }
+}
 
-const attributesMixes = {id: "str",
-                         title: "str",
-                         thumbnail: "str",
-                         uploaders: "str",
-                         firstVideoId: "str"};
+const attributesPlaylists =
+{
+  id: {
+    type: "str",
+    simpleDescription: "The playlist ID"
+  },
+  title: {
+    type: "str",
+    simpleDescription: "The name of the playlist"
+  },
+  size: {
+    type: "num",
+    simpleDescription: "Num. videos in the playlist"
+  },
+  thumbnail: {
+    type: "str",
+    simpleDescription: "The video thumbnail used for the playlist"
+  },
+  uploader: {
+    type: "str",
+    simpleDescription: "The name of the playlist's creator"
+  },
+  handle: {
+    type: "str",
+    simpleDescription: "The uploader's channel handle"
+  },
+  channelId: {
+    type: "str",
+    simpleDescription: "The creator's channel ID"
+  },
+  firstVideoId: {
+    type: "str",
+    simpleDescription: "The video ID of the starting video in the playlist"
+  }
+}
+
+const attributesMixes =
+{
+  id: {
+    type: "str",
+    simpleDescription: "The playlist ID"
+  },
+  title: {
+    type: "str",
+    simpleDescription: "The name of the mix"
+  },
+  thumbnail: {
+    type: "str",
+    simpleDescription: "The video thumbnail used for the mix"
+  },
+  uploaders: {
+    type: "str",
+    simpleDescription: "A snippet of some of the uploaders included in the mix"
+  },
+  firstVideoId: {
+    type: "str",
+    simpleDescription: "The video ID of the starting video in the mix"
+  }
+}
+
 
 const cmd = {
 
@@ -48,15 +128,8 @@ const cmd = {
       }
     },
 
-    attributes: {id: "The video ID",
-                 title: "The video title",
-                 views: "Num. views",
-                 duration: "Length of the video",
-                 published: "Approximate publish date (distance from today)",
-                 thumbnail: "Thumbnail of the video",
-                 uploader: "The name of the video uploader",
-                 handle: "The uploader's channel handle",
-                 channelId: "The uploader's channel ID"}
+    attributes: attributesVideos
+
   },
 
   playlists: {
@@ -75,14 +148,8 @@ const cmd = {
       }
     },
 
-    attributes: {id: "The playlist ID",
-                 title: "The name of the playlist",
-                 size: "Num. videos in the playlist",
-                 thumbnail: "The video thumbnail used for the playlist",
-                 uploader: "The name of the playlist's creator",
-                 handle: "The uploader's channel handle",
-                 channelId: "The creator's channel ID",
-                 firstVideoId: "The video ID of the starting video in the playlist"}
+    attributes: attributesPlaylists
+
   },
 
   mixes: {
@@ -101,11 +168,8 @@ const cmd = {
       }
     },
 
-    attributes: {id: "The playlist ID",
-                 title: "The name of the mix",
-                 thumbnail: "The video thumbnail used for the mix",
-                 uploaders: "A snippet of some of the uploaders included in the mix",
-                 firstVideoId: "The video ID of the starting video in the mix"}
+    attributes: attributesMixes
+
   }
 
 };

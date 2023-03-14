@@ -9,13 +9,37 @@ const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "
  /* Arguments + commands and corresponding functions for the comments module */
 /****************************************************************************/
 
-var attributes = {"author": "str", //List of data the module will scrape; reused by different commands
-                  "text": "str",
-                  "id": "str",
-                  "published": "str",
-                  "votes": "num",
-                  "picture": "str",
-                  "channelId": "str"};
+const attributes =
+{
+  "author": {
+    type: "str",
+    simpleDescription: "The comment author's name"
+  },
+  "text": {
+    type: "str",
+    simpleDescription: "The comment's contents"
+  },
+  "id": {
+    type: "str",
+    simpleDescription: "The ID of the comment"
+  },
+  "published": {
+    type: "str",
+    simpleDescription: "When the comment was made"
+  },
+  "votes": {
+    type: "num",
+    simpleDescription: "Num. likes"
+  },
+  "picture": {
+    type: "str",
+    simpleDescription: "The author's profile picture"
+  },
+  "channelId": {
+    type: "str",
+    simpleDescription: "The author's channel ID"
+  }
+}
 
 
 const cmd = {
@@ -71,16 +95,7 @@ const cmd = {
 
   },
 
-  attributes: {
-
-    "author": "The comment author's name",
-    "text": "The comment's contents",
-    "id": "The ID of the comment",
-    "published": "When the comment was made",
-    "votes": "Num. likes",
-    "picture": "The author's profile picture",
-    "channelId": "The author's channel ID"
-  }
+  attributes: attributes
 
 };
 

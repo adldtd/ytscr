@@ -90,10 +90,19 @@ function outputValidValues(arg, values = {}, ignore = {}) { //Gives the end user
   console.log("The valid values for command \"" + arg + "\" are:");
   for (valid in values) {
     if (!(valid in ignore)) {
-      if (values[valid] === "")
-        console.log("\t\"" + valid + "\"");
-      else
-        console.log("\t\"" + valid + "\" (" + values[valid] + ")");
+
+      if (typeof values[valid] === "string") {
+        if (values[valid] === "")
+          console.log("\t\"" + valid + "\"");
+        else
+          console.log("\t\"" + valid + "\" (" + values[valid] + ")");
+      } else {
+        if ("type" in values[valid])
+          console.log("\t\"" + valid + "\" (" + values[valid].type + ")");
+        else
+          console.log("\t\"" + valid + "\"");
+      }
+      
     }
   }
 }
