@@ -80,8 +80,8 @@ function cli(args, index) {
   };
 
 
-  verifyDmodule(currentState[THIS_MODULE], settings[THIS_MODULE]); /////////////////////Debugging
-  verifyFilterable(currentState.videos, settings.videos); /////////////////////Debugging
+  /*verifyDmodule(currentState[THIS_MODULE], settings[THIS_MODULE]); /////////////////////Debugging
+  verifyFilterable(currentState.videos, settings.videos); /////////////////////Debugging*/
   
 
   //Loop through the CLI

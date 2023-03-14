@@ -226,12 +226,12 @@ function cli(args, index) {
   };
 
 
-  verifyDmodule(currentState[THIS_MODULE], settings[THIS_MODULE]); /////////////////////Debugging
+  /*verifyDmodule(currentState[THIS_MODULE], settings[THIS_MODULE]); /////////////////////Debugging
   verifyFilterable(currentState.comments, settings.comments); /////////////////////Debugging
   verifyFilterable(currentState.chat, settings.chat); /////////////////////Debugging
   verifyFilterable(currentState.recommended.videos, settings.recommended.videos); /////////////////////Debugging
   verifyFilterable(currentState.recommended.playlists, settings.recommended.playlists); /////////////////////Debugging
-  verifyFilterable(currentState.recommended.mixes, settings.recommended.mixes); /////////////////////Debugging
+  verifyFilterable(currentState.recommended.mixes, settings.recommended.mixes); /////////////////////Debugging*/
 
 
   //Loop through the CLI

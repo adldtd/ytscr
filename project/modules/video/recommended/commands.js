@@ -6,7 +6,10 @@ const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "
 
 const results_cli = require("./results/cli").cli;
 
-const validModules = {videos: "", playlists: ""};
+
+  /***************************************************/
+ /* The recommended submodule commands + submodules */
+/***************************************************/
 
 
 const cmd = {
@@ -70,12 +73,13 @@ const cmd = {
       numArgs: 1
     }
 
-  },
+  }
 
 };
 
 
-var commands = cmd.commands;
+let commands = cmd.commands;
+let validModules = cmd.modules;
 subscribeDmoduleSimple(validModules, commands);
 subscribeMeta(commands);
 

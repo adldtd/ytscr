@@ -19,8 +19,6 @@ const recommended_scraper = require(path.join(__dirname, "recommended", "recomme
  /* The video module commands + submodules */
 /******************************************/
 
-var validModules = {meta: "", comments: "", chat: "", recommended: ""}; //Reused by both --exclude and --focus
-
 
 const cmd = {
 
@@ -86,6 +84,8 @@ const cmd = {
 
 }
 
+
+let validModules = cmd.modules;
 subscribeDmodule(validModules, cmd.commands);
 subscribeMeta(cmd.commands);
 

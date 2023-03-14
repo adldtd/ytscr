@@ -9,24 +9,22 @@ const meta_cli = require("./meta/cli").cli;
 const results_cli = require("./results/cli").cli;
 
 
-var validModules = {meta: "", videos: "", shorts: "", channels: "", playlists: "", mixes: "", movies: ""};
-
-var validTimeFrames = {LastHour: "",
+const validTimeFrames = {LastHour: "",
                        Today: "",
                        ThisWeek: "",
                        ThisMonth: "",
                        ThisYear: ""};
 
-var validTypes = {Video: "",
+const validTypes = {Video: "",
                   Channel: "",
                   Playlist: "",
                   Movie: ""};
 
-var validDurations = {"Under4Minutes": "Under 4 minutes",
+const validDurations = {"Under4Minutes": "Under 4 minutes",
                       "4-20Minutes": "4-20 minutes",
                       "Over20Minutes": "Over 20 minutes"};
 
-var validFeatures = {"Live": "Livestream",
+const validFeatures = {"Live": "Livestream",
                      "4K": "4K Video",
                      "HD": "High Definition",
                      "Subtitles/CC": "Includes subtitles",
@@ -38,7 +36,7 @@ var validFeatures = {"Live": "Livestream",
                      "Location": "",
                      "Purchased": ""};
 
-var validMetrics = {Relevance: "",
+const validMetrics = {Relevance: "",
                     UploadDate: "Sorts from most recent to least",
                     ViewCount: "Sorts from highest views to lowest",
                     Rating: "Sorts from least likes to most"};
@@ -239,7 +237,8 @@ const cmd = {
 }
 
 
-var commands = cmd.commands;
+let commands = cmd.commands;
+let validModules = cmd.modules;
 subscribeDmodule(validModules, commands);
 subscribeMeta(commands);
 

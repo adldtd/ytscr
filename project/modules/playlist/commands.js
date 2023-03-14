@@ -10,8 +10,6 @@ const videos_cli = require("./videos/cli").cli;
 const videos_scrape = require("./videos/videos-scraper").scrape;
 
 
-var validModules = {/*meta: "",*/ videos: ""};
-
 const cmd = {
 
   modules: {
@@ -53,7 +51,9 @@ const cmd = {
   
 };
 
+
 let commands = cmd.commands;
+let validModules = cmd.modules;
 subscribeDmodule(validModules, commands);
 subscribeMeta(commands);
 
