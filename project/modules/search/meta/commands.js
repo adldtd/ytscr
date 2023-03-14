@@ -8,9 +8,15 @@ const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"
  /* Arguments + commands and corresponding functions for the search meta module */
 /*******************************************************************************/
 
-
-const attributes = {estimatedResults: "",
-                    predictions: ""};
+const attributes =
+{
+  estimatedResults: {
+    simpleDescription: "About how many search results are expected"
+  },
+  predictions: {
+    simpleDescription: "Search predictions, given the input"
+  }
+};
 
 
 const cmd = {
@@ -31,8 +37,7 @@ const cmd = {
 
   },
 
-  attributes: {estimatedResults: "About how many search results are expected",
-               predictions: "Search predictions, given the input"}
+  attributes: attributes
 
 };
 

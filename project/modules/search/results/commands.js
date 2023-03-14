@@ -8,63 +8,233 @@ const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"
  /* Arguments + commands and corresponding functions for the search results module */
 /**********************************************************************************/
 
+const attributesVideos =
+{
+  id: {
+    type: "str",
+    simpleDescription: "The video ID"
+  },
+  title: {
+    type: "str",
+    simpleDescription: "The video title"
+  },
+  shortDescription: {
+    type: "str",
+    simpleDescription: "Snippet of the description"
+  },
+  badges: {
+    type: "str",
+    simpleDescription: "A list of items describing the content of the video"
+  },
+  views: {
+    type: "num",
+    simpleDescription: "Num. views"
+  },
+  duration: {
+    type: "num",
+    simpleDescription: "Length of the video"
+  },
+  published: {
+    type: "str",
+    simpleDescription: "An approximate publish date (distance from the current date)"
+  },
+  thumbnail: {
+    type: "str",
+    simpleDescription: "Link to the video thumbnail"
+  },
+  uploader: {
+    type: "str",
+    simpleDescription: "The name of the video uploader"
+  },
+  verified: {
+    type: "str",
+    simpleDescription: "Whether the uploader is verified"
+  },
+  profilePicture: {
+    type: "str",
+    simpleDescription: "The uploader's profile picture"
+  },
+  handle: {
+    type: "str",
+    simpleDescription: "The uploader's channel handle"
+  },
+  channelId: {
+    type: "str",
+    simpleDescription: "The uploader's channel ID"
+  }
+};
 
-const attributesVideos = {id: "str",
-                          title: "str",
-                          shortDescription: "str",
-                          badges: "str",
-                          views: "num",
-                          duration: "num",
-                          published: "str",
-                          thumbnail: "str",
-                          uploader: "str",
-                          verified: "str",
-                          profilePicture: "str",
-                          handle: "str",
-                          channelId: "str"};
+const attributesShorts =
+{
+  id: {
+    type: "str",
+    simpleDescription: "The video ID"
+  },
+  title: {
+    type: "str",
+    simpleDescription: "The name of the short"
+  },
+  views: {
+    type: "num",
+    simpleDescription: "Num. views"
+  },
+  thumbnail: {
+    type: "str",
+    simpleDescription: "Link to the short's thumbnail"
+  }
+};
 
-const attributesShorts = {id: "str",
-                          title: "str",
-                          views: "num",
-                          thumbnail: "str"};
+const attributesChannels =
+{
+  name: {
+    type: "str",
+    simpleDescription: "The name of the channel"
+  },
+  verified: {
+    type: "str",
+    simpleDescription: "Whether the channel is verified"
+  },
+  subscribers: {
+    type: "num",
+    simpleDescription: "Num. subscribers"
+  },
+  shortDescription: {
+    type: "str",
+    simpleDescription: "Snippet of the channel's bio"
+  },
+  picture: {
+    type: "str",
+    simpleDescription: "Channel's profile picture"
+  },
+  handle: {
+    type: "str",
+    simpleDescription: "The channel handle"
+  },
+  channelId: {
+    type: "str",
+    simpleDescription: "The channel ID"
+  }
+};
 
-const attributesChannels = {name: "str",
-                            verified: "str",
-                            subscribers: "num",
-                            shortDescription: "str",
-                            picture: "str",
-                            handle: "str",
-                            channelId: "str"};
+const attributesPlaylists =
+{
+  id: {
+    type: "str",
+    simpleDescription: "The playlist ID"
+  },
+  title: {
+    type: "str",
+    simpleDescription: "The name of the playlist"
+  },
+  size: {
+    type: "num",
+    simpleDescription: "Num. videos in the playlist"
+  },
+  shortVideos: {
+    type: "str",
+    simpleDescription: "A short info list of the first videos of the playlist"
+  },
+  shortVideoIds: {
+    type: "str",
+    simpleDescription: "The corresponding video IDs for those first videos"
+  },
+  updated: {
+    type: "str",
+    simpleDescription: "Approximate time of the last change made to the list (distance from current date)"
+  },
+  thumbnail: {
+    type: "str",
+    simpleDescription: "The video thumbnail used for the playlist"
+  },
+  uploader: {
+    type: "str",
+    simpleDescription: "The name of the playlist's creator"
+  },
+  verified: {
+    type: "str",
+    simpleDescription: "Whether the creator is verified"
+  },
+  handle: {
+    type: "str",
+    simpleDescription: "The creator's channel handle"
+  },
+  channelId: {
+    type: "str",
+    simpleDescription: "The creator's channel ID"
+  }
+};
 
-const attributesPlaylists = {id: "str",
-                             title: "str",
-                             size: "num",
-                             shortVideos: "str",
-                             shortVideoIds: "str",
-                             updated: "str",
-                             thumbnail: "str",
-                             uploader: "str",
-                             verified: "str",
-                             handle: "str",
-                             channelId: "str"};
+const attributesMixes =
+{
+  id: {
+    type: "str",
+    simpleDescription: "The playlist ID"
+  },
+  title: {
+    type: "str",
+    simpleDescription: "The name of the mix"
+  },
+  shortVideos: {
+    type: "str",
+    simpleDescription: "A short info list of the first videos of the mix"
+  },
+  shortVideoIds: {
+    type: "str",
+    simpleDescription: "The corresponding video IDs for those first videos"
+  },
+  thumbnail: {
+    type: "str",
+    simpleDescription: "The video thumbnail used for the mix"
+  },
+  uploaders: {
+    type: "str",
+    simpleDescription: "A snippet of some of the uploaders included in the mix"
+  }
+};
 
-const attributesMixes = {id: "str",
-                         title: "str",
-                         shortVideos: "str",
-                         shortVideoIds: "str",
-                         thumbnail: "str",
-                         uploaders: "str"};
-
-const attributesMovies = {id: "str",
-                          title: "str",
-                          shortDescription: "str",
-                          duration: "num",
-                          year: "num",
-                          category: "str",
-                          contentHeaders: "str",
-                          uploader: "str",
-                          verified: "str",
-                          channelId: "str"};
+const attributesMovies =
+{
+  id: {
+    type: "str",
+    simpleDescription: "The video ID"
+  },
+  title: {
+    type: "str",
+    simpleDescription: "The movie title"
+  },
+  shortDescription: {
+    type: "str",
+    simpleDescription: "Snippet of the movie description"
+  },
+  duration: {
+    type: "num",
+    simpleDescription: "Length of the movie"
+  },
+  year: {
+    type: "num",
+    simpleDescription: "The year the movie was made"
+  },
+  category: {
+    type: "str",
+    simpleDescription: "The movie's category (action, horror, etc.)"
+  },
+  contentHeaders: {
+    type: "str",
+    simpleDescription: "A list of headers for the movie (\"Free with Ads\", \"PG-13\", etc.)"
+  },
+  uploader: {
+    type: "str",
+    simpleDescription: "The name of the video uploader"
+  },
+  verified: {
+    type: "str",
+    simpleDescription: "Whether the uploader is verified"
+  },
+  channelId: {
+    type: "str",
+    simpleDescription: "The uploader's channel ID"
+  }
+};
 
 
 const cmd = {
@@ -85,19 +255,8 @@ const cmd = {
       }
     },
 
-    attributes: {id: "The video ID",
-                 title: "The video title",
-                 shortDescription: "Snippet of the description",
-                 badges: "A list of items describing the content of the video",
-                 views: "Num. views",
-                 duration: "Length of the video",
-                 published: "An approximate publish date (distance from the current date)",
-                 thumbnail: "Link to the video thumbnail",
-                 uploader: "The name of the video uploader",
-                 verified: "Whether the uploader is verified",
-                 profilePicture: "The uploader's profile picture",
-                 handle: "The uploader's channel handle",
-                 channelId: "The uploader's channel ID"}
+    attributes: attributesVideos
+
   },
 
   shorts: {
@@ -116,10 +275,8 @@ const cmd = {
       }
     },
 
-    attributes: {id: "The short (video) ID",
-                 title: "The name of the short",
-                 views: "Num. views",
-                 thumbnail: "Link to the short's thumbnail"}
+    attributes: attributesShorts
+
   },
 
   channels: {
@@ -138,13 +295,8 @@ const cmd = {
       }
     },
 
-    attributes: {name: "The name of the channel",
-                 verified: "Whether the channel is verified",
-                 subscribers: "Num. subscribers",
-                 shortDescription: "Snippet of the channel's bio",
-                 picture: "Channel's profile picture",
-                 handle: "The channel handle",
-                 channelId: "The channel ID"}
+    attributes: attributesChannels
+
   },
 
   playlists: {
@@ -163,17 +315,8 @@ const cmd = {
       }
     },
 
-    attributes: {id: "The playlist ID",
-                 title: "The name of the playlist",
-                 size: "Num. videos in the playlist",
-                 shortVideos: "A short info list of the first videos of the playlist",
-                 shortVideoIds: "The corresponding video IDs for those first videos",
-                 updated: "Approximate time of the last change made to the list (distance from current date)",
-                 thumbnail: "The video thumbnail used for the playlist",
-                 uploader: "The name of the playlist's creator",
-                 verified: "Whether the creator is verified",
-                 handle: "The creator's channel handle",
-                 channelId: "The creator's channel ID"}
+    attributes: attributesPlaylists
+
   },
 
   mixes: {
@@ -192,12 +335,8 @@ const cmd = {
       }
     },
 
-    attributes: {id: "The playlist ID",
-                 title: "The name of the mix",
-                 shortVideos: "A short info list of the first videos of the mix",
-                 shortVideoIds: "The corresponding video IDs for those first videos",
-                 thumbnail: "The video thumbnail used for the mix",
-                 uploaders: "A snippet of some of the uploaders included in the mix"}
+    attributes: attributesMixes
+
   },
 
   movies: {
@@ -216,16 +355,8 @@ const cmd = {
       }
     },
 
-    attributes: {id: "The video ID",
-                 title: "The movie title",
-                 shortDescription: "Snippet of the movie description",
-                 duration: "Length of the movie",
-                 year: "The year the movie was made",
-                 category: "The movie's category (action, horror, etc.)",
-                 contentHeaders: "A list of headers for the movie (\"Free with Ads\", \"PG-13\", etc.)",
-                 uploader: "The name of the video uploader",
-                 verified: "Whether the uploader is verified",
-                 channelId: "The uploader's channel ID"}
+    attributes: attributesMovies
+
   }
 }
 

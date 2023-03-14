@@ -9,16 +9,45 @@ const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "
  /* Arguments + commands and corresponding functions for the videos module */
 /**************************************************************************/
 
-
-const attributes = {id: "str",
-                    title: "str",
-                    views: "num",
-                    duration: "num",
-                    published: "str",
-                    thumbnail: "str",
-                    uploader: "str",
-                    handle: "str",
-                    channelId: "str"};
+const attributes =
+{
+  id: {
+    type: "str",
+    simpleDescription: "The video ID"
+  },
+  title: {
+    type: "str",
+    simpleDescription: "The video title"
+  },
+  views: {
+    type: "num",
+    simpleDescription: "Num. views"
+  },
+  duration: {
+    type: "num",
+    simpleDescription: "Length of the video"
+  },
+  published: {
+    type: "str",
+    simpleDescription: "An approximate publish date (distance from the current date)"
+  },
+  thumbnail: {
+    type: "str",
+    simpleDescription: "Link to the video thumbnail"
+  },
+  uploader: {
+    type: "str",
+    simpleDescription: "The name of the video uploader"
+  },
+  handle: {
+    type: "str",
+    simpleDescription: "The uploader's channel handle"
+  },
+  channelId: {
+    type: "str",
+    simpleDescription: "The uploader's channel ID"
+  }
+};
 
 
 const cmd = {
@@ -38,15 +67,7 @@ const cmd = {
     }
   },
 
-  attributes: {id: "The video ID",
-               title: "The video title",
-               views: "Num. views",
-               duration: "Length of the video",
-               published: "An approximate publish date (distance from the current date)",
-               thumbnail: "Link to the video thumbnail",
-               uploader: "The name of the video uploader",
-               handle: "The uploader's channel handle",
-               channelId: "The uploader's channel ID"}
+  attributes: attributes
 
 };
 
