@@ -1,6 +1,6 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
-const helpers = require("../../common/helpers");
+const map = require("../../common/helpers").map;
 
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
@@ -51,12 +51,36 @@ const cmd = {
   
 };
 
+//*************************************************************************** Settings for the CLI
 
 let commands = cmd.commands;
 let validModules = cmd.modules;
+
+
+var thisSettings = {
+  input: "",
+  prettyprint: true,
+
+  focus: map(validModules, true),
+
+  output: "",
+  verbose: 4,
+  timeout: 1000,
+  save: true
+}
+
+var thisCurrentState = {
+  focusList: {},
+  excludeList: {},
+  modulesCalled: {},
+  firstFocusCalled: false
+}
+
+
 subscribeDmodule(validModules, commands);
 subscribeMeta(commands);
 
+//*************************************************************************** CLI call functions
 
 function inputCall(parsed, currentState, innerState, settings, innerSettings) {
 
@@ -77,3 +101,5 @@ function inputCall(parsed, currentState, innerState, settings, innerSettings) {
 
 
 module.exports.cmd = cmd;
+module.exports.settings = thisSettings;
+module.exports.currentState = thisCurrentState;

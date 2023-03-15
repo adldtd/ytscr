@@ -2,6 +2,7 @@ const path = require("path");
 const { subscribeFilterable } = require("../../../common/subscribe-filterable");
 const { subscribeMeta } = require("../../../common/subscribe-meta")
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
+const map = require("../../../common/helpers").map;
 
 
   /**********************************************************************************/
@@ -360,6 +361,115 @@ const cmd = {
   }
 }
 
+//*************************************************************************** Settings for the CLI
+
+var videosSettings = {
+  savefilter: false,
+  printfilter: false,
+
+  lim: Number.POSITIVE_INFINITY,
+  limfilter: Number.POSITIVE_INFINITY,
+
+  filter: [],
+  ignore: map(attributesVideos, false)
+}
+
+var videosCurrentState = {
+  usedFilterCheckValues: {},
+  inFilter: false,
+  currentFilter: {}
+}
+
+
+var shortsSettings = {
+  savefilter: false,
+  printfilter: false,
+
+  lim: Number.POSITIVE_INFINITY,
+  limfilter: Number.POSITIVE_INFINITY,
+
+  filter: [],
+  ignore: map(attributesShorts, false)
+}
+
+var shortsCurrentState = {
+  usedFilterCheckValues: {},
+  inFilter: false,
+  currentFilter: {}
+}
+
+
+var channelsSettings = {
+  savefilter: false,
+  printfilter: false,
+
+  lim: Number.POSITIVE_INFINITY,
+  limfilter: Number.POSITIVE_INFINITY,
+
+  filter: [],
+  ignore: map(attributesChannels, false)
+}
+
+var channelsCurrentState = {
+  usedFilterCheckValues: {},
+  inFilter: false,
+  currentFilter: {}
+}
+
+
+var playlistsSettings = {
+  savefilter: false,
+  printfilter: false,
+
+  lim: Number.POSITIVE_INFINITY,
+  limfilter: Number.POSITIVE_INFINITY,
+
+  filter: [],
+  ignore: map(attributesPlaylists, false)
+}
+
+var playlistsCurrentState = {
+  usedFilterCheckValues: {},
+  inFilter: false,
+  currentFilter: {}
+}
+
+
+var mixesSettings = {
+  savefilter: false,
+  printfilter: false,
+
+  lim: Number.POSITIVE_INFINITY,
+  limfilter: Number.POSITIVE_INFINITY,
+
+  filter: [],
+  ignore: map(attributesMixes, false)
+}
+
+var mixesCurrentState = {
+  usedFilterCheckValues: {},
+  inFilter: false,
+  currentFilter: {}
+}
+
+
+var moviesSettings = {
+  savefilter: false,
+  printfilter: false,
+
+  lim: Number.POSITIVE_INFINITY,
+  limfilter: Number.POSITIVE_INFINITY,
+
+  filter: [],
+  ignore: map(attributesMovies, false)
+}
+
+var moviesCurrentState = {
+  usedFilterCheckValues: {},
+  inFilter: false,
+  currentFilter: {}
+}
+
 
 subscribeFilterable(attributesVideos, cmd.videos.commands);
 subscribeFilterable(attributesShorts, cmd.shorts.commands);
@@ -374,6 +484,7 @@ subscribeMeta(cmd.playlists.commands);
 subscribeMeta(cmd.mixes.commands);
 subscribeMeta(cmd.movies.commands);
 
+//*************************************************************************** CLI call functions
 
 function limCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
 
@@ -394,3 +505,15 @@ function limCall(parsed, currentState, innerState, moduleSettings, innerSettings
 
 
 module.exports.cmd = cmd;
+module.exports.videosSettings = videosSettings;
+module.exports.videosCurrentState = videosCurrentState;
+module.exports.shortsSettings = shortsSettings;
+module.exports.shortsCurrentState = shortsCurrentState;
+module.exports.channelsSettings = channelsSettings;
+module.exports.channelsCurrentState = channelsCurrentState;
+module.exports.playlistsSettings = playlistsSettings;
+module.exports.playlistsCurrentState = playlistsCurrentState;
+module.exports.mixesSettings = mixesSettings;
+module.exports.mixesCurrentState = mixesCurrentState;
+module.exports.moviesSettings = moviesSettings;
+module.exports.moviesCurrentState = moviesCurrentState;

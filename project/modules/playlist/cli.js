@@ -11,77 +11,13 @@ const THIS_MODULE = "playlist";
 
 function cli(args, index) {
 
-  //Setup settings for both this module and others
-  let settings = {
-
-    playlist: {
-      input: "",
-      prettyprint: true,
-
-      focus: {
-        //meta: true,
-        videos: true
-      },
-
-      output: "",
-      verbose: 4,
-      timeout: 1000,
-      save: true
-    },
-
-    /*meta: {
-      ignore: {}
-    },*/
-
-    videos: {
-      savefilter: false,
-      printfilter: false,
-
-      lim: Number.POSITIVE_INFINITY,
-      limfilter: Number.POSITIVE_INFINITY,
-
-      filter: [],
-      ignore: {id: false,
-               title: false,
-               views: false,
-               duration: false,
-               published: false,
-               thumbnail: false,
-               uploader: false,
-               handle: false,
-               channelId: false}
-    }
-    
+  let settings = require("./linker").settings;
+  let currentState = require("./linker").currentState;
+  if (global.TESTING) { //If not testing, no need to make copies, as the cli command will only be called once before the program ends
+    settings = helpers.deepCopy(settings);
+    currentState = helpers.deepCopy(currentState);
   }
-
-  //Set up currentState for this module, and other submodules
-  let currentState = {
-
-    error: false, //Used by all modules/submodules
-    index: index,
-
-    playlist: {
-      focusList: {}, //Used to keep track of and deal with focus + exclude collisions
-      excludeList: {},
-      modulesCalled: {},
-      firstFocusCalled: false
-    },
-
-    /*meta: {
-
-    },*/
-
-    videos: {
-      usedFilterCheckValues: {},
-      inFilter: false,
-      currentFilter: {}
-    }
-
-  };
-
-
-  /*verifyDmodule(currentState[THIS_MODULE], settings[THIS_MODULE]); /////////////////////Debugging
-  verifyFilterable(currentState.videos, settings.videos); /////////////////////Debugging*/
+  currentState.index = index;
   
 
   //Loop through the CLI

@@ -1,6 +1,7 @@
 const path = require("path");
 const { subscribeMeta } = require("../../../common/subscribe-meta")
 const helpers = require("../../../common/helpers");
+const map = helpers.map;
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
 
 
@@ -41,10 +42,23 @@ const cmd = {
 
 };
 
+//*************************************************************************** Settings for the CLI
 
 let commands = cmd.commands;
+
+
+var thisSettings = {
+  ignore: map(attributes, false)
+}
+
+var thisCurrentState = {
+
+}
+
+
 subscribeMeta(commands);
 
+//*************************************************************************** CLI call functions
 
 function ignoreCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
 
@@ -60,3 +74,5 @@ function ignoreCall(parsed, currentState, innerState, moduleSettings, innerSetti
 
 
 module.exports.cmd = cmd;
+module.exports.settings = thisSettings;
+module.exports.currentState = thisCurrentState;
