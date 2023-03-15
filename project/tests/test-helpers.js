@@ -2,6 +2,8 @@ const path = require("path");
 const cli = require(path.join(__dirname, "..", "entry", "cli")).cli;
 
 
+global.TESTING = true;
+
 //*********************************************************************************
 //Mini shell parser for simpler looking testing; doesn't work with everything
 //(including escape characters)

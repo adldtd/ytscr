@@ -3,6 +3,8 @@ const cli = require(path.join(__dirname, "..", "entry", "cli")).cli;
 const parse = require("./test-helpers").parse;
 
 
+global.TESTING = true;
+
 function baseModuleTests(stage, module) {
 
   test(stage + "No input", () => {

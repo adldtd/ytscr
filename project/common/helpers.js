@@ -384,11 +384,37 @@ function unencodeURL(link) {
 }
 
 
+function map(keys, val) { //Simple map function for objects
+  let newObj = {};
+  for (let key in keys) newObj[key] = val;
+  return newObj;
+}
+
+function deepCopy(keys) { //Simplistic deep copy
+  let newObj = {};
+  for (let key in keys) {
+    if (Array.isArray(keys[key])) newObj[key] = deepCopyArr(keys[key]);
+    else if (typeof keys[key] === "object") newObj[key] = deepCopy(keys[key]);
+    else newObj[key] = keys[key];
+  }
+  return newObj;
+}
+
+function deepCopyArr(arr) { //Helper for deep copy with arrays
+  let newArr = [];
+  for (let item in arr) {
+    item = arr[item];
+    if (Array.isArray(item)) newArr.push(deepCopyArr(item));
+    else if (typeof item === "object") newArr.push(deepCopy(item));
+    else newArr.push(item);
+  }
+  return newArr;
+}
+
 function validFileName(filename) { //https://stackoverflow.com/a/53635003
   let re = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])$|([<>:"\/\\|?*])|(\.|\s)$/;
   return !(filename === "" || re.test(filename));
 }
-
 
 function clearLastLine() {
   readline.moveCursor(process.stdout, 0, -1); //https://stackoverflow.com/a/65863081
@@ -406,5 +432,8 @@ module.exports.handleSaveJSON = handleSaveJSON;
 module.exports.safeSplit = safeSplit;
 module.exports.retrieveJSON = retrieveJSON;
 module.exports.unencodeURL = unencodeURL;
+module.exports.map = map;
+module.exports.deepCopy = deepCopy;
+module.exports.deepCopyArr = deepCopyArr;
 module.exports.validFileName = validFileName;
 module.exports.clearLastLine = clearLastLine;

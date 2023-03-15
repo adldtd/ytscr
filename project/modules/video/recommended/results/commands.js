@@ -1,5 +1,6 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "..", "..", "common", "errors"));
+const map = require("../../../../common/helpers").map;
 
 const subscribeFilterable = require(path.join(__dirname, "..", "..", "..", "..", "common", "subscribe-filterable")).subscribeFilterable;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "..", "common", "subscribe-meta")).subscribeMeta;errors
@@ -174,6 +175,61 @@ const cmd = {
 
 };
 
+//*************************************************************************** Settings for the CLI
+
+var videosSettings = {
+  savefilter: false,
+  printfilter: false,
+
+  lim: Number.POSITIVE_INFINITY,
+  limfilter: Number.POSITIVE_INFINITY,
+
+  filter: [],
+  ignore: map(attributesVideos, false)
+}
+
+var videosCurrentState = {
+  usedFilterCheckValues: {},
+  inFilter: false,
+  currentFilter: {}
+}
+
+
+var playlistsSettings = {
+  savefilter: false,
+  printfilter: false,
+
+  lim: Number.POSITIVE_INFINITY,
+  limfilter: Number.POSITIVE_INFINITY,
+
+  filter: [],
+  ignore: map(attributesPlaylists, false)
+}
+
+var playlistsCurrentState = {
+  usedFilterCheckValues: {},
+  inFilter: false,
+  currentFilter: {}
+}
+
+
+var mixesSettings = {
+  savefilter: false,
+  printfilter: false,
+
+  lim: Number.POSITIVE_INFINITY,
+  limfilter: Number.POSITIVE_INFINITY,
+
+  filter: [],
+  ignore: map(attributesMixes, false)
+}
+
+var mixesCurrentState = {
+  usedFilterCheckValues: {},
+  inFilter: false,
+  currentFilter: {}
+}
+
 
 subscribeFilterable(attributesVideos, cmd.videos.commands);
 subscribeFilterable(attributesPlaylists, cmd.playlists.commands);
@@ -182,6 +238,7 @@ subscribeMeta(cmd.videos.commands);
 subscribeMeta(cmd.playlists.commands);
 subscribeMeta(cmd.mixes.commands);
 
+//*************************************************************************** CLI call functions
 
 function limCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
 
@@ -202,3 +259,9 @@ function limCall(parsed, currentState, innerState, moduleSettings, innerSettings
 
 
 module.exports.cmd = cmd;
+module.exports.videosSettings = videosSettings;
+module.exports.videosCurrentState = videosCurrentState;
+module.exports.playlistsSettings = playlistsSettings;
+module.exports.playlistsCurrentState = playlistsCurrentState;
+module.exports.mixesSettings = mixesSettings;
+module.exports.mixesCurrentState = mixesCurrentState;

@@ -1,5 +1,6 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
+const map = require("../../../common/helpers").map;
 
 const subscribeFilterable = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-filterable")).subscribeFilterable;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-meta")).subscribeMeta;
@@ -99,10 +100,36 @@ const cmd = {
 
 };
 
-const commands = cmd.commands;
+//*************************************************************************** Settings for the CLI
+
+let commands = cmd.commands;
+
+
+var thisSettings = {
+  savefilter: false,
+  newest: false,
+  replies: true,
+  nrf: true,
+
+  printfilter: false,
+  lim: Number.POSITIVE_INFINITY,
+  limfilter: Number.POSITIVE_INFINITY,
+
+  filter: [],
+  ignore: map(attributes, false)
+}
+
+var thisCurrentState = {
+  usedFilterCheckValues: {},
+  inFilter: false,
+  currentFilter: {}
+}
+
+
 subscribeFilterable(attributes, commands);
 subscribeMeta(commands);
 
+//*************************************************************************** CLI call functions
 
 function newestCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
   let c = parsed.command;
@@ -147,3 +174,5 @@ function limCall(parsed, currentState, innerState, moduleSettings, innerSettings
 
 
 module.exports.cmd = cmd;
+module.exports.settings = thisSettings;
+module.exports.currentState = thisCurrentState;

@@ -1,5 +1,6 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
+const map = require("../../../common/helpers").map;
 
 const subscribeDmoduleSimple = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-dmodule")).subscribeDmoduleSimple;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-meta")).subscribeMeta;
@@ -77,12 +78,31 @@ const cmd = {
 
 };
 
+//*************************************************************************** Settings for the CLI
 
 let commands = cmd.commands;
 let validModules = cmd.modules;
+
+
+var thisSettings = {
+  seperate: false,
+  lim: Number.POSITIVE_INFINITY,
+
+  focus: map(validModules, true)
+}
+
+var thisCurrentState = {
+  focusList: {},
+  excludeList: {},
+  modulesCalled: {},
+  firstFocusCalled: false
+}
+
+
 subscribeDmoduleSimple(validModules, commands);
 subscribeMeta(commands);
 
+//*************************************************************************** CLI call functions
 
 function seperateCall(parsed, currentState, innerState, settings, innerSettings) {
   if (!innerSettings.savesections)
@@ -107,3 +127,5 @@ function limCall(parsed, currentState, innerState, settings, innerSettings) {
 
 
 module.exports.cmd = cmd;
+module.exports.settings = thisSettings;
+module.exports.currentState = thisCurrentState;

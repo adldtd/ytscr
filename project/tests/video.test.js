@@ -5,6 +5,8 @@ const testVideo = require("./test-helpers").testVideo;
 const gl = require("../common/globals");
 
 
+global.TESTING = true;
+
 const TERMINATED = "9BfVn7vEVlM";
 const REMOVED = "HDeadIvpRTw";
 const NORMAL_VIDEO_1 = "BOh5p9i4r8E";

@@ -5,6 +5,8 @@ const testSearch = require("./test-helpers").testSearch;
 const gl = require("../common/globals");
 
 
+global.TESTING = true;
+
 const NONE1 = "...";
 const NONE2 = '../../..';
 const NONE3 = "꧁꧂";
