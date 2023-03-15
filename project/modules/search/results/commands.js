@@ -364,119 +364,65 @@ const cmd = {
 //*************************************************************************** Settings for the CLI
 
 var videosSettings = {
-  savefilter: false,
-  printfilter: false,
-
-  lim: Number.POSITIVE_INFINITY,
-  limfilter: Number.POSITIVE_INFINITY,
-
-  filter: [],
-  ignore: map(attributesVideos, false)
+  lim: Number.POSITIVE_INFINITY
 }
 
 var videosCurrentState = {
-  usedFilterCheckValues: {},
-  inFilter: false,
-  currentFilter: {}
+
 }
 
 
 var shortsSettings = {
-  savefilter: false,
-  printfilter: false,
-
-  lim: Number.POSITIVE_INFINITY,
-  limfilter: Number.POSITIVE_INFINITY,
-
-  filter: [],
-  ignore: map(attributesShorts, false)
+  lim: Number.POSITIVE_INFINITY
 }
 
 var shortsCurrentState = {
-  usedFilterCheckValues: {},
-  inFilter: false,
-  currentFilter: {}
+
 }
 
 
 var channelsSettings = {
-  savefilter: false,
-  printfilter: false,
-
-  lim: Number.POSITIVE_INFINITY,
-  limfilter: Number.POSITIVE_INFINITY,
-
-  filter: [],
-  ignore: map(attributesChannels, false)
+  lim: Number.POSITIVE_INFINITY
 }
 
 var channelsCurrentState = {
-  usedFilterCheckValues: {},
-  inFilter: false,
-  currentFilter: {}
+
 }
 
 
 var playlistsSettings = {
-  savefilter: false,
-  printfilter: false,
-
-  lim: Number.POSITIVE_INFINITY,
-  limfilter: Number.POSITIVE_INFINITY,
-
-  filter: [],
-  ignore: map(attributesPlaylists, false)
+  lim: Number.POSITIVE_INFINITY
 }
 
 var playlistsCurrentState = {
-  usedFilterCheckValues: {},
-  inFilter: false,
-  currentFilter: {}
+
 }
 
 
 var mixesSettings = {
-  savefilter: false,
-  printfilter: false,
-
-  lim: Number.POSITIVE_INFINITY,
-  limfilter: Number.POSITIVE_INFINITY,
-
-  filter: [],
-  ignore: map(attributesMixes, false)
+  lim: Number.POSITIVE_INFINITY
 }
 
 var mixesCurrentState = {
-  usedFilterCheckValues: {},
-  inFilter: false,
-  currentFilter: {}
+
 }
 
 
 var moviesSettings = {
-  savefilter: false,
-  printfilter: false,
-
-  lim: Number.POSITIVE_INFINITY,
-  limfilter: Number.POSITIVE_INFINITY,
-
-  filter: [],
-  ignore: map(attributesMovies, false)
+  lim: Number.POSITIVE_INFINITY
 }
 
 var moviesCurrentState = {
-  usedFilterCheckValues: {},
-  inFilter: false,
-  currentFilter: {}
+
 }
 
 
-subscribeFilterable(attributesVideos, cmd.videos.commands);
-subscribeFilterable(attributesShorts, cmd.shorts.commands);
-subscribeFilterable(attributesChannels, cmd.channels.commands);
-subscribeFilterable(attributesPlaylists, cmd.playlists.commands);
-subscribeFilterable(attributesMixes, cmd.mixes.commands);
-subscribeFilterable(attributesMovies, cmd.movies.commands);
+subscribeFilterable(attributesVideos, cmd.videos.commands, videosCurrentState, videosSettings);
+subscribeFilterable(attributesShorts, cmd.shorts.commands, shortsCurrentState, shortsSettings);
+subscribeFilterable(attributesChannels, cmd.channels.commands, channelsCurrentState, channelsSettings);
+subscribeFilterable(attributesPlaylists, cmd.playlists.commands, playlistsCurrentState, playlistsSettings);
+subscribeFilterable(attributesMixes, cmd.mixes.commands, mixesCurrentState, mixesSettings);
+subscribeFilterable(attributesMovies, cmd.movies.commands, moviesCurrentState, moviesSettings);
 subscribeMeta(cmd.videos.commands);
 subscribeMeta(cmd.shorts.commands);
 subscribeMeta(cmd.channels.commands);

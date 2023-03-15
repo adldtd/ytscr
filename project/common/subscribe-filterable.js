@@ -325,34 +325,23 @@ function ignoreCall(parsed, currentState, innerState, moduleSettings, innerSetti
 //--------------------------------------------------------------------- "Registration" functions
 
 /**
- * Makes sure both currentState and settings "comply" with the filterable set of commands; used for debugging
- * @param {Object} innerState Represents a tracker of a certain CLI's "state" while running
- * @param {Object} innerSettings Module specific settings to be passed to a scraping function
- */
-function verifyFilterable(innerState, innerSettings) {
-
-  let stateError = false; let settingsError = false;
-
-  if (!("usedFilterCheckValues" in innerState && "inFilter" in innerState && "currentFilter" in innerState))
-    stateError = true;
-
-  if (!("savefilter" in innerSettings && "printfilter" in innerSettings && "limfilter" in innerSettings && "filter" in innerSettings && "ignore" in innerSettings))
-    settingsError = true;
-  
-  if (stateError && settingsError)
-    throw "Error: currentState and settings are incomplete (filterable)";
-  if (stateError)
-    throw "Error: currentState is incomplete (filterable)";
-  if (settingsError)
-    throw "Error: settings is incomplete (filterable)";
-}
-
-/**
  * Registers a group of commands into the command section of a cmd object. Made to be used by commands.js files to reduce code bloat.
  * @param {Object} attributes Contains names of scraped data as the "keys" and a string representing their type as the data (int, str)
  * @param {Object} cmdCommands The "command" section of a cmd object
+ * 
+ * currentState:
+ *  usedFilterCheckValues: {}
+ *  inFilter: false
+ *  currentFilter: {}
+ * 
+ * settings:
+ *  savefilter: false
+ *  printfilter: false
+ *  limfilter: Number.POSITIVE_INFINITY
+ *  filter: []
+ *  ignore: map(attributes, false)
  */
-function subscribeFilterable(attributes, cmdCommands) {
+function subscribeFilterable(attributes, cmdCommands, innerState = {}, innerSettings = {}) {
 
   for (c in commands) {
 
@@ -364,8 +353,17 @@ function subscribeFilterable(attributes, cmdCommands) {
       cmdCommands[c].call = commands[c].call.bind({commands: cmdCommands});
 
   }
+
+  innerState.usedFilterCheckValues = {};
+  innerState.inFilter = false;
+  innerState.currentFilter = {};
+
+  innerSettings.savefilter = false;
+  innerSettings.printfilter = false;
+  innerSettings.limfilter = Number.POSITIVE_INFINITY;
+  innerSettings.filter = [];
+  innerSettings.ignore = helpers.map(attributes, false);
 }
 
 
-module.exports.verifyFilterable = verifyFilterable;
 module.exports.subscribeFilterable = subscribeFilterable;

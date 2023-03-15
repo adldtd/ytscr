@@ -91,26 +91,15 @@ let validModules = cmd.modules;
 
 
 var thisSettings = {
-  input: "",
-  prettyprint: true,
-
-  focus: map(validModules, true),
-
-  output: "",
-  verbose: 4,
-  timeout: 1000,
-  save: true
+  input: ""
 }
 
 var thisCurrentState = {
-  focusList: {}, //Used to keep track of and deal with focus + exclude collisions
-  excludeList: {},
-  modulesCalled: {},
-  firstFocusCalled: false
+  
 }
 
 
-subscribeDmodule(validModules, cmd.commands);
+subscribeDmodule(validModules, cmd.commands, thisCurrentState, thisSettings);
 subscribeMeta(cmd.commands);
 
 //*************************************************************************** CLI call functions

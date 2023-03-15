@@ -178,62 +178,35 @@ const cmd = {
 //*************************************************************************** Settings for the CLI
 
 var videosSettings = {
-  savefilter: false,
-  printfilter: false,
-
-  lim: Number.POSITIVE_INFINITY,
-  limfilter: Number.POSITIVE_INFINITY,
-
-  filter: [],
-  ignore: map(attributesVideos, false)
+  lim: Number.POSITIVE_INFINITY
 }
 
 var videosCurrentState = {
-  usedFilterCheckValues: {},
-  inFilter: false,
-  currentFilter: {}
+
 }
 
 
 var playlistsSettings = {
-  savefilter: false,
-  printfilter: false,
-
-  lim: Number.POSITIVE_INFINITY,
-  limfilter: Number.POSITIVE_INFINITY,
-
-  filter: [],
-  ignore: map(attributesPlaylists, false)
+  lim: Number.POSITIVE_INFINITY
 }
 
 var playlistsCurrentState = {
-  usedFilterCheckValues: {},
-  inFilter: false,
-  currentFilter: {}
+
 }
 
 
 var mixesSettings = {
-  savefilter: false,
-  printfilter: false,
-
-  lim: Number.POSITIVE_INFINITY,
-  limfilter: Number.POSITIVE_INFINITY,
-
-  filter: [],
-  ignore: map(attributesMixes, false)
+  lim: Number.POSITIVE_INFINITY
 }
 
 var mixesCurrentState = {
-  usedFilterCheckValues: {},
-  inFilter: false,
-  currentFilter: {}
+
 }
 
 
-subscribeFilterable(attributesVideos, cmd.videos.commands);
-subscribeFilterable(attributesPlaylists, cmd.playlists.commands);
-subscribeFilterable(attributesMixes, cmd.mixes.commands);
+subscribeFilterable(attributesVideos, cmd.videos.commands, videosCurrentState, videosSettings);
+subscribeFilterable(attributesPlaylists, cmd.playlists.commands, playlistsCurrentState, playlistsSettings);
+subscribeFilterable(attributesMixes, cmd.mixes.commands, mixesCurrentState, mixesSettings);
 subscribeMeta(cmd.videos.commands);
 subscribeMeta(cmd.playlists.commands);
 subscribeMeta(cmd.mixes.commands);

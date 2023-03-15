@@ -106,27 +106,19 @@ let commands = cmd.commands;
 
 
 var thisSettings = {
-  savefilter: false,
   newest: false,
   replies: true,
   nrf: true,
 
-  printfilter: false,
-  lim: Number.POSITIVE_INFINITY,
-  limfilter: Number.POSITIVE_INFINITY,
-
-  filter: [],
-  ignore: map(attributes, false)
+  lim: Number.POSITIVE_INFINITY
 }
 
 var thisCurrentState = {
-  usedFilterCheckValues: {},
-  inFilter: false,
-  currentFilter: {}
+
 }
 
 
-subscribeFilterable(attributes, commands);
+subscribeFilterable(attributes, commands, thisCurrentState, thisSettings);
 subscribeMeta(commands);
 
 //*************************************************************************** CLI call functions

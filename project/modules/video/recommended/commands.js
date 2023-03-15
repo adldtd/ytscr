@@ -87,19 +87,14 @@ let validModules = cmd.modules;
 var thisSettings = {
   seperate: false,
   lim: Number.POSITIVE_INFINITY,
-
-  focus: map(validModules, true)
 }
 
 var thisCurrentState = {
-  focusList: {},
-  excludeList: {},
-  modulesCalled: {},
-  firstFocusCalled: false
+
 }
 
 
-subscribeDmoduleSimple(validModules, commands);
+subscribeDmoduleSimple(validModules, commands, thisCurrentState, thisSettings);
 subscribeMeta(commands);
 
 //*************************************************************************** CLI call functions

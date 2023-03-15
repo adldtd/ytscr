@@ -191,34 +191,25 @@ function verboseCall(parsed, currentState, innerState, settings, innerSettings) 
 //--------------------------------------------------------------------- "Registration" functions
 
 /**
- * Makes sure both currentState and settings "comply" with the dmodule set of commands; used for debugging
- * @param {Object} innerState Represents a tracker of a certain CLI's "state" while running
- * @param {Object} innerSettings Module specific settings to be passed to a scraping function
- */
-function verifyDmodule(innerState, innerSettings) {
-
-  let stateError = false; let settingsError = false;
-
-  if (!("focusList" in innerState && "excludeList" in innerState && "modulesCalled" in innerState && "firstFocusCalled" in innerState))
-    stateError = true;
-
-  if (!("prettyprint" in innerSettings && "verbose" in innerSettings && "focus" in innerSettings && "output" in innerSettings && "timeout" in innerSettings))
-    settingsError = true;
-
-  if (stateError && settingsError)
-    throw "Error: currentState and settings are incomplete (dmodule)";
-  if (stateError)
-    throw "Error: currentState is incomplete (dmodule)";
-  if (settingsError)
-    throw "Error: settings is incomplete (dmodule)";
-}
-
-/**
  * Registers a group of commands into the command section of a cmd object. Made to be used by commands.js files to reduce code bloat.
  * @param {Object} modules Contains the names of modules as keys in an object
  * @param {Object} cmdCommands The "command" section of a cmd object
+ * 
+ * currentState:
+ *  focusList: {}
+ *  excludeList {}
+ *  modulesCalled: {}
+ *  firstFocusCalled: false
+ * 
+ * settings:
+ *  prettyprint: true
+ *  verbose: 4
+ *  focus: map(modules, true)
+ *  output: ""
+ *  timeout: 1000
+ *  save: true
  */
-function subscribeDmodule(modules, cmdCommands) {
+function subscribeDmodule(modules, cmdCommands, innerState = {}, innerSettings = {}) {
 
   for (c in commands) {
 
@@ -228,9 +219,21 @@ function subscribeDmodule(modules, cmdCommands) {
       cmdCommands[c].validValues = modules;
 
   }
+
+  innerState.focusList = {};
+  innerState.excludeList = {};
+  innerState.modulesCalled = {};
+  innerState.firstFocusCalled = false;
+
+  innerSettings.prettyprint = true;
+  innerSettings.verbose = 4; //Highest level possible
+  innerSettings.focus = helpers.map(modules, true); //Every module is focused at the start
+  innerSettings.output = "";
+  innerSettings.timeout = 1000;
+  innerSettings.save = true;
 }
 
-function subscribeDmoduleSimple(modules, cmdCommands) { //Only add focus and exclude commands
+function subscribeDmoduleSimple(modules, cmdCommands, innerState = {}, innerSettings = {}) { //Only add focus and exclude commands
 
   let subCommands = ["-fc", "--focus", "-e", "--exclude"];
   for (c in subCommands) {
@@ -241,9 +244,15 @@ function subscribeDmoduleSimple(modules, cmdCommands) { //Only add focus and exc
       cmdCommands[c].validValues = modules;
     
   }
+
+  innerState.focusList = {};
+  innerState.excludeList = {};
+  innerState.modulesCalled = {};
+  innerState.firstFocusCalled = false;
+
+  innerSettings.focus = helpers.map(modules, true);
 }
 
 
-module.exports.verifyDmodule = verifyDmodule;
 module.exports.subscribeDmodule = subscribeDmodule;
 module.exports.subscribeDmoduleSimple = subscribeDmoduleSimple;
