@@ -7,6 +7,7 @@
 var settings = {};
 
 settings.playlist = require("./commands").settings;
+settings.meta = require("./meta/commands").settings;
 settings.videos = require("./videos/commands").settings;
 
 
@@ -16,6 +17,7 @@ var currentState = {
 };
 
 currentState.playlist = require("./commands").currentState;
+currentState.meta = require("./meta/commands").currentState;
 currentState.videos = require("./videos/commands").currentState;
 
 

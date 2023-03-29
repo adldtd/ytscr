@@ -5,8 +5,10 @@ const map = require("../../common/helpers").map;
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
 
+const meta_cli = require("./meta/cli").cli;
 const videos_cli = require("./videos/cli").cli;
 
+const meta_scrape = require("./meta/meta-scraper").scrape;
 const videos_scrape = require("./videos/videos-scraper").scrape;
 
 
@@ -14,14 +16,14 @@ const cmd = {
 
   modules: {
 
-    /*"meta": {
+    "meta": {
       aliases: ["meta"],
       simpleDescription: "Submodule for playlist metadata",
       description: "A submodule that focuses on the metadata inside the playlist.",
       examples: ["meta [argument1] [argument2] ... #"],
-      cli: undefined,
-      scrape: undefined
-    },*/
+      cli: meta_cli,
+      scrape: meta_scrape
+    },
 
     "videos": {
       aliases: ["videos"],
