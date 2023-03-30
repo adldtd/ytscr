@@ -102,6 +102,9 @@ function errorCodes(code, arg, value = "") {
   
   switch (code) {
 
+    case -5:
+      console.log("Error: Invalid channel link \"" + value + "\"");
+      break;
     case -4:
       console.log("Error: Invalid playlist link \"" + value + "\"");
       break;

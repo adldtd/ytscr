@@ -4,19 +4,19 @@ const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 
 const cmd = require(__dirname + "/commands").cmd;
 
-const THIS_MODULE = "playlist";
+const THIS_MODULE = "channel";
 
 
 function cli(args, index) {
 
   let settings = require("./linker").settings;
   let currentState = require("./linker").currentState;
-  if (global.TESTING) { //If not testing, no need to make copies, as the cli command will only be called once before the program ends
+  if (global.TESTING) {
     settings = helpers.deepCopy(settings);
     currentState = helpers.deepCopy(currentState);
   }
   currentState.index = index;
-  
+
 
   //Loop through the CLI
   while (currentState.index < args.length) {
@@ -77,6 +77,7 @@ function cli(args, index) {
   }
 
   return settings;
+  
 }
 
 
