@@ -1,14 +1,37 @@
-const path = require("path");
+//Only load modules when called
+const video_cli = (args, index) => {
+  if (video_cli.cli === undefined) video_cli.cli = require("../modules/video/cli").cli;
+  return video_cli.cli(args, index);
+}
+const search_cli = (args, index) => {
+  if (search_cli.cli === undefined) search_cli.cli = require("../modules/search/cli").cli;
+  return search_cli.cli(args, index);
+}
+const playlist_cli = (args, index) => {
+  if (playlist_cli.cli === undefined) playlist_cli.cli = require("../modules/playlist/cli").cli;
+  return playlist_cli.cli(args, index);
+}
+const channel_cli = (args, index) => {
+  if (channel_cli.cli === undefined) channel_cli.cli = require("../modules/channel/cli").cli;
+  return channel_cli.cli(args, index);
+}
 
-const video_cli = require(path.join(__dirname, "..", "modules", "video", "cli")).cli;
-const search_cli = require("../modules/search/cli").cli;
-const playlist_cli = require("../modules/playlist/cli").cli;
-const channel_cli = require("../modules/channel/cli").cli;
-
-const video_scraper = require(path.join(__dirname, "..", "modules", "video", "video-scraper")).scrape;
-const search_scraper = require("../modules/search/search-scraper").scrape;
-const playlist_scraper = require("../modules/playlist/playlist-scraper").scrape;
-const channel_scraper = require("../modules/channel/channel-scraper").scrape;
+const video_scraper = (settings) => {
+  if (video_scraper.scrape === undefined) video_scraper.scrape = require("../modules/video/video-scraper").scrape;
+  return video_scraper.scrape(settings);
+}
+const search_scraper = (settings) => {
+  if (search_scraper.scrape === undefined) search_scraper.scrape = require("../modules/search/search-scraper").scrape;
+  return search_scraper.scrape(settings);
+}
+const playlist_scraper = (settings) => {
+  if (playlist_scraper.scrape === undefined) playlist_scraper.scrape = require("../modules/playlist/playlist-scraper").scrape;
+  return playlist_scraper.scrape(settings);
+}
+const channel_scraper = (settings) => {
+  if (channel_scraper.scrape === undefined) channel_scraper.scrape = require("../modules/channel/channel-scraper").scrape;
+  return channel_scraper.scrape(settings);
+}
 
 
   /*******************************************************************/
