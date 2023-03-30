@@ -486,7 +486,7 @@ test(stage + "Bad focus 1", () => {
 });
 
 test(stage + "Bad focus 2", () => {
-  let parsed = parse("playlist -i PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo --exclude videos --focus videos");
+  let parsed = parse("playlist -i PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo --exclude meta --focus meta");
   expect(cli(parsed)).toBe(-1);
 });
 
@@ -522,5 +522,43 @@ baseFilterTests(stage, "PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo", "playlist", "videos
 
 test(stage + "Behemoth", () => {
   let parsed = parse("playlist -i PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo videos # videos # videos # videos -f { --check title --match Red --compare eq } --ignore duration --ignore published # videos --filter { --check views --match 5000 --compare less }");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+
+stage = "PLAYLIST/META: ";
+
+test(stage + "No input", () => {
+  let parsed = parse("playlist meta");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No such command", () => {
+  let parsed = parse("playlist -i PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo meta --cewdawdwd #");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Help called 1", () => {
+  let parsed = parse("playlist -i PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo meta -h");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Help called 2", () => {
+  let parsed = parse("playlist -i PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo meta --help -h");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Invalid ignore", () => {
+  let parsed = parse("playlist -i PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo meta --ignore DOES_NOT_EXIST");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Successful ignore", () => {
+  let parsed = parse("playlist -i PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo meta --ignore uploader");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+test(stage + "Multiple ignore", () => {
+  let parsed = parse("playlist -i PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo meta --ignore channelId --ignore id --ignore handle --ignore views #");
   expect(cli(parsed)).toBeInstanceOf(Array);
 });

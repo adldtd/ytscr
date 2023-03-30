@@ -237,7 +237,7 @@ function testVideo(savedData, focus, ignore, limits, norp) {
 //*********************************************************************************
 //Checks if the submodules of the search module adhere with given options
 //*********************************************************************************
-function testSearch(savedData, focus, ignore, limits, overallLimit, seperate) { //**************CHECK IF RESULTS MEGA MODULE IS INSIDE
+function testSearch(savedData, focus, ignore, limits, overallLimit, seperate) {
 
   if ("results" in savedData && seperate) //1st test
     throw Error("Seperate specified, but aggregate module \"" + "results" + "\" found in saved data:\n" + JSON.stringify(savedData, null, 2));
@@ -272,6 +272,24 @@ function testSearch(savedData, focus, ignore, limits, overallLimit, seperate) { 
       focus.meta = memory.focus; ignore.meta = memory.ignore; limits.meta = memory.limit;
     } else
       diagStd(savedData[module], ignore[module][1], limits[module][0]);
+  }
+}
+
+
+//*********************************************************************************
+//Checks if the submodules of the playlist module adhere with given options
+//*********************************************************************************
+function testPlaylist(savedData, focus, ignore, limits) {
+
+  for (let module in focus) {
+    if (module in savedData && !focus[module][0])
+      throw Error("Unfocused submodule \"" + module + "\" found in saved data:\n" + JSON.stringify(savedData, null, 2));
+    if (!(module in savedData) && focus[module][0])
+      throw Error("Focused submodule \"" + module + "\" could not be found in saved data:\n" + JSON.stringify(savedData, null, 2));
+
+    if (!(module in savedData)) continue;
+
+    diagStd(savedData[module], ignore[module][1], limits[module][0]);
   }
 }
 
@@ -328,5 +346,6 @@ module.exports.diagStd = diagStd;
 module.exports.diagStream = diagStream;
 module.exports.testVideo = testVideo;
 module.exports.testSearch = testSearch;
+module.exports.testPlaylist = testPlaylist;
 module.exports.mapVal = mapVal;
 module.exports.printMapped = printMapped;
