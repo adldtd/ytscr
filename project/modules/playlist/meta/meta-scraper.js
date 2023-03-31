@@ -1,4 +1,4 @@
-const { ERR, HEADER, PROG } = require("../../../common/verbosity_vars");
+const {INFO, HEADER, PROG} = require("../../../common/verbosity_vars");
 
 
 function scrapeMeta(initialData, ignore) {
