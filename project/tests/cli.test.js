@@ -562,3 +562,84 @@ test(stage + "Multiple ignore", () => {
   let parsed = parse("playlist -i PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo meta --ignore channelId --ignore id --ignore handle --ignore views #");
   expect(cli(parsed)).toBeInstanceOf(Array);
 });
+
+
+
+stage = "CHANNEL: ";
+
+baseModuleTests(stage, "channel");
+
+test(stage + "Not enough arguments", () => {
+  let parsed = parse("channel -i");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Bad input 1", () => {
+  let parsed = parse("channel -i wow");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Bad input 2", () => {
+  let parsed = parse("channel -i https://www.youtube.com/watch?v=jNQXAC9IVRw");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Bad input 3", () => {
+  let parsed = parse("channel --input MrBeast");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Good input 1", () => {
+  let parsed = parse("channel -i @MrBeast");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+test(stage + "Good input 2", () => {
+  let parsed = parse("channel -i \"https://www.youtube.com/channel/UCiTCYv4F4eAz5AsNaJ_BNKQ\"");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+test(stage + "Bad focus 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ -fc this_submodule_does_not_exist");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Bad focus 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ --exclude videos --focus videos");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Good arguments", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ --focus videos");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+
+stage = "CHANNEL/VIDEOS: ";
+
+test(stage + "No input", () => {
+  let parsed = parse("channel videos");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No such command", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ videos --aaaaaaaaaaaaaaaaaaaaaaa");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Help called 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ videos -h");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Help called 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ videos --help -h");
+  expect(cli(parsed)).toBe(1);
+});
+
+baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "videos", "id", "views");
+
+test(stage + "Behemoth", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ videos --popular # videos --filter { --check views --match 400000 --compare eq } --filter { --check views --match 301 --compare eq } # videos --ignore duration --ignore id --limfilter 400 --savefilter # videos --popular --lim 40");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
