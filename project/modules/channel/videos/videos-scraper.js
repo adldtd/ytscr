@@ -16,10 +16,12 @@ async function getTabData(config, timeout, initialData) {
       delete config.data.continuation;
       let tabData = await helpers.makeRequest(config, timeout, 1, INFO);
       if (tabData == -1) return -1;
+      tabData = tabData.data;
 
       delete config.data.browseId;
       delete config.data.params;
-      return tabData.data;
+
+      return tabData;
 
     }
   }
@@ -48,7 +50,34 @@ async function scrapeVideos(settings, config, timeout, innerData) {
       for (let tab in tabs) {
         tab = tabs[tab].tabRenderer;
         if (tab.selected) {
-          contents = tab.content.richGridRenderer.contents;
+
+          if (settings.popular) { //Make another request
+
+            let buttons = tab.content.richGridRenderer.header.feedFilterChipBarRenderer.contents;
+            for (let button in buttons) {
+              button = buttons[button].chipCloudChipRenderer;
+              if (button.isSelected === false) { //Should be the popular tab
+
+                config.data.continuation = button.navigationEndpoint.continuationCommand.token;
+                innerData = await helpers.makeRequest(config, timeout, 1, INFO);
+                if (innerData === -1) return savedVideos;
+                innerData = innerData.data;
+
+                let actions = innerData.onResponseReceivedActions;
+                for (let action in actions) {
+                  action = actions[action];
+                  if ("reloadContinuationItemsCommand" in action && action.reloadContinuationItemsCommand.slot === "RELOAD_CONTINUATION_SLOT_BODY") {
+                    contents = action.reloadContinuationItemsCommand.continuationItems;
+                    break;
+                  }
+                }
+                break;
+              }
+            }
+
+          } else
+            contents = tab.content.richGridRenderer.contents;
+          
           break;
         }
       }
