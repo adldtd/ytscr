@@ -5,6 +5,10 @@ const map = require("../../common/helpers").map;
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
 
+const videos_cli = require("./videos/cli").cli;
+
+const videos_scrape = require("./videos/videos-scraper").scrape;
+
 
 const cmd = {
   
@@ -34,8 +38,8 @@ const cmd = {
       simpleDescription: "Submodule for the channel's videos",
       description: "A submodule that focuses on the channel's uploaded videos.",
       examples: ["videos [argument1] [argument2] ... #"],
-      cli: undefined,
-      scrape: undefined
+      cli: videos_cli,
+      scrape: videos_scrape
     }
 
   },

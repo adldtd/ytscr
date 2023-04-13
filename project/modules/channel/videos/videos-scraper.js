@@ -1,6 +1,33 @@
 const helpers = require("../../../common/helpers");
 const filterHelpers = require("../../../common/filter_helpers");
+const {INFO, HEADER, PROG} = require("../../../common/verbosity_vars");
 
+
+async function getTabData(config, timeout, initialData) {
+
+  let tabs = initialData.contents.twoColumnBrowseResultsRenderer.tabs;
+  for (let tab in tabs) {
+    tab = tabs[tab].tabRenderer;
+
+    if (tab.title === "Videos") {
+
+      config.data.browseId = tab.endpoint.browseEndpoint.browseId;
+      config.data.params = tab.endpoint.browseEndpoint.params;
+      delete config.data.continuation;
+      let tabData = await helpers.makeRequest(config, timeout, 1, INFO);
+      if (tabData == -1) return -1;
+
+      delete config.data.browseId;
+      delete config.data.params;
+      return tabData.data;
+
+    }
+  }
+
+  global.sendvb(HEADER, 'Tab "videos" could not be found.');
+  return -1;
+
+}
 
 async function scrapeVideos(settings, config, timeout, innerData) {
 
@@ -15,24 +42,29 @@ async function scrapeVideos(settings, config, timeout, innerData) {
 
     let contents = null;
     if (initialData) {
-      contents = innerData.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents;
       initialData = false;
-    } else {
-      contents = innerData.onResponseReceivedActions;
-      for (let action in contents) {
-        action = contents[action];
-        if ("appendContinuationItemsAction" in action) {
-          contents = action.appendContinuationItemsAction;
+
+      let tabs = innerData.contents.twoColumnBrowseResultsRenderer.tabs;
+      for (let tab in tabs) {
+        tab = tabs[tab].tabRenderer;
+        if (tab.selected) {
+          contents = tab.content.richGridRenderer.contents;
           break;
         }
       }
+      if (contents === null) return savedVideos;
 
-      if ("continuationItems" in contents)
-        contents = contents.continuationItems;
-      else
-        return savedVideos;
+    } else {
+      let actions = innerData.onResponseReceivedActions;
+      for (let action in actions) {
+        action = actions[action];
+        if ("appendContinuationItemsAction" in action) {
+          contents = action.appendContinuationItemsAction.continuationItems;
+          break;
+        }
+      }
+      if (contents === null) return savedVideos;
     }
-
 
     for (let item in contents) {
       item = contents[item];
@@ -44,11 +76,11 @@ async function scrapeVideos(settings, config, timeout, innerData) {
       }
 
       let innerVideo = null;
-      if ("playlistVideoRenderer" in item)
-        innerVideo = item.playlistVideoRenderer;
+      if ("richItemRenderer" in item && "videoRenderer" in item.richItemRenderer.content)
+        innerVideo = item.richItemRenderer.content.videoRenderer;
       else
         continue;
-      
+
       let singleVideo = retrieveVideo(innerVideo, settings.ignore);
       let match = videoMatches(singleVideo, settings.filter);
       if (match) ++matchCounter;
@@ -66,17 +98,18 @@ async function scrapeVideos(settings, config, timeout, innerData) {
       }
     }
 
-    if (global.verbose >= 3) helpers.clearLastLine();
-    global.sendvb(3, "Videos scraped: " + counter);
+    if (global.verbose >= PROG) helpers.clearLastLine();
+    global.sendvb(PROG, "Videos scraped: " + counter);
 
     if (hasContinuation) {
-      innerData = await helpers.makeRequest(config, timeout, 1, 1);
+      innerData = await helpers.makeRequest(config, timeout, 1, INFO);
       if (innerData === -1) break;
       innerData = innerData.data;
     }
   }
 
   return savedVideos;
+
 }
 
 
@@ -93,44 +126,17 @@ function retrieveVideo(innerVideo, ignore) {
   }
 
   if (!ignore.views)
-    singleVideo.views = innerVideo.videoInfo.runs[0].text;
+    singleVideo.views = innerVideo.viewCountText.simpleText;
 
   if (!ignore.duration)
     singleVideo.duration = innerVideo.lengthText.simpleText;
 
   if (!ignore.published)
-    singleVideo.published = innerVideo.videoInfo.runs[2].text;
+    singleVideo.published = innerVideo.publishedTimeText.simpleText;
 
   if (!ignore.thumbnail) {
     let thumbnails = innerVideo.thumbnail.thumbnails;
     singleVideo.thumbnail = thumbnails[thumbnails.length - 1].url;
-  }
-
-  if (!ignore.uploader) {
-    singleVideo.uploader = "";
-    for (let run in innerVideo.shortBylineText.runs)
-      singleVideo.uploader += innerVideo.shortBylineText.runs[run].text;
-  }
-
-  if (!ignore.handle) {
-    singleVideo.handle = "";
-    for (run in innerVideo.shortBylineText.runs) {
-      if ("navigationEndpoint" in innerVideo.shortBylineText.runs[run] && "browseEndpoint" in innerVideo.shortBylineText.runs[run].navigationEndpoint) {
-        let link = innerVideo.shortBylineText.runs[run].navigationEndpoint.browseEndpoint.canonicalBaseUrl;
-        if (link[1] === "@") singleVideo.handle = link;
-        break;
-      }
-    }
-  }
-
-  if (!ignore.channelId) {
-    singleVideo.channelId = "";
-    for (run in innerVideo.shortBylineText.runs) {
-      if ("navigationEndpoint" in innerVideo.shortBylineText.runs[run] && "browseEndpoint" in innerVideo.shortBylineText.runs[run].navigationEndpoint) {
-        singleVideo.channelId = innerVideo.shortBylineText.runs[run].navigationEndpoint.browseEndpoint.browseId;
-        break;
-      }
-    }
   }
 
   return singleVideo;
@@ -144,7 +150,7 @@ function videoMatches(singleVideo, filter) {
   for (s in filter) {
 
     let condition = filter[s];
-    if (condition.check !== "views" && condition.check !== "duration") { //Special numerical values
+    if (condition.check !== "views" && condition.check !== "duration") {
 
       let videoCheck = singleVideo[condition.check];
       let conditionMatch = condition.match;
@@ -157,15 +163,15 @@ function videoMatches(singleVideo, filter) {
         returnMatch = videoCheck === conditionMatch;
       else if (condition.compare === "in")
         returnMatch = videoCheck.includes(conditionMatch);
-    }
-    else {
-      
+
+    } else {
+
       let videoCheck = null;
       if (condition.check === "views")
-        videoCheck = filterHelpers.crunchSimpleViews(singleVideo[condition.check]);
+        videoCheck = filterHelpers.crunchViewCount(singleVideo[condition.check]);
       else
         videoCheck = filterHelpers.durationToSec(singleVideo[condition.check]);
-      
+
       switch (condition.compare) {
         case "less":
           returnMatch = videoCheck < parseInt(condition.match);
@@ -185,8 +191,7 @@ function videoMatches(singleVideo, filter) {
       }
     }
 
-    if (!returnMatch)
-      break;
+    if (!returnMatch) break;
   }
 
   return returnMatch;
@@ -200,8 +205,6 @@ function printVideo(singleVideo) {
   for (att in singleVideo) {
     if (att === "id")
       console.log("link: https://www.youtube.com/watch?v=" + singleVideo[att]);
-    else if (att === "channelId")
-      console.log("channel: " + "https://youtube.com/channel/" + singleVideo[att]);
     else
       console.log(att + ": " + singleVideo[att]);
   }
@@ -211,12 +214,18 @@ function printVideo(singleVideo) {
 
 async function collectVideos(settings, config, timeout, initialData) {
   
-  global.sendvb(2, "\n");
-  let savedVideos = await scrapeVideos(settings, config, timeout, initialData);
-  global.sendvb(2, "Complete");
+  global.sendvb(HEADER, "\n");
+  let tabData = await getTabData(config, timeout, initialData);
+  if (tabData === -1) {
+    global.sendvb(HEADER, "No videos found.");
+    return [];
+  }
+
+  let savedVideos = await scrapeVideos(settings, config, timeout, tabData);
+  global.sendvb(HEADER, "Complete");
 
   if (savedVideos.length === 0)
-    global.sendvb(2, "No videos found.");
+    global.sendvb(HEADER, "No videos found.");
 
   return savedVideos;
 }

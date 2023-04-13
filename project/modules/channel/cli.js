@@ -71,7 +71,7 @@ function cli(args, index) {
     return -1;
 
   if (settings[THIS_MODULE].output === "") { //Default destination
-    let id = settings[THIS_MODULE].input.split("?list=")[1];
+    let id = helpers.safeSplit(settings[THIS_MODULE].input, "/", 1, true)[1];
     let filename = THIS_MODULE + "_" + id + ".json";
     settings[THIS_MODULE].output = path.join(__dirname, "..", "..", "SAVES", filename);
   }
