@@ -22,7 +22,6 @@ async function getTabData(config, timeout, initialData) {
       delete config.data.params;
 
       return tabData;
-
     }
   }
 

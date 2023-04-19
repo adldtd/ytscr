@@ -8,6 +8,7 @@ var settings = {};
 
 settings.channel = require("./commands").settings;
 settings.videos = require("./videos/commands").settings;
+settings.shorts = require("./shorts/commands").settings;
 
 
 var currentState = {
@@ -17,6 +18,7 @@ var currentState = {
 
 currentState.channel = require("./commands").currentState;
 currentState.videos = require("./videos/commands").currentState;
+currentState.shorts = require("./shorts/commands").currentState;
 
 
 module.exports.settings = settings;

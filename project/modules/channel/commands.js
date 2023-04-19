@@ -6,8 +6,10 @@ const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "sub
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
 
 const videos_cli = require("./videos/cli").cli;
+const shorts_cli = require("./shorts/cli").cli;
 
 const videos_scrape = require("./videos/videos-scraper").scrape;
+const shorts_scrape = require("./shorts/shorts-scraper").scrape;
 
 
 const cmd = {
@@ -40,6 +42,15 @@ const cmd = {
       examples: ["videos [argument1] [argument2] ... #"],
       cli: videos_cli,
       scrape: videos_scrape
+    },
+
+    "shorts": {
+      aliases: ["shorts"],
+      simpleDescription: "Submodule for the channel's shorts",
+      description: "A submodule that focuses on the channel's uploaded shorts.",
+      examples: ["shorts [argument1] [argument2] ... #"],
+      cli: shorts_cli,
+      scrape: shorts_scrape
     }
 
   },
