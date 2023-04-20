@@ -143,7 +143,7 @@ function shortMatches(singleShort, filter) {
   for (let s in filter) {
 
     let condition = filter[s];
-    if (condition !== "views") { //String checker
+    if (condition.check !== "views") { //String checker
 
       let shortCheck = singleShort[condition.check];
       let conditionMatch = condition.match;

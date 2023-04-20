@@ -35,6 +35,7 @@ function crunchSimpleViews(views) {
     return 0;
 
   let lastChar = views[views.length - 1];
+  views = views.substring(0, views.length - 1);
   if (lastChar === "K")
     return (Number(views) * 1000);
   if (lastChar === "M")
