@@ -643,3 +643,33 @@ test(stage + "Behemoth", () => {
   let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ videos --popular # videos --filter { --check views --match 400000 --compare eq } --filter { --check views --match 301 --compare eq } # videos --ignore duration --ignore id --limfilter 400 --savefilter # videos --popular --lim 40");
   expect(cli(parsed)).toBeInstanceOf(Array);
 });
+
+
+stage = "CHANNEL/SHORTS: ";
+
+test(stage + "No input", () => {
+  let parsed = parse("channel shorts");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No such command", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ shorts --hekpws");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Help called 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ shorts -h");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Help called 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ shorts --help -h");
+  expect(cli(parsed)).toBe(1);
+});
+
+baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "shorts", "thumbnail", "views");
+
+test(stage + "Behemoth", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ shorts --lim 50 --limfilter 42 --filter { --check id --match 15 --compare in --casesensitive } # shorts -pop # shorts --filter { --check views --match 2832 --compare eq --casesensitive }");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
