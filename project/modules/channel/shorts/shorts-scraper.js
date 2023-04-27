@@ -30,6 +30,34 @@ async function getTabData(config, timeout, initialData) {
 
 }
 
+async function getPopularTab(tab, config, timeout) {
+
+  let buttons = tab.content.richGridRenderer;
+  if (!("header" in buttons)) return -1;
+  buttons = buttons.header.feedFilterChipBarRenderer.contents;
+
+  for (let button in buttons) {
+    button = buttons[button].chipCloudChipRenderer;
+    if (button.isSelected === false) { //Should be the popular tab
+
+      config.data.continuation = button.navigationEndpoint.continuationCommand.token;
+      let innerData = await helpers.makeRequest(config, timeout, 1, INFO);
+      if (innerData === -1) return -1;
+      innerData = innerData.data;
+
+      let actions = innerData.onResponseReceivedActions;
+      for (let action in actions) {
+        action = actions[action];
+        if ("reloadContinuationItemsCommand" in action && action.reloadContinuationItemsCommand.slot === "RELOAD_CONTINUATION_SLOT_BODY") {
+          return action.reloadContinuationItemsCommand.continuationItems;
+        }
+      }
+      break;
+    }
+  }
+
+  return -1;
+}
 
 async function scrapeShorts(settings, config, timeout, innerData) {
 
@@ -50,7 +78,16 @@ async function scrapeShorts(settings, config, timeout, innerData) {
       for (let tab in tabs) {
         tab = tabs[tab].tabRenderer;
         if (tab.selected) {
-          contents = tab.content.richGridRenderer.contents;
+
+          if (settings.popular) {
+            contents = await getPopularTab(tab, config, timeout);
+            if (contents == -1) {
+              global.sendvb(INFO, "Error: \"Popular\" sort button could not be found. Continuing scraping.\n\n");
+              contents = tab.content.richGridRenderer.contents;
+            }
+          } else
+            contents = tab.content.richGridRenderer.contents;
+          
           break;
         }
       }
