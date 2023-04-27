@@ -1,17 +1,9 @@
 const path = require("path");
-const helpers = require(path.join(__dirname, "..", "..", "..", "common", "helpers"));
-const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
-
-const cmd = require(__dirname + "/commands").cmd;
-
-const CALLER = "channel";
-const THIS_MODULE = "shorts";
+const helpers = require("./helpers");
+const errors = require("./errors");
 
 
-//*********************************************************************************
-//Shorts module CLI; modifies settings.shorts
-//*********************************************************************************
-function cli(args, currentState, settings) {
+function basicFilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, settings) {
   
   //Loop through the CLI
   while (currentState.index < args.length) {
@@ -53,4 +45,4 @@ function cli(args, currentState, settings) {
 }
 
 
-module.exports.cli = cli;
+module.exports.basicFilterableCli = basicFilterableCli;

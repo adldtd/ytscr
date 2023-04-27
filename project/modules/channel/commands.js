@@ -4,9 +4,11 @@ const map = require("../../common/helpers").map;
 
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
+const basicFilterableCli = require("../../common/cli_funcs").basicFilterableCli;
 
-const videos_cli = require("./videos/cli").cli;
-const shorts_cli = require("./shorts/cli").cli;
+const videos_cmd = require("./videos/commands").cmd;
+const shorts_cmd = require("./shorts/commands").cmd;
+const live_cmd = require("./live/commands").cmd;
 
 const videos_scrape = require("./videos/videos-scraper").scrape;
 const shorts_scrape = require("./shorts/shorts-scraper").scrape;
@@ -40,7 +42,8 @@ const cmd = {
       simpleDescription: "Submodule for the channel's videos",
       description: "A submodule that focuses on the channel's uploaded videos.",
       examples: ["videos [argument1] [argument2] ... #"],
-      cli: videos_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(videos_cmd, "channel", "videos", args, currentState, settings),
       scrape: videos_scrape
     },
 
@@ -49,8 +52,19 @@ const cmd = {
       simpleDescription: "Submodule for the channel's shorts",
       description: "A submodule that focuses on the channel's uploaded shorts.",
       examples: ["shorts [argument1] [argument2] ... #"],
-      cli: shorts_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(shorts_cmd, "channel", "shorts", args, currentState, settings),
       scrape: shorts_scrape
+    },
+
+    "live": {
+      aliases: ["live"],
+      simpleDescription: "Submodule for the channel's livestreams",
+      description: "A submodule that focuses on the channel's past (and present) streams.",
+      examples: ["live [argument1] [argument2] ... #"],
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(live_cmd, "channel", "live", args, currentState, settings),
+      scrape: undefined
     }
 
   },
