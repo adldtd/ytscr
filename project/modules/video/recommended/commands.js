@@ -1,6 +1,5 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
-const map = require("../../../common/helpers").map;
 
 const subscribeDmoduleSimple = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-dmodule")).subscribeDmoduleSimple;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-meta")).subscribeMeta;

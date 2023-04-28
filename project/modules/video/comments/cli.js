@@ -43,7 +43,7 @@ function cli(args, currentState, settings) {
       return -1;
   }
 
-  if (!settings.comments.replies && settings.comments.nrf)
+  if (!settings.comments.replies && !settings.comments.nrf)
     console.log("WARNING: -nrf is specified alongside --noreply, making the former redundant (no replies will be saved).")
 
   if (currentState[THIS_MODULE].inFilter) {

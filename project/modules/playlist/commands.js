@@ -1,12 +1,12 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
-const map = require("../../common/helpers").map;
 
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
+const basicFilterableCli = require("../../common/cli_funcs").basicFilterableCli;
 
 const meta_cli = require("./meta/cli").cli;
-const videos_cli = require("./videos/cli").cli;
+const videos_cmd = require("./videos/commands").cmd;
 
 const meta_scrape = require("./meta/meta-scraper").scrape;
 const videos_scrape = require("./videos/videos-scraper").scrape;
@@ -30,7 +30,8 @@ const cmd = {
       simpleDescription: "Submodule for all the videos in the playlist",
       description: "A submodule that focuses on the videos contained in the playlist.",
       examples: ["videos [argument1] [argument2] ... #"],
-      cli: videos_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(videos_cmd, "playlist", "videos", args, currentState, settings),
       scrape: videos_scrape
     }
 

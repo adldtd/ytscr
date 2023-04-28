@@ -1,13 +1,13 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
-const map = require("../../common/helpers").map;
 
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
+const basicFilterableCli = require("../../common/cli_funcs").basicFilterableCli;
 
 const meta_cli = require(path.join(__dirname, "meta", "cli")).cli;
 const comment_cli = require(path.join(__dirname, "comments", "cli")).cli;
-const chat_cli = require(path.join(__dirname, "chat", "cli")).cli;
+const chat_cmd = require("./chat/commands").cmd;
 const recommended_cli = require(path.join(__dirname, "recommended", "cli")).cli;
 
 const meta_scraper = require(path.join(__dirname, "meta", "meta-scraper")).scraper;
@@ -52,7 +52,8 @@ const cmd = {
       description: "The submodule for retrieving chat data from a past livestream/premiere. Will be ignored " +
       "if the video was not live in the past (and if it is an ongoing livestream.)",
       examples: ["chat [argument 1] [argument 2] ... #"],
-      cli: chat_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(chat_cmd, "video", "chat", args, currentState, settings),
       scrape: chat_scraper
     },
 

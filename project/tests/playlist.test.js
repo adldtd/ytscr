@@ -9,7 +9,7 @@ global.TESTING = true;
 
 const INVALID1 = "PLFsQlewWXsj_4yDedbiIADdH5FMayBiJp";
 const INVALID2 = "PLUg5WJL2pGHcM9ZReMONn_XVIpDXZb0vU";
-const VALID1 = "PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo";
+const VALID1 = "PLZ4DbyIWUwCq4V8bIEa8jm2ozHZVuREJP";
 const VALID2 = "PLtKVsbX6mq9RvO__n08wujegVI0NsuNiu";
 const VALID3 = "PLpR68gbIfkKmrNp3yeVmZRyNR_Lb6XM5Q"; //Long!
 const VALID4 = "PLoSWVnSA9vG9QbL9nV1pisgWCemD0UFnZ";
