@@ -7,15 +7,12 @@ const helpers = require("./helpers");
 
 
 //*********************************************************************************
-//Condense a view count into a pure number
+//Turn a number seperated by commas into numerical form; assumes commas are
+//purely "decorational"
 //*********************************************************************************
-function crunchViewCount(views) {
-  views = views.split(" ", 1)[0];
-  if (isNaN(parseInt(views))) //"No views," should work for different languages
-    return 0;
-
+function commaSeperatedToNumerical(number) {
   let num = 0;
-  let places = views.split(",");
+  let places = number.split(",");
   let modifier = 1;
 
   for (let i = places.length - 1; i >= 0; i--) {
@@ -24,6 +21,16 @@ function crunchViewCount(views) {
   }
 
   return num;
+}
+
+//*********************************************************************************
+//Condense a view count into a pure number
+//*********************************************************************************
+function crunchViewCount(views) {
+  views = views.split(" ", 1)[0];
+  if (isNaN(parseInt(views))) //"No views," should work for different languages
+    return 0;
+  return commaSeperatedToNumerical(views);
 }
 
 //*********************************************************************************
@@ -51,11 +58,12 @@ function crunchSimpleViews(views) {
 //*********************************************************************************
 function durationToSec(duration) {
   
+  console.log("! " + duration + " !");
   let time = 0;
   let divisions = duration.split(":");
 
   for (let i = 0; i < divisions.length; i++)
-    divisions[i] = parseInt(divisions[i]);
+    divisions[i] = commaSeperatedToNumerical(divisions[i]);
 
   if (divisions.length === 3) //hh:mm::ss
     time = (divisions[0] * 3600) + (divisions[1] * 60) + divisions[2];
