@@ -1,63 +1,8 @@
 const helpers = require("../../../common/helpers");
 const filterHelpers = require("../../../common/filter_helpers");
+const {getTabData, getPopularTab} = require("../channel_helpers");
 const {INFO, HEADER, PROG} = require("../../../common/verbosity_vars");
 
-
-async function getTabData(config, timeout, initialData) {
-
-  let tabs = initialData.contents.twoColumnBrowseResultsRenderer.tabs;
-  for (let tab in tabs) {
-    tab = tabs[tab].tabRenderer;
-
-    if (tab.title === "Videos") {
-
-      config.data.browseId = tab.endpoint.browseEndpoint.browseId;
-      config.data.params = tab.endpoint.browseEndpoint.params;
-      delete config.data.continuation;
-      let tabData = await helpers.makeRequest(config, timeout, 1, INFO);
-      if (tabData == -1) return -1;
-      tabData = tabData.data;
-
-      delete config.data.browseId;
-      delete config.data.params;
-
-      return tabData;
-    }
-  }
-
-  global.sendvb(HEADER, 'Tab "videos" could not be found.');
-  return -1;
-
-}
-
-async function getPopularTab(tab, config, timeout) {
-
-  let buttons = tab.content.richGridRenderer;
-  if (!("header" in buttons)) return -1;
-  buttons = buttons.header.feedFilterChipBarRenderer.contents;
-
-  for (let button in buttons) {
-    button = buttons[button].chipCloudChipRenderer;
-    if (button.isSelected === false) { //Should be the popular tab
-
-      config.data.continuation = button.navigationEndpoint.continuationCommand.token;
-      let innerData = await helpers.makeRequest(config, timeout, 1, INFO);
-      if (innerData === -1) return -1;
-      innerData = innerData.data;
-
-      let actions = innerData.onResponseReceivedActions;
-      for (let action in actions) {
-        action = actions[action];
-        if ("reloadContinuationItemsCommand" in action && action.reloadContinuationItemsCommand.slot === "RELOAD_CONTINUATION_SLOT_BODY") {
-          return action.reloadContinuationItemsCommand.continuationItems;
-        }
-      }
-      break;
-    }
-  }
-
-  return -1;
-}
 
 async function scrapeVideos(settings, config, timeout, innerData) {
 
@@ -254,7 +199,7 @@ function printVideo(singleVideo) {
 async function collectVideos(settings, config, timeout, initialData) {
   
   global.sendvb(HEADER, "\n");
-  let tabData = await getTabData(config, timeout, initialData);
+  let tabData = await getTabData(config, timeout, initialData, "Videos");
   if (tabData === -1) {
     global.sendvb(HEADER, "No videos found.");
     return [];

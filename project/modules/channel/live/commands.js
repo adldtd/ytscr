@@ -55,6 +55,16 @@ const cmd = {
       examples: ["--lim 100", "-l=27"],
       call: limCall,
       numArgs: 1
+    },
+
+    "-pop": {redirect: "--popular"},
+    "--popular": {
+      aliases: ["--popular", "-pop"],
+      simpleDescription: "Whether to sort by popularity",
+      description: "A flag which tells YouTube to sort streams by views (from highest to lowest). By default, " +
+      "the \"sort\" setting is set to \"Latest\", where the latest uploaded livestreams are at the top.",
+      call: popularCall,
+      numArgs: 0
     }
   },
 
@@ -95,6 +105,16 @@ function limCall(parsed, currentState, innerState, moduleSettings, innerSettings
     } else
       currentState.error = errors.errorCodes(16, c, a);
   } else
+    currentState.error = errors.errorCodes(2, c);
+}
+
+function popularCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command;
+
+  if (!innerState.inFilter)
+    innerSettings.popular = true;
+  else
     currentState.error = errors.errorCodes(2, c);
 }
 

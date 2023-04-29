@@ -12,6 +12,7 @@ const live_cmd = require("./live/commands").cmd;
 
 const videos_scrape = require("./videos/videos-scraper").scrape;
 const shorts_scrape = require("./shorts/shorts-scraper").scrape;
+const live_scrape = require("./live/live-scraper").scrape;
 
 
 const cmd = {
@@ -64,7 +65,7 @@ const cmd = {
       examples: ["live [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => 
         basicFilterableCli(live_cmd, "channel", "live", args, currentState, settings),
-      scrape: undefined
+      scrape: live_scrape
     }
 
   },
