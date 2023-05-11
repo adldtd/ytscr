@@ -48,8 +48,8 @@ function parseArgs(args, index, cmd, currentState) {
   else
     returnVal.commandBox = cmd.commands[returnVal.command];
 
-  if (!("numArgs" in returnVal.commandBox)) //Solely for debugging purposes
-    throw "ERR! Command " + returnVal.command + " defined improperly: missing numArgs";
+  //if (!("numArgs" in returnVal.commandBox)) //Solely for debugging purposes
+  //  throw "ERR! Command " + returnVal.command + " defined improperly: missing numArgs";
 
   //Collect needed arguments for a command; iterate until you either reach the end of all arguments or collect enough
   let limit = returnVal.commandBox.numArgs;

@@ -9,6 +9,7 @@ const basicFilterableCli = require("../../common/cli_funcs").basicFilterableCli;
 const videos_cmd = require("./videos/commands").cmd;
 const shorts_cmd = require("./shorts/commands").cmd;
 const live_cmd = require("./live/commands").cmd;
+const playlists_cli = require("./playlists/cli").cli;
 
 const videos_scrape = require("./videos/videos-scraper").scrape;
 const shorts_scrape = require("./shorts/shorts-scraper").scrape;
@@ -66,6 +67,15 @@ const cmd = {
       cli: (args, currentState, settings) => 
         basicFilterableCli(live_cmd, "channel", "live", args, currentState, settings),
       scrape: live_scrape
+    },
+
+    "playlists": {
+      aliases: ["playlists"],
+      simpleDescription: "Submodule for the channel's playlists",
+      description: "A submodule that focuses on the channel's public playlists",
+      examples: ["playlists [argument1] [argument2] ... #"],
+      cli: playlists_cli,
+      scrape: null
     }
 
   },

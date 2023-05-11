@@ -1,8 +1,13 @@
-const helpers = require("./helpers");
-const errors = require("./errors");
+const helpers = require("../../../common/helpers");
+const errors = require("../../../common/errors");
+
+const cmd = require("./commands").cmd;
+
+const CALLER = "channel";
+const THIS_MODULE = "playlists";
 
 
-function basicFilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, settings) {
+function cli(args, currentState, settings) {
   
   //Loop through the CLI
   while (currentState.index < args.length) {
@@ -36,6 +41,15 @@ function basicFilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, settin
       return -1;
   }
 
+  if (settings[THIS_MODULE].focusmode) { //Warns that unfocused or unexcluded sections will be automatically ignored
+    for (let section in currentState[THIS_MODULE].unwarnedSections) {
+      let sectionData = currentState[THIS_MODULE].unwarnedSections[section];
+      if (sectionData.focussection === null)
+        console.log("WARNING: Section \"" + section + "\" was not specified to be focused, but another was; the section will be automatically excluded.");
+      delete currentState[THIS_MODULE].unwarnedSections[section];
+    }
+  }
+
   if (currentState[THIS_MODULE].inFilter) {
     currentState.error = errors.errorCodesScope(2, "--filter");
     return -1;
@@ -44,4 +58,4 @@ function basicFilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, settin
 }
 
 
-module.exports.basicFilterableCli = basicFilterableCli;
+module.exports.cli = cli;

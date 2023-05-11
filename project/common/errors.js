@@ -96,6 +96,34 @@ function errorCodesScope(code, moduleOrCommand) {
 
 
 //*********************************************************************************
+//Focuses on errors involving user-defined "section settings"
+//*********************************************************************************
+function errorCodesSection(code, command, value = "") {
+
+  switch (code) {
+
+    case 0: //Section already specified
+      console.log("Error: Section \"" + value + "\" was already specified/modified");
+      break;
+    case 1: //Section modifier not in section context
+      console.log("Error: Command \"" + command + "\", as a section modifier, must follow a section or another modifier");
+      break;
+    case 2: //Section modifier called after exclusion
+      console.log("Error: Section modifier \"" + command + "\" used after exclusion of section \"" + value + "\"");
+      break;
+    case 3: //Exclusion called after section modified
+      console.log("Error: Section \"" + value + "\" was excluded after being previously modified");
+      break;
+    case 4: //Section is reserved
+      console.log("Error: Section name \"" + value + "\" is special and cannot be specified");
+      break;
+  }
+
+  return true;
+}
+
+
+//*********************************************************************************
 //More general error code list; mostly for values and value conflicts
 //*********************************************************************************
 function errorCodes(code, arg, value = "") {
@@ -193,4 +221,5 @@ module.exports.errorCodesNums = errorCodesNums;
 module.exports.errorCodesConflict = errorCodesConflict;
 module.exports.errorCodesOutput = errorCodesOutput;
 module.exports.errorCodesScope = errorCodesScope;
+module.exports.errorCodesSection = errorCodesSection;
 module.exports.errorCodes = errorCodes;

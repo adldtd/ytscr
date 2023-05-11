@@ -10,6 +10,7 @@ settings.channel = require("./commands").settings;
 settings.videos = require("./videos/commands").settings;
 settings.shorts = require("./shorts/commands").settings;
 settings.live = require("./live/commands").settings;
+settings.playlists = require("./playlists/commands").settings;
 
 
 var currentState = {
@@ -21,6 +22,7 @@ currentState.channel = require("./commands").currentState;
 currentState.videos = require("./videos/commands").currentState;
 currentState.shorts = require("./shorts/commands").currentState;
 currentState.live = require("./live/commands").currentState;
+currentState.playlists = require("./playlists/commands").currentState;
 
 
 module.exports.settings = settings;
