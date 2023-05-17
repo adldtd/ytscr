@@ -14,6 +14,7 @@ const playlists_cli = require("./playlists/cli").cli;
 const videos_scrape = require("./videos/videos-scraper").scrape;
 const shorts_scrape = require("./shorts/shorts-scraper").scrape;
 const live_scrape = require("./live/live-scraper").scrape;
+const playlists_scrape = require("./playlists/playlists-scraper").scrape;
 
 
 const cmd = {
@@ -75,7 +76,7 @@ const cmd = {
       description: "A submodule that focuses on the channel's public playlists",
       examples: ["playlists [argument1] [argument2] ... #"],
       cli: playlists_cli,
-      scrape: null
+      scrape: playlists_scrape
     }
 
   },

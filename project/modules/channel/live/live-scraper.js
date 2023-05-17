@@ -26,7 +26,7 @@ async function scrapeLive(settings, config, timeout, innerData) {
 
           if (settings.popular) {
             contents = await getPopularTab(tab, config, timeout);
-            if (contents == -1) {
+            if (contents === -1) {
               global.sendvb(INFO, "Error: \"Popular\" sort button could not be found. Continuing scraping.\n\n");
               contents = tab.content.richGridRenderer.contents;
             }

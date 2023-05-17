@@ -1,0 +1,376 @@
+const helpers = require("../../../common/helpers");
+const {getTabData} = require("../channel_helpers");
+const {INFO, HEADER, PROG} = require("../../../common/verbosity_vars");
+
+
+async function getSectionData(config, timeout, section) {
+
+  config.data.browseId = section.endpoint.browseEndpoint.browseId;
+  config.data.params = section.endpoint.browseEndpoint.params;
+  delete config.data.continuation;
+  let sectionData = await helpers.makeRequest(config, timeout, 1, INFO);
+  if (sectionData == -1) return -1;
+  sectionData = sectionData.data;
+
+  delete config.data.browseId;
+  delete config.data.params;
+
+  return sectionData;
+}
+
+
+async function sortSectionData(config, timeout, sortSetting) {
+
+  config.data.browseId = sortSetting.navigationEndpoint.browseEndpoint.browseId;
+  config.data.params = sortSetting.navigationEndpoint.browseEndpoint.params;
+  delete config.data.continuation;
+  let sortData = await helpers.makeRequest(config, timeout, 1, INFO);
+  if (sortData == -1) return -1;
+  sortData = sortData.data;
+
+  delete config.data.browseId;
+  delete config.data.params;
+
+  return sortData;
+}
+
+
+async function scrapePlaylists(settings, config, timeout, innerData) {
+
+  let savedPlaylists = {};
+  let counters = {counter: 0, matchCounter: 0};
+
+  let sections = null;
+  let tabs = innerData.contents.twoColumnBrowseResultsRenderer.tabs;
+  let playlistsTab = null;
+
+  for (let tab in tabs) {
+    tab = tabs[tab].tabRenderer;
+    if (tab.selected) {
+      playlistsTab = tab;
+      sections = tab.content.sectionListRenderer.subMenu.channelSubMenuRenderer.contentTypeSubMenuItems;
+      break;
+    }
+  }
+  if (sections === null) return savedPlaylists;
+
+  let organizedSections = {}; //Place each element of sections into a dictionary, with its title as its key
+  for (let section in sections) {
+    section = sections[section];
+    organizedSections[section.title] = section;
+  }
+  sections = organizedSections;
+
+  let sectionUnion = {};
+  //0: Section in settings, but no section found
+  //1: Section found, but no section in settings
+  //2: Section in settings; section found
+  for (let section in settings.section)
+    sectionUnion[section] = 0;
+  for (let section in sections) {
+    if (section === "All playlists") continue;
+    if (section in sectionUnion) sectionUnion[section] = 2;
+    else sectionUnion[section] = 1;
+  }
+
+
+  for (let section in sectionUnion) {
+    let code = sectionUnion[section];
+
+    let sectionSettings = null;
+    if (code === 0) {
+      sectionSettings = settings.section[section];
+      if (!(sectionSettings.focussection === false || (sectionSettings.focussection === null && settings.focusmode))) {
+        global.sendvb(INFO, "Error: Playlist section \"" + section + "\" could not be found. Continuing scraping.\n\n");
+        savedPlaylists[section] = [];
+      }
+      continue;
+    }
+    if (code === 1) {
+      if (settings.focusmode) continue; //In "focus mode," any sections not specifically focused are ignored
+      sectionSettings = {
+        limsection: settings.limsectionall,
+        lastvideo: settings.lastvideoall
+      };
+    } else { //(code === 2)
+      sectionSettings = settings.section[section];
+      if (sectionSettings.focussection === false || (sectionSettings.focussection === null && settings.focusmode))
+        continue; //Section excluded or not focused
+    }
+    savedPlaylists[section] = [];
+
+    if (counters.counter >= settings.lim || counters.matchCounter >= settings.limfilter)
+      continue;
+
+
+    //Scrape specific section
+    let sectionName = section;
+    section = sections[section];
+
+    //If limsection and lastvideo are not specified, but the "all" versions are, change them
+    if (code !== 1) {
+      if (sectionSettings.limsection === Number.POSITIVE_INFINITY && settings.limsectionall !== Number.POSITIVE_INFINTY)
+        sectionSettings.limsection = settings.limsectionall;
+      if (!sectionSettings.lastvideo && settings.lastvideoall)
+        sectionSettings.lastvideo = settings.lastvideoall;
+    }
+
+    let sectionData = null;
+    if (!section.selected) { //Request required
+      sectionData = await getSectionData(config, timeout, section);
+      if (sectionData === -1) continue;
+
+      let innerSectionData = null;
+      let sectionTabs = sectionData.contents.twoColumnBrowseResultsRenderer.tabs;
+      for (let tab in sectionTabs) {
+        tab = sectionTabs[tab].tabRenderer;
+        if (tab.selected) { //Does not work with "All playlists", which should have been filtered
+          innerSectionData = tab;
+          break;
+        }
+      }
+      if (innerSectionData === null) continue;
+      sectionData = innerSectionData;
+
+    } else
+      sectionData = playlistsTab;
+
+    
+    if (sectionSettings !== null && sectionSettings.lastvideo) { //Sort by last video added
+      let sortedSectionData = null;
+      let sortSetting = sectionData.content.sectionListRenderer.subMenu.channelSubMenuRenderer;
+      if ("sortSetting" in sortSetting) {
+        sortSetting = sortSetting.sortSetting.sortFilterSubMenuRenderer.subMenuItems;
+
+        for (let item in sortSetting) {
+          item = sortSetting[item];
+          if (item.title === "Last video added") {
+            sortedSectionData = await sortSectionData(config, timeout, item);
+            break;
+          }
+        }
+      }
+
+      if (sortedSectionData === null)
+        global.sendvb(INFO, "Error: Section \"" + sectionName + "\" could not be sorted by last video added. Continuing scraping.\n\n");
+      else {
+        if (sortedSectionData === -1) continue;
+
+        let sortedTab = null;
+        let tabs = sortedSectionData.contents.twoColumnBrowseResultsRenderer.tabs;
+        for (let tab in tabs) {
+          tab = tabs[tab].tabRenderer;
+          if (tab.selected) {
+            sortedTab = tab;
+            break;
+          }
+        }
+        if (sortedTab === null) continue;
+
+        sectionData = sortedTab;
+      }
+    }
+
+
+    sectionData = sectionData.content.sectionListRenderer.contents;
+    sectionData = sectionData[0].itemSectionRenderer.contents;
+    sectionData = sectionData[0].gridRenderer.items;
+
+    savedPlaylists[sectionName] = await scrapeSection(settings, config, timeout, sectionData, sectionSettings, counters);
+  }
+
+  return savedPlaylists;
+
+}
+
+
+async function scrapeSection(settings, config, timeout, innerData, sectionSettings, counters) {
+
+  let savedSection = [];
+  let limsection = sectionSettings.limsection;
+  let sectionCounter = 0;
+
+  let hasContinuation = true;
+  do {
+    hasContinuation = false;
+    let contents = innerData; //The first instance of innerData passed will always be a list of playlists
+
+    for (let item in contents) {
+      item = contents[item];
+
+      if ("continuationItemRenderer" in item) {
+        config.data.continuation = item.continuationItemRenderer.continuationEndpoint.continuationCommand.token;
+        hasContinuation = true;
+        continue;
+      }
+
+      let innerPlaylist = null;
+      if ("gridPlaylistRenderer" in item)
+        innerPlaylist = item.gridPlaylistRenderer;
+      else
+        continue;
+
+      let singlePlaylist = retrievePlaylist(innerPlaylist, settings.ignore);
+      let match = playlistMatches(singlePlaylist, settings.filter);
+      if (match) ++(counters.matchCounter);
+
+      if (!settings.savefilter || match)
+        savedSection.push(singlePlaylist);
+      if (settings.printfilter && match)
+        printPlaylist(singlePlaylist);
+
+      ++(counters.counter);
+      ++sectionCounter;
+
+      if (sectionCounter >= limsection || counters.counter >= settings.lim || counters.matchCounter >= settings.limfilter) {
+        hasContinuation = false;
+        break;
+      }
+    }
+
+    if (global.verbose >= PROG) helpers.clearLastLine();
+    global.sendvb(PROG, "Playlists scraped: " + counters.counter);
+
+    if (hasContinuation) {
+      innerData = await helpers.makeRequest(config, timeout, 1, INFO);
+      if (innerData === -1) break;
+      innerData = innerData.data;
+
+      contents = null;
+      let actions = innerData.onResponseReceivedActions;
+      for (let action in actions) {
+        action = actions[action];
+        if ("appendContinuationItemsAction" in action) {
+          contents = action.appendContinuationItemsAction.continuationItems;
+          break;
+        }
+      }
+      if (contents === null) return savedSection;
+      innerData = contents;
+    }
+
+  } while (hasContinuation);
+
+  return savedSection;
+
+}
+
+
+function retrievePlaylist(innerPlaylist, ignore) {
+  let singlePlaylist = {};
+
+  if (!ignore.id)
+    singlePlaylist.id = innerPlaylist.playlistId;
+
+  if (!ignore.title) {
+    singlePlaylist.title = "";
+    for (let run in innerPlaylist.title.runs)
+      singlePlaylist.title += innerPlaylist.title.runs[run].text;
+  }
+
+  if (!ignore.size)
+    singlePlaylist.size = innerPlaylist.videoCountShortText.simpleText; //*******CHECK IF THIS TRUNCATES NUMBERS IN THE THOUSANDS
+  
+  if (!ignore.updated) {
+    singlePlaylist.updated = "";
+    if ("publishedTimeText" in innerPlaylist)
+      singlePlaylist.updated = innerPlaylist.publishedTimeText.simpleText;
+  }
+
+  if (!ignore.thumbnail) {
+    let thumbnails = innerPlaylist.thumbnail.thumbnails;
+    singlePlaylist.thumbnail = thumbnails[thumbnails.length - 1].url;
+  }
+  
+  return singlePlaylist;
+}
+
+
+function playlistMatches(singlePlaylist, filter) {
+
+  let returnMatch = true;
+
+  for (let s in filter) {
+
+    let condition = filter[s];
+    if (condition.check !== "size") { //String checker
+
+      let playlistCheck = singlePlaylist[condition.check];
+      let conditionMatch = condition.match;
+      if ("casesensitive" in condition ? !condition.casesensitive : true) {
+        playlistCheck = playlistCheck.toLowerCase();
+        conditionMatch = conditionMatch.toLowerCase();
+      }
+
+      if (condition.compare === "eq") //Exact match needed
+        returnMatch = playlistCheck === conditionMatch;
+      else if (condition.compare === "in")
+        returnMatch = playlistCheck.includes(conditionMatch);
+
+    } else { //Num checker
+
+      let playlistCheck = parseInt(singlePlaylist[condition.check]);
+      switch (condition.compare) {
+        case "less":
+          returnMatch = playlistCheck < parseInt(condition.match);
+          break;
+        case "greater":
+          returnMatch = playlistCheck > parseInt(condition.match);
+          break;
+        case "lesseq":
+          returnMatch = playlistCheck <= parseInt(condition.match);
+          break;
+        case "greatereq":
+          returnMatch = playlistCheck >= parseInt(condition.match);
+          break;
+        case "eq":
+          returnMatch = playlistCheck === parseInt(condition.match);
+          break;
+      }
+    }
+
+    if (!returnMatch) break;
+  }
+
+  return returnMatch;
+}
+
+
+function printPlaylist(singlePlaylist) {
+
+  helpers.clearLastLine();
+  console.log("-------------------------------------------------------------------");
+  for (att in singlePlaylist) {
+    if (att === "id")
+      console.log("link: https://www.youtube.com/playlist?list=" + singlePlaylist[att]);
+    else
+      console.log(att + ": " + singlePlaylist[att]);
+  }
+  console.log("-------------------------------------------------------------------\n\n");
+}
+
+
+async function collectPlaylists(settings, config, timeout, initialData) {
+  
+  global.sendvb(HEADER, "\n");
+  let tabData = await getTabData(config, timeout, initialData, "Playlists");
+  if (tabData === -1) {
+    global.sendvb(HEADER, "No playlists found.");
+    return {};
+  }
+
+  let savedPlaylists = await scrapePlaylists(settings, config, timeout, tabData);
+  global.sendvb(HEADER, "Complete");
+
+  let amount = 0;
+  for (let section in savedPlaylists)
+    amount += savedPlaylists[section].length;
+
+  if (amount === 0)
+    global.sendvb(HEADER, "No playlists found.");
+
+  return savedPlaylists;
+}
+
+
+module.exports.scrape = collectPlaylists;
