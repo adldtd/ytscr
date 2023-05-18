@@ -673,3 +673,73 @@ test(stage + "Behemoth", () => {
   let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ shorts --lim 50 --limfilter 42 --filter { --check id --match 15 --compare in --casesensitive } # shorts -pop # shorts --filter { --check views --match 2832 --compare eq --casesensitive }");
   expect(cli(parsed)).toBeInstanceOf(Array);
 });
+
+
+stage = "CHANNEL/PLAYLISTS: ";
+
+test(stage + "No input", () => {
+  let parsed = parse("channel playlists");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No such command", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists --sececececec");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Help called 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists -h");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Help called 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists --help --section");
+  expect(cli(parsed)).toBe(1);
+});
+
+baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "playlists", "updated", "size");
+
+test(stage + "Bad modifier 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists --limsection 50");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Bad modifier 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists --section \"Created playlists\" --limsection 50 --combine --focussection");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Reserved section name", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists --section \"All playlists\"");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Modified and excluded 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists --section Wow --lastvideo --excludesection");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Modified and excluded 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists --section Wow --excludesection --lastvideo");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Double section call", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists --section Lists --section Lists");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Good sections 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists --section Songs --limsection 10 --limsectionall 5");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+test(stage + "Good sections 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ playlists --section Snogs --focussection --section Music");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+test(stage + "Behemoth", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ --focus playlists playlists # playlists --section \"IRL\" --limsection 5 --focussection -com --limsectionall 5 # playlists --section \"Scary Games!\" --limsection 55 --focussection --filter { --check id --match lol --compare in } -f { --check size --match 50 --compare eq } --section Movies --excludesection #");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
