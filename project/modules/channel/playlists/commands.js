@@ -49,6 +49,17 @@ const cmd = {
       numArgs: 1
     },
 
+    "-com": {redirect: "--combine"},
+    "--combine": {
+      aliases: ["--combine", "-com"],
+      simpleDescription: "Combines section results into a single list",
+      description: "An argument which causes the scraper to combine scraped playlists into one, continuous list. " +
+      "By default, results are saved in different section lists; this flag adds a \"section\" attribute to every " +
+      "scraped playlist, and replaces the playlists object with a list.",
+      call: combineCall,
+      numArgs: 0
+    },
+
     "--limsectionall": {
       aliases: ["--limsectionall"],
       simpleDescription: "Limits the amount of playlists ALL sections",
@@ -135,6 +146,7 @@ let commands = cmd.commands;
 
 var thisSettings = {
   lim: Number.POSITIVE_INFINITY,
+  combine: false,
   limsectionall: Number.POSITIVE_INFINITY,
   lastvideoall: false,
   section: {},
@@ -169,6 +181,16 @@ function limCall(parsed, currentState, innerState, moduleSettings, innerSettings
     } else
       currentState.error = errors.errorCodes(16, c, a);
   } else
+    currentState.error = errors.errorCodes(2, c);
+}
+
+function combineCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command;
+
+  if (!innerState.inFilter)
+    innerSettings.combine = true;
+  else
     currentState.error = errors.errorCodes(2, c);
 }
 

@@ -37,7 +37,7 @@ async function sortSectionData(config, timeout, sortSetting) {
 
 async function scrapePlaylists(settings, config, timeout, innerData) {
 
-  let savedPlaylists = {};
+  let savedPlaylists = (settings.combine) ? [] : {};
   let counters = {counter: 0, matchCounter: 0};
 
   let sections = null;
@@ -82,7 +82,7 @@ async function scrapePlaylists(settings, config, timeout, innerData) {
       sectionSettings = settings.section[section];
       if (!(sectionSettings.focussection === false || (sectionSettings.focussection === null && settings.focusmode))) {
         global.sendvb(INFO, "Error: Playlist section \"" + section + "\" could not be found. Continuing scraping.\n\n");
-        savedPlaylists[section] = [];
+        if (!settings.combine) savedPlaylists[section] = [];
       }
       continue;
     }
@@ -97,7 +97,7 @@ async function scrapePlaylists(settings, config, timeout, innerData) {
       if (sectionSettings.focussection === false || (sectionSettings.focussection === null && settings.focusmode))
         continue; //Section excluded or not focused
     }
-    savedPlaylists[section] = [];
+    if (!settings.combine) savedPlaylists[section] = [];
 
     if (counters.counter >= settings.lim || counters.matchCounter >= settings.limfilter)
       continue;
@@ -176,7 +176,11 @@ async function scrapePlaylists(settings, config, timeout, innerData) {
     sectionData = sectionData[0].itemSectionRenderer.contents;
     sectionData = sectionData[0].gridRenderer.items;
 
-    savedPlaylists[sectionName] = await scrapeSection(settings, config, timeout, sectionData, sectionSettings, counters);
+    let sectionSavedPlaylists = await scrapeSection(settings, config, timeout, sectionData, sectionSettings, counters, sectionName);
+    if (settings.combine)
+      savedPlaylists = savedPlaylists.concat(sectionSavedPlaylists);
+    else
+      savedPlaylists[section] = sectionSavedPlaylists;
   }
 
   return savedPlaylists;
@@ -184,7 +188,7 @@ async function scrapePlaylists(settings, config, timeout, innerData) {
 }
 
 
-async function scrapeSection(settings, config, timeout, innerData, sectionSettings, counters) {
+async function scrapeSection(settings, config, timeout, innerData, sectionSettings, counters, sectionName) {
 
   let savedSection = [];
   let limsection = sectionSettings.limsection;
@@ -210,7 +214,7 @@ async function scrapeSection(settings, config, timeout, innerData, sectionSettin
       else
         continue;
 
-      let singlePlaylist = retrievePlaylist(innerPlaylist, settings.ignore);
+      let singlePlaylist = retrievePlaylist(innerPlaylist, settings.ignore, (settings.combine) ? sectionName : null);
       let match = playlistMatches(singlePlaylist, settings.filter);
       if (match) ++(counters.matchCounter);
 
@@ -256,8 +260,11 @@ async function scrapeSection(settings, config, timeout, innerData, sectionSettin
 }
 
 
-function retrievePlaylist(innerPlaylist, ignore) {
+function retrievePlaylist(innerPlaylist, ignore, sectionName) {
   let singlePlaylist = {};
+
+  if (sectionName !== null)
+    singlePlaylist.section = sectionName;
 
   if (!ignore.id)
     singlePlaylist.id = innerPlaylist.playlistId;
@@ -356,15 +363,18 @@ async function collectPlaylists(settings, config, timeout, initialData) {
   let tabData = await getTabData(config, timeout, initialData, "Playlists");
   if (tabData === -1) {
     global.sendvb(HEADER, "No playlists found.");
-    return {};
+    return (settings.combine) ? [] : {}
   }
 
   let savedPlaylists = await scrapePlaylists(settings, config, timeout, tabData);
   global.sendvb(HEADER, "Complete");
 
   let amount = 0;
-  for (let section in savedPlaylists)
-    amount += savedPlaylists[section].length;
+  if (!settings.combine) {
+    for (let section in savedPlaylists)
+      amount += savedPlaylists[section].length;
+  } else
+    amount = savedPlaylists.length;
 
   if (amount === 0)
     global.sendvb(HEADER, "No playlists found.");
