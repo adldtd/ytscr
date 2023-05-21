@@ -48,6 +48,9 @@ function errorCodesConflict(code, command1, command2, value = "") {
     case 2: //Conflict when a command (command1) is called, and a module (value) is called
       console.log("Error: Module \"" + value + "\" cannot be both specified as an argument for command \"" + command1 + "\" and be called");
       break;
+    case 3: //Conflict when a flag (command1) is called, and ANY module is called
+      console.log("Error: Flag \"" + command1 + "\" cannot be specified when a module was called");
+      break;
   }
 
   return true;

@@ -322,6 +322,19 @@ function ignoreCall(parsed, currentState, innerState, moduleSettings, innerSetti
     currentState.error = errors.errorCodes(2, c);
 }
 
+function ignoreCallNoFilter(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command; let a = parsed.args[0];
+  let commands = this.commands;
+
+  if (a in commands["--ignore"].validValues)
+    innerSettings.ignore[a] = true;
+  else {
+    currentState.error = errors.errorCodes(3, c, a);
+    helpers.outputValidValues(c, commands["--ignore"].validValues);
+  }
+}
+
 //--------------------------------------------------------------------- "Registration" functions
 
 /**
@@ -365,5 +378,15 @@ function subscribeFilterable(attributes, cmdCommands, innerState = {}, innerSett
   innerSettings.ignore = helpers.map(attributes, false);
 }
 
+function subscribeIgnorable(attributes, cmdCommands, innerState, innerSettings) {
+
+  cmdCommands["--ignore"] = Object.assign({}, commands["--ignore"]); //Does not implement filterable
+  cmdCommands["--ignore"].validValues = attributes;
+  cmdCommands["--ignore"].call = ignoreCallNoFilter.bind({commands: cmdCommands});
+
+  innerSettings.ignore = helpers.map(attributes, false);
+}
+
 
 module.exports.subscribeFilterable = subscribeFilterable;
+module.exports.subscribeIgnorable = subscribeIgnorable;

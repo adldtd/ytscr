@@ -11,7 +11,13 @@ function basicFilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, settin
     if (currentState.error) return -1;
     currentState.index = parsed.currentIndex;
 
-    if (parsed.command === "#") {
+    if (parsed.isModule) {
+
+      currentState[THIS_MODULE].modulesCalled[parsed.command] = "";
+      let result = parsed.commandBox.cli(args, currentState, settings);
+      if (result === -1 || result === 1) return result;
+
+    } else if (parsed.command === "#") {
 
       if (currentState[THIS_MODULE].inFilter) {
         currentState.error = errors.errorCodesScope(3, THIS_MODULE);

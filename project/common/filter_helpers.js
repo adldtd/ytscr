@@ -57,8 +57,6 @@ function crunchSimpleViews(views) {
 //Converts video runtime into seconds
 //*********************************************************************************
 function durationToSec(duration) {
-  
-  console.log("! " + duration + " !");
   let time = 0;
   let divisions = duration.split(":");
 

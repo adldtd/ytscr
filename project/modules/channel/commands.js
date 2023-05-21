@@ -1,6 +1,5 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
-const map = require("../../common/helpers").map;
 
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
@@ -10,6 +9,7 @@ const videos_cmd = require("./videos/commands").cmd;
 const shorts_cmd = require("./shorts/commands").cmd;
 const live_cmd = require("./live/commands").cmd;
 const playlists_cli = require("./playlists/cli").cli;
+const community_cmd = require("./community/commands").cmd;
 
 const videos_scrape = require("./videos/videos-scraper").scrape;
 const shorts_scrape = require("./shorts/shorts-scraper").scrape;
@@ -77,6 +77,30 @@ const cmd = {
       examples: ["playlists [argument1] [argument2] ... #"],
       cli: playlists_cli,
       scrape: playlists_scrape
+    },
+
+    "community": {
+      aliases: ["community"],
+      simpleDescription: "Submodule for the channel's community tab",
+      description: "A submodule that focuses on the channel's community posts",
+      examples: ["community [argument1] [argument2] ... #"],
+      cli: (args, currentState, settings) => {
+        let result = basicFilterableCli(community_cmd, "channel", "community", args, currentState, settings);
+        if (result === -1 || result === 1) return result;
+
+        if (settings.community.noattach) {
+          for (let _ in currentState.community.focusList) {
+            currentState.error = errors.errorCodesConflict(0, "--focus", "--noattach");
+            return -1;
+          }
+          for (let _ in currentState.community.modulesCalled) {
+            currentState.error = errors.errorCodesConflict(3, "--noattach", "");
+            return -1;
+          }
+        }
+        return 0;
+      },
+      scrape: null
     }
 
   },

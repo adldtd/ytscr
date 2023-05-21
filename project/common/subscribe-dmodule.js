@@ -8,7 +8,6 @@ const errors = require(path.join(__dirname, "errors"));
  /* Default module command pack; meant to reduce code bloat between first-call modules */
 /**************************************************************************************/
 
-
 const commands = {
 
   "-fc": {redirect: "--focus"},
