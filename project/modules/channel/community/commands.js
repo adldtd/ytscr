@@ -36,6 +36,10 @@ const attributes = {
   posted: {
     type: "str",
     simpleDescription: "When the post was created"
+  },
+  attachmentType: {
+    type: "str",
+    simpleDescription: "The type of the post's attachment"
   }
 };
 
@@ -112,8 +116,6 @@ let commands = cmd.commands;
 
 
 var thisSettings = {
-  _helper_modules: map(cmd.modules, ""),
-
   lim: Number.POSITIVE_INFINITY,
   noattach: false
 }

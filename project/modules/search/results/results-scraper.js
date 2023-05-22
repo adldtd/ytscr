@@ -752,7 +752,7 @@ function printResult(singleResult, type) {
         console.log("link: https://www.youtube.com/playlist?list=" + singleResult[att])
     }
     else if (att === "channelId")
-      console.log("channel: " + "https://youtube.com/channel/" + singleResult[att]);
+      console.log("channel: " + "https://www.youtube.com/channel/" + singleResult[att]);
     else if (att === "badges" || att === "shortVideos" || att === "shortVideoIds" || att === "contentHeaders") {
       let printStr = att + ": ";
       if (singleResult[att].length > 0) {

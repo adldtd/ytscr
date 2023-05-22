@@ -19,10 +19,6 @@ const attributesVideo = {
     type: "str",
     simpleDescription: "Snippet of the description"
   },
-  badges: {
-    type: "str",
-    simpleDescription: "A list of items describing the content of the video"
-  },
   views: {
     type: "num",
     simpleDescription: "Num. views"

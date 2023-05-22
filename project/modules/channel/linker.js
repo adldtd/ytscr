@@ -15,6 +15,9 @@ settings.community = require("./community/commands").settings;
   settings.videoAttachments = require("./community/attachments/commands").settingsVideo;
   settings.pollAttachments = require("./community/attachments/commands").settingsPoll;
   settings.imageAttachments = require("./community/attachments/commands").settingsImage;
+  settings.community.video = settings.videoAttachments;
+  settings.community.poll = settings.pollAttachments;
+  settings.community.image = settings.imageAttachments;
 
 
 var currentState = {

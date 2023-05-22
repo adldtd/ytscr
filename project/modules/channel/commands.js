@@ -15,6 +15,7 @@ const videos_scrape = require("./videos/videos-scraper").scrape;
 const shorts_scrape = require("./shorts/shorts-scraper").scrape;
 const live_scrape = require("./live/live-scraper").scrape;
 const playlists_scrape = require("./playlists/playlists-scraper").scrape;
+const community_scrape = require("./community/community-scraper").scrape;
 
 
 const cmd = {
@@ -100,7 +101,7 @@ const cmd = {
         }
         return 0;
       },
-      scrape: null
+      scrape: community_scrape
     }
 
   },

@@ -160,10 +160,10 @@ function liveMatches(singleLive, filter) {
 
   let returnMatch = true;
 
-  for (let s in filter) { //String checker
+  for (let s in filter) {
 
     let condition = filter[s];
-    if (condition.check !== "views" && condition.check !== "watching" && condition.check !== "duration") {
+    if (condition.check !== "views" && condition.check !== "watching" && condition.check !== "duration") { //String checker
 
       let liveCheck = singleLive[condition.check];
       let conditionMatch = condition.match;
