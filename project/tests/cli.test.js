@@ -743,3 +743,48 @@ test(stage + "Behemoth", () => {
   let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ --focus playlists playlists # playlists --section \"IRL\" --limsection 5 --focussection -com --limsectionall 5 # playlists --section \"Scary Games!\" --limsection 55 --focussection --filter { --check id --match lol --compare in } -f { --check size --match 50 --compare eq } --section Movies --excludesection #");
   expect(cli(parsed)).toBeInstanceOf(Array);
 });
+
+
+stage = "CHANNEL/COMMUNITY: ";
+
+test(stage + "No input", () => {
+  let parsed = parse("channel community");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No such command", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ community ----");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Help called 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ community -h");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Help called 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ community --help --noattach");
+  expect(cli(parsed)).toBe(1);
+});
+
+baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "community", "text", "comments");
+
+test(stage + "No attachments conflict 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ community --focus video --focus poll --focus image -noat");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No attachments conflict 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ community video # # community --noattach #");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No attachments success", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ community --exclude video --noattach");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+test(stage + "Behemoth", () => {
+  let parsed = parse("channel community video --ignore id --ignore handle --ignore uploader # image --ignore url # --ignore attachmentType # community --lim 100 --limfilter 30 -f { --check comments --match 100 --compare greatereq } poll --ignore options # # -i UCiTCYv4F4eAz5AsNaJ_BNKQ");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
