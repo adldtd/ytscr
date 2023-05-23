@@ -41,7 +41,6 @@ const attributes =
 const cmd = {
 
   commands: {
-
     "-top": {redirect: "--topchat"},
     "--topchat":
     {
@@ -51,22 +50,7 @@ const cmd = {
       "filter out some potential spam. By default, the chat is on \"live replay\" mode; all messages are sent.",
       call: topchatCall,
       numArgs: 0
-    },
-
-    "-l": {redirect: "--lim"},
-    "--lim":
-    {
-      aliases: ["--lim", "-l"],
-      simpleDescription: "Limits the amount of messages scraped",
-      description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
-      "as a positive integer. If this argument is not present, the scraper will not stop until all messages are " +
-      "retrieved. NOTE: The value entered limits the scraper based on how many messages were checked, " +
-      "not how many matched the filters (see limfilter).",
-      examples: ["--lim 100", "-l=27"],
-      call: limCall,
-      numArgs: 1
     }
-
   },
 
   attributes: attributes
@@ -79,9 +63,7 @@ let commands = cmd.commands;
 
 
 var thisSettings = {
-  topchat: false,
-
-  lim: Number.POSITIVE_INFINITY
+  topchat: false
 }
 
 var thisCurrentState = {
@@ -99,23 +81,6 @@ function topchatCall(parsed, currentState, innerState, moduleSettings, innerSett
   if (!innerState.inFilter)
     innerSettings.topchat = true;
   else
-    currentState.error = errors.errorCodes(2, c);
-}
-
-function limCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
-
-  let c = parsed.command; let a = parsed.args[0];
-
-  if (!innerState.inFilter) {
-    if (!isNaN(parseInt(a))) {
-      a = parseInt(a);
-      if (a > 0)
-        innerSettings.lim = a;
-      else
-        currentState.error = errors.errorCodes(15, c, a);
-    } else
-      currentState.error = errors.errorCodes(16, c, a);
-  } else
     currentState.error = errors.errorCodes(2, c);
 }
 

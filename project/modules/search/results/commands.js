@@ -1,8 +1,5 @@
-const path = require("path");
 const { subscribeFilterable } = require("../../../common/subscribe-filterable");
 const { subscribeMeta } = require("../../../common/subscribe-meta")
-const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
-const map = require("../../../common/helpers").map;
 
 
   /**********************************************************************************/
@@ -241,130 +238,46 @@ const attributesMovies =
 const cmd = {
 
   videos: {
-    commands: {
-      "-l": {redirect: "--lim"},
-      "--lim": {
-        aliases: ["--lim", "-l"],
-        simpleDescription: "Limits the amount of videos scraped",
-        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
-        "as a positive integer. If this argument is not present, the scraper will not stop until all videos are " +
-        "retrieved. NOTE: The value entered limits the scraper based on how many videos were checked, " +
-        "not how many matched the filters (see limfilter).",
-        examples: ["--lim 100", "-l=27"],
-        call: limCall,
-        numArgs: 1
-      }
-    },
+    commands: {},
 
     attributes: attributesVideos
-
   },
 
   shorts: {
-    commands: {
-      "-l": {redirect: "--lim"},
-      "--lim": {
-        aliases: ["--lim", "-l"],
-        simpleDescription: "Limits the amount of shorts scraped",
-        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
-        "as a positive integer. If this argument is not present, the scraper will not stop until all shorts are " +
-        "retrieved. NOTE: The value entered limits the scraper based on how many shorts were checked, " +
-        "not how many matched the filters (see limfilter).",
-        examples: ["--lim 100", "-l=27"],
-        call: limCall,
-        numArgs: 1
-      }
-    },
+    commands: {},
 
     attributes: attributesShorts
-
   },
 
   channels: {
-    commands: {
-      "-l": {redirect: "--lim"},
-      "--lim": {
-        aliases: ["--lim", "-l"],
-        simpleDescription: "Limits the amount of channels scraped",
-        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
-        "as a positive integer. If this argument is not present, the scraper will not stop until all channels are " +
-        "retrieved. NOTE: The value entered limits the scraper based on how many channels were checked, " +
-        "not how many matched the filters (see limfilter).",
-        examples: ["--lim 100", "-l=27"],
-        call: limCall,
-        numArgs: 1
-      }
-    },
+    commands: {},
 
     attributes: attributesChannels
-
   },
 
   playlists: {
-    commands: {
-      "-l": {redirect: "--lim"},
-      "--lim": {
-        aliases: ["--lim", "-l"],
-        simpleDescription: "Limits the amount of playlists scraped",
-        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
-        "as a positive integer. If this argument is not present, the scraper will not stop until all playlists are " +
-        "retrieved. NOTE: The value entered limits the scraper based on how many playlists were checked, " +
-        "not how many matched the filters (see limfilter).",
-        examples: ["--lim 100", "-l=27"],
-        call: limCall,
-        numArgs: 1
-      }
-    },
+    commands: {},
 
     attributes: attributesPlaylists
-
   },
 
   mixes: {
-    commands: {
-      "-l": {redirect: "--lim"},
-      "--lim": {
-        aliases: ["--lim", "-l"],
-        simpleDescription: "Limits the amount of mixes scraped",
-        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
-        "as a positive integer. If this argument is not present, the scraper will not stop until all mixes are " +
-        "retrieved. NOTE: The value entered limits the scraper based on how many mixes were checked, " +
-        "not how many matched the filters (see limfilter).",
-        examples: ["--lim 100", "-l=27"],
-        call: limCall,
-        numArgs: 1
-      }
-    },
+    commands: {},
 
     attributes: attributesMixes
-
   },
 
   movies: {
-    commands: {
-      "-l": {redirect: "--lim"},
-      "--lim": {
-        aliases: ["--lim", "-l"],
-        simpleDescription: "Limits the amount of movies scraped",
-        description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
-        "as a positive integer. If this argument is not present, the scraper will not stop until all movies are " +
-        "retrieved. NOTE: The value entered limits the scraper based on how many movies were checked, " +
-        "not how many matched the filters (see limfilter).",
-        examples: ["--lim 100", "-l=27"],
-        call: limCall,
-        numArgs: 1
-      }
-    },
+    commands: {},
 
     attributes: attributesMovies
-
   }
 }
 
 //*************************************************************************** Settings for the CLI
 
 var videosSettings = {
-  lim: Number.POSITIVE_INFINITY
+  
 }
 
 var videosCurrentState = {
@@ -373,7 +286,7 @@ var videosCurrentState = {
 
 
 var shortsSettings = {
-  lim: Number.POSITIVE_INFINITY
+
 }
 
 var shortsCurrentState = {
@@ -382,7 +295,7 @@ var shortsCurrentState = {
 
 
 var channelsSettings = {
-  lim: Number.POSITIVE_INFINITY
+
 }
 
 var channelsCurrentState = {
@@ -391,7 +304,7 @@ var channelsCurrentState = {
 
 
 var playlistsSettings = {
-  lim: Number.POSITIVE_INFINITY
+
 }
 
 var playlistsCurrentState = {
@@ -400,7 +313,7 @@ var playlistsCurrentState = {
 
 
 var mixesSettings = {
-  lim: Number.POSITIVE_INFINITY
+
 }
 
 var mixesCurrentState = {
@@ -409,7 +322,7 @@ var mixesCurrentState = {
 
 
 var moviesSettings = {
-  lim: Number.POSITIVE_INFINITY
+
 }
 
 var moviesCurrentState = {
@@ -431,23 +344,6 @@ subscribeMeta(cmd.mixes.commands);
 subscribeMeta(cmd.movies.commands);
 
 //*************************************************************************** CLI call functions
-
-function limCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
-
-  let c = parsed.command; let a = parsed.args[0];
-
-  if (!innerState.inFilter) {
-    if (!isNaN(parseInt(a))) {
-      a = parseInt(a);
-      if (a > 0)
-        innerSettings.lim = a;
-      else
-        currentState.error = errors.errorCodes(15, c, a);
-    } else
-      currentState.error = errors.errorCodes(16, c, a);
-  } else
-    currentState.error = errors.errorCodes(2, c);
-}
 
 
 module.exports.cmd = cmd;

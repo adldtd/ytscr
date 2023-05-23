@@ -141,9 +141,9 @@ const cmd = {
       numArgs: 0
     },
 
-    "-savesec": {redirect: "--savesections"},
+    "-ssec": {redirect: "--savesections"},
     "--savesections": {
-      aliases: ["--savesections", "-savesec"],
+      aliases: ["--savesections", "-ssec"],
       simpleDescription: "Saves section names/data during result scraping",
       description: "A flag which tells the scraper to save information \"sections\" while collecting data. " +
       "When returning results, YouTube sometimes wraps results into seperate packs (i.e. \"People also " +
