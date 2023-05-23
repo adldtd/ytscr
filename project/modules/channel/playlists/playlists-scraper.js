@@ -180,7 +180,7 @@ async function scrapePlaylists(settings, config, timeout, innerData) {
     if (settings.combine)
       savedPlaylists = savedPlaylists.concat(sectionSavedPlaylists);
     else
-      savedPlaylists[section] = sectionSavedPlaylists;
+      savedPlaylists[sectionName] = sectionSavedPlaylists;
   }
 
   return savedPlaylists;

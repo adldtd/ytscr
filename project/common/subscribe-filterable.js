@@ -36,9 +36,8 @@ const commands = {
   {
     aliases: ["--limfilter", "-lf"],
     simpleDescription: "Limits the amount of \"matching\" comments",
-    description: "An argument which stops the scraper once enough match the filters. Should be defined as a " +
-    "positive integer. If this is not defined, the scraper will preform matches without a threshold. NOTE: " +
-    "If flag -nrf is present, all replies that are automatically matched will NOT be counted as such.",
+    description: "An argument which stops the scraper once enough items match the filters. Should be defined as a " +
+    "positive integer. If this is not defined, the scraper will preform matches without a threshold.",
     examples: ["--limfilter 50", "-lf=5"],
     call: limfilterCall,
     numArgs: 1

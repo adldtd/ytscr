@@ -10,6 +10,7 @@ const shorts_cmd = require("./shorts/commands").cmd;
 const live_cmd = require("./live/commands").cmd;
 const playlists_cli = require("./playlists/cli").cli;
 const community_cmd = require("./community/commands").cmd;
+const store_cmd = require("./store/commands").cmd;
 
 const videos_scrape = require("./videos/videos-scraper").scrape;
 const shorts_scrape = require("./shorts/shorts-scraper").scrape;
@@ -102,6 +103,16 @@ const cmd = {
         return 0;
       },
       scrape: community_scrape
+    },
+
+    "store": {
+      aliases: ["store"],
+      simpleDescription: "Submodule for the channel's store tab",
+      description: "A submodule that focuses on the channel's listed products",
+      examples: ["store [argument1] [argument2] ... #"],
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(store_cmd, "channel", "store", args, currentState, settings),
+      scrape: null
     }
 
   },
