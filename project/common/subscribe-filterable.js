@@ -10,6 +10,19 @@ const errors = require(path.join(__dirname, "errors"));
 
 const commands = {
 
+  "-l": {redirect: "--lim"},
+  "--lim": {
+    aliases: ["--lim", "-l"],
+    simpleDescription: "Limits the amount of items scraped",
+    description: "A command which stops the scraper once a certain threshold is reached. Should be defined " +
+    "as a positive integer. If this command is not present, the scraper will not stop until all items are " +
+    "retrieved. NOTE: The value entered limits the scraper based on how many data were found, " +
+    "not how many matched the filters (see limfilter).",
+    examples: ["--lim 100", "-l=27"],
+    call: limCall,
+    numArgs: 1
+  },
+
   "-sf": {redirect: "--savefilter"},
   "--savefilter":
   {
@@ -35,7 +48,7 @@ const commands = {
   "--limfilter":
   {
     aliases: ["--limfilter", "-lf"],
-    simpleDescription: "Limits the amount of \"matching\" comments",
+    simpleDescription: "Limits the amount of \"matching\" items",
     description: "An argument which stops the scraper once enough items match the filters. Should be defined as a " +
     "positive integer. If this is not defined, the scraper will preform matches without a threshold.",
     examples: ["--limfilter 50", "-lf=5"],
@@ -47,7 +60,7 @@ const commands = {
   "--filter":
   {
     aliases: ["--filter", "-f"],
-    simpleDescription: "Used to filter comments based on attributes",
+    simpleDescription: "Used to filter data based on attributes",
     description: "Begins a \"filter object,\" where arguments define the filter's attributes. A filter's first " +
     "argument is always an opening bracket, and is later ended by a closing bracket. An indefinite amount " +
     "of filter objects can be created, each with different attributes and properties, to narrow down a search.",
@@ -135,6 +148,23 @@ const commands = {
 };
 
 //--------------------------------------------------------------------- CLI state modification functions
+
+function limCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
+
+  let c = parsed.command; let a = parsed.args[0];
+
+  if (!innerState.inFilter) {
+    if (!isNaN(parseInt(a))) {
+      a = parseInt(a);
+      if (a > 0)
+        innerSettings.lim = a;
+      else
+        currentState.error = errors.errorCodes(15, c, a);
+    } else
+      currentState.error = errors.errorCodes(16, c, a);
+  } else
+    currentState.error = errors.errorCodes(2, c);
+}
 
 function savefilterCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
   let c = parsed.command;
@@ -347,6 +377,7 @@ function ignoreCallNoFilter(parsed, currentState, innerState, moduleSettings, in
  *  currentFilter: {}
  * 
  * settings:
+ *  lim: Number.POSITIVE_INFINITY
  *  savefilter: false
  *  printfilter: false
  *  limfilter: Number.POSITIVE_INFINITY
@@ -370,6 +401,7 @@ function subscribeFilterable(attributes, cmdCommands, innerState = {}, innerSett
   innerState.inFilter = false;
   innerState.currentFilter = {};
 
+  innerSettings.lim = Number.POSITIVE_INFINITY;
   innerSettings.savefilter = false;
   innerSettings.printfilter = false;
   innerSettings.limfilter = Number.POSITIVE_INFINITY;

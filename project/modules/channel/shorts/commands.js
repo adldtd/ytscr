@@ -32,19 +32,6 @@ const attributes = {
 const cmd = {
 
   commands: {
-    "-l": {redirect: "--lim"},
-    "--lim": {
-      aliases: ["--lim", "-l"],
-      simpleDescription: "Limits the amount of shorts scraped",
-      description: "An argument which stops the scraper once a certain threshold is reached. Should be defined " +
-      "as a positive integer. If this argument is not present, the scraper will not stop until all shorts are " +
-      "retrieved. NOTE: The value entered limits the scraper based on how many shorts were checked, " +
-      "not how many matched the filters (see limfilter).",
-      examples: ["--lim 100", "-l=27"],
-      call: limCall,
-      numArgs: 1
-    },
-
     "-pop": {redirect: "--popular"},
     "--popular": {
       aliases: ["--popular", "-pop"],
@@ -66,7 +53,6 @@ let commands = cmd.commands;
 
 
 var thisSettings = {
-  lim: Number.POSITIVE_INFINITY,
   popular: false
 }
 
@@ -79,23 +65,6 @@ subscribeFilterable(attributes, commands, thisCurrentState, thisSettings);
 subscribeMeta(commands);
 
 //*************************************************************************** CLI call functions
-
-function limCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
-
-  let c = parsed.command; let a = parsed.args[0];
-
-  if (!innerState.inFilter) {
-    if (!isNaN(parseInt(a))) {
-      a = parseInt(a);
-      if (a > 0)
-        innerSettings.lim = a;
-      else
-        currentState.error = errors.errorCodes(15, c, a);
-    } else
-      currentState.error = errors.errorCodes(16, c, a);
-  } else
-    currentState.error = errors.errorCodes(2, c);
-}
 
 function popularCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
 
