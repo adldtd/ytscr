@@ -788,3 +788,33 @@ test(stage + "Behemoth", () => {
   let parsed = parse("channel community video --ignore id --ignore handle --ignore uploader # image --ignore url # --ignore attachmentType # community --lim 100 --limfilter 30 -f { --check comments --match 100 --compare greatereq } poll --ignore options # # -i UCiTCYv4F4eAz5AsNaJ_BNKQ");
   expect(cli(parsed)).toBeInstanceOf(Array);
 });
+
+
+stage = "CHANNEL/STORE: ";
+
+test(stage + "No input", () => {
+  let parsed = parse("channel store");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No such command", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ store --hjalp");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Help called 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ store --help");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Help called 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ store -h -h");
+  expect(cli(parsed)).toBe(1);
+});
+
+baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "store", "title", "price");
+
+test(stage + "Behemoth", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ store --lim 50 --limfilter 22 --filter { --check price --match 50 --compare lesseq } -f { --check seller --match \"Creator Ink\" --compare eq } # store --ignore title --ignore thumbnail #");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
