@@ -71,7 +71,35 @@ function durationToSec(duration) {
   return time;
 }
 
+//*********************************************************************************
+//Simple converter from currency (DOT DECIMAL FORMAT ONLY) to a number
+//*********************************************************************************
+function priceToNum(price) {
+
+  //Find an embedded number in the string
+  let start = 0;
+  for (let i = 0; i < price.length; i++) {
+    let code = price.charCodeAt(i);
+    if (code >= 48 && code <= 57) {
+      start = i;
+      break;
+    }
+  }
+
+  let end = 0;
+  for (let j = price.length - 1; j >= 0; j--) {
+    let code = price.charCodeAt(j);
+    if (code >= 48 && code <= 57) {
+      end = j;
+      break;
+    }
+  }
+
+  return commaSeperatedToNumerical(price.substring(start, end));
+}
+
 
 module.exports.crunchViewCount = crunchViewCount;
 module.exports.crunchSimpleViews = crunchSimpleViews;
 module.exports.durationToSec = durationToSec;
+module.exports.priceToNum = priceToNum;

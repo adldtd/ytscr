@@ -17,6 +17,7 @@ const shorts_scrape = require("./shorts/shorts-scraper").scrape;
 const live_scrape = require("./live/live-scraper").scrape;
 const playlists_scrape = require("./playlists/playlists-scraper").scrape;
 const community_scrape = require("./community/community-scraper").scrape;
+const store_scrape = require("./store/store-scraper").scrape;
 
 
 const cmd = {
@@ -112,7 +113,7 @@ const cmd = {
       examples: ["store [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => 
         basicFilterableCli(store_cmd, "channel", "store", args, currentState, settings),
-      scrape: null
+      scrape: store_scrape
     }
 
   },
