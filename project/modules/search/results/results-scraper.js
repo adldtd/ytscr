@@ -325,8 +325,11 @@ function retrieveVideo(innerData, settings) {
   }
 
   if (!ignore.profilePicture) {
-    let thumbnails = innerData.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.thumbnail.thumbnails;
-    singleVideo.profilePicture = thumbnails[thumbnails.length - 1].url;
+    singleVideo.profilePicture = "";
+    if ("channelThumbnailSupportedRenderers" in innerData) {
+      let thumbnails = innerData.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.thumbnail.thumbnails;
+      singleVideo.profilePicture = thumbnails[thumbnails.length - 1].url;
+    }
   }
 
   if (!ignore.handle) {
