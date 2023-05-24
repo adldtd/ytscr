@@ -11,6 +11,7 @@ const live_cmd = require("./live/commands").cmd;
 const playlists_cli = require("./playlists/cli").cli;
 const community_cmd = require("./community/commands").cmd;
 const store_cmd = require("./store/commands").cmd;
+const channels_cmd = require("./channels/commands").cmd;
 
 const videos_scrape = require("./videos/videos-scraper").scrape;
 const shorts_scrape = require("./shorts/shorts-scraper").scrape;
@@ -76,7 +77,7 @@ const cmd = {
     "playlists": {
       aliases: ["playlists"],
       simpleDescription: "Submodule for the channel's playlists",
-      description: "A submodule that focuses on the channel's public playlists",
+      description: "A submodule that focuses on the channel's public playlists.",
       examples: ["playlists [argument1] [argument2] ... #"],
       cli: playlists_cli,
       scrape: playlists_scrape
@@ -85,7 +86,7 @@ const cmd = {
     "community": {
       aliases: ["community"],
       simpleDescription: "Submodule for the channel's community tab",
-      description: "A submodule that focuses on the channel's community posts",
+      description: "A submodule that focuses on the channel's community posts.",
       examples: ["community [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => {
         let result = basicFilterableCli(community_cmd, "channel", "community", args, currentState, settings);
@@ -109,11 +110,33 @@ const cmd = {
     "store": {
       aliases: ["store"],
       simpleDescription: "Submodule for the channel's store tab",
-      description: "A submodule that focuses on the channel's listed products",
+      description: "A submodule that focuses on the channel's listed products.",
       examples: ["store [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => 
         basicFilterableCli(store_cmd, "channel", "store", args, currentState, settings),
       scrape: store_scrape
+    },
+
+    "channels": {
+      aliases: ["channels"],
+      simpleDescription: "Submodule for the channel's channels tab",
+      description: "A submodule that focuses on the channel's listed channels.",
+      examples: ["channels [argument1] [argument2] ... #"],
+      cli: (args, currentState, settings) => {
+        let result = basicFilterableCli(channels_cmd, "channel", "channels", args, currentState, settings);
+        if (result === -1 || result === 1) return result;
+
+        if (settings.channels.focusmode) { //Warns that unfocused or unexcluded sections will be automatically ignored
+          for (let section in currentState.channels.unwarnedSections) {
+            let sectionData = currentState.channels.unwarnedSections[section];
+            if (sectionData.focussection === null)
+              console.log("WARNING: Section \"" + section + "\" was not specified to be focused, but another was; the section will be automatically excluded.");
+            delete currentState.channels.unwarnedSections[section];
+          }
+        }
+        return 0;
+      },
+      scrape: null
     }
 
   },

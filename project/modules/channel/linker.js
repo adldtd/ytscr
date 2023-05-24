@@ -19,6 +19,7 @@ settings.community = require("./community/commands").settings;
   settings.community.poll = settings.pollAttachments;
   settings.community.image = settings.imageAttachments;
 settings.store = require("./store/commands").settings;
+settings.channels = require("./channels/commands").settings;
 
 
 var currentState = {
@@ -36,6 +37,7 @@ currentState.community = require("./community/commands").currentState;
   currentState.pollAttachments = require("./community/attachments/commands").currentStatePoll;
   currentState.imageAttachments = require("./community/attachments/commands").currentStateImage;
 currentState.store = require("./store/commands").currentState;
+currentState.channels = require("./channels/commands").currentState;
 
 
 module.exports.settings = settings;

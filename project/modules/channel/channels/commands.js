@@ -5,30 +5,30 @@ const subscribeFilterable = require(path.join(__dirname, "..", "..", "..", "comm
 const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-meta")).subscribeMeta;
 
 
-  /*****************************************************************************/
- /* Arguments + commands and corresponding functions for the playlists module */
-/*****************************************************************************/
+  /****************************************************************************/
+ /* Arguments + commands and corresponding functions for the channels module */
+/****************************************************************************/
 
 const attributes = {
-  id: {
+  name: {
     type: "str",
-    simpleDescription: "The playlist ID"
+    simpleDescription: "The channel's name"
   },
-  title: {
-    type: "str",
-    simpleDescription: "The title of the playlist"
-  },
-  size: {
+  subscribers: {
     type: "num",
-    simpleDescription: "Num. videos in the playlist"
+    simpleDescription: "Num. subscribers"
   },
-  updated: {
+  profilePicture: {
     type: "str",
-    simpleDescription: "Approximate time of the last change made to the list (distance from current date)"
+    simpleDescription: "The channel's profile picture"
   },
-  thumbnail: {
+  handle: {
     type: "str",
-    simpleDescription: "Link to the playlist's thumbnail"
+    simpleDescription: "The channel's handle"
+  },
+  channelId: {
+    type: "str",
+    simpleDescription: "The channel's ID"
   }
 };
 
@@ -40,45 +40,35 @@ const cmd = {
     "--combine": {
       aliases: ["--combine", "-com"],
       simpleDescription: "Combines section results into a single list",
-      description: "An argument which causes the scraper to combine scraped playlists into one, continuous list. " +
+      description: "An argument which causes the scraper to combine scraped channels into one, continuous list. " +
       "By default, results are saved in different section lists; this flag adds a \"section\" attribute to every " +
-      "scraped playlist, and replaces the playlists object with a list.",
+      "scraped channel, and replaces the \"channels\" object with a list.",
       call: combineCall,
       numArgs: 0
     },
 
     "--limsectionall": {
       aliases: ["--limsectionall"],
-      simpleDescription: "Limits the amount of playlists for ALL sections",
+      simpleDescription: "Limits the amount of channels for ALL sections",
       description: "An argument which stops the scraper in a section once it reaches the specified " +
       "limit. If another limit (i.e. for \"--lim\" or \"--limfilter\") is reached beforehand, scraping stops " +
       "outright. NOTE: This command is different from \"--lim\", as --lim is for total results, while \"--limsectionall\" " +
-      "is equivalent to calling \"--limsection\" for every playlist section. If a limit is specified for a " +
+      "is equivalent to calling \"--limsection\" for every channel section. If a limit is specified for a " +
       "certain section, it overrides this limit.",
       examples: ["--limsectionall 100"],
       call: limsectionallCall,
       numArgs: 1
     },
 
-    "--lastvideoall": {
-      aliases: ["--lastvideoall"],
-      simpleDescription: "Changes how YouTube sorts playlists for ALL sections",
-      description: "A flag which tells YouTube how to sort incoming results. By default, it sorts playlists " +
-      "by the time they were created (newest to oldest); this flag makes it so playlists are sorted by " +
-      "modification date (most recent to oldest). Equivalent to calling \"--lastvideo\" for every playlist section.",
-      call: lastvideoallCall,
-      numArgs: 0
-    },
-
     "-sec": {redirect: "--section"},
     "--section": {
       aliases: ["--section", "-sec"],
       simpleDescription: "Specifies a section to be modified",
-      description: "A command which takes in the name of a playlist section. This command by itself does " +
+      description: "A command which takes in the name of a channel section. This command by itself does " +
       "nothing; to change the scraper's functionality, it requires following commands, known as \"section " +
       "modifiers.\" Those commands are ONLY valid if they either follow this command, or one another. NOTE: " +
-      "the section name \"All playlists\" is reserved by YouTube, and cannot be specified/modified.",
-      examples: ['--section "Created playlists"', "-sec Cool"],
+      "the section name \"All channels\" is reserved by YouTube, and cannot be specified/modified.",
+      examples: ['--section "Subscriptions"', "-sec Alts"],
       call: sectionCall,
       numArgs: 1
     },
@@ -102,23 +92,13 @@ const cmd = {
 
     "--limsection": {
       aliases: ["--limsection"],
-      simpleDescription: "Section modifier; limits the amount of playlists scraped in a section",
+      simpleDescription: "Section modifier; limits the amount of channels scraped in a section",
       description: "An argument which stops the scraper in a certain section once it reaches the specified " +
       "limit. If another limit (i.e. for \"--lim\" or \"--limfilter\") is reached beforehand, scraping stops " +
       "outright. If this argument is not present, the scraper will not stop until it reaches the end of the section.",
       examples: ["--limsection 27"],
       call: limsectionCall,
       numArgs: 1
-    },
-
-    "--lastvideo": {
-      aliases: ["--lastvideo"],
-      simpleDescription: "Section modifier; changes how YouTube sorts playlists in a section",
-      description: "A flag which tells YouTube how to sort incoming results. By default, it sorts playlists " +
-      "by the time they were created (newest to oldest); this flag makes it so playlists are sorted by " +
-      "modification date (most recent to oldest).",
-      call: lastvideoCall,
-      numArgs: 0
     }
   },
 
@@ -134,7 +114,6 @@ let commands = cmd.commands;
 var thisSettings = {
   combine: false,
   limsectionall: Number.POSITIVE_INFINITY,
-  lastvideoall: false,
   section: {},
 
   focusmode: false //When false, the scraper scrapes all sections (except for ignored ones)
@@ -180,28 +159,17 @@ function limsectionallCall(parsed, currentState, innerState, moduleSettings, inn
     currentState.error = errors.errorCodes(2, c);
 }
 
-function lastvideoallCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
-
-  let c = parsed.command;
-
-  if (!innerState.inFilter) {
-    innerSettings.lastvideoall = true;
-  } else
-    currentState.error = errors.errorCodes(2, c);
-}
-
 function sectionCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
 
   let c = parsed.command; let a = parsed.args[0];
 
   if (!innerState.inFilter) {
-    if (a !== "All playlists") {
+    if (a !== "All channels") {
       if (!(a in innerSettings.section)) {
 
         innerSettings.section[a] = {
           focussection: null, //Unspecified
-          limsection: Number.POSITIVE_INFINITY,
-          lastvideo: false
+          limsection: Number.POSITIVE_INFINITY
         };
         innerState.unwarnedSections[a] = innerSettings.section[a];
 
@@ -275,25 +243,6 @@ function limsectionCall(parsed, currentState, innerState, moduleSettings, innerS
     } else
       currentState.error = errors.errorCodes(2, c, innerState.currentSection);
   
-  } else
-    currentState.error = errors.errorCodesSection(1, c);
-}
-
-function lastvideoCall(parsed, currentState, innerState, moduleSettings, innerSettings) {
-  innerState.sectionModified = true;
-
-  let c = parsed.command;
-  let currentSection = innerSettings.section[innerState.currentSection];
-
-  let distance = currentState.index - innerState.lastSectionalIndex;
-  if (distance === parsed.commandBox.numArgs + 1) {
-    innerState.lastSectionalIndex = currentState.index;
-
-    if (currentSection.focussection !== false) {
-      currentSection.lastvideo = true;
-    } else
-      currentState.error = errors.errorCodes(2, c, innerState.currentSection);
-
   } else
     currentState.error = errors.errorCodesSection(1, c);
 }
