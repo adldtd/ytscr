@@ -818,3 +818,73 @@ test(stage + "Behemoth", () => {
   let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ store --lim 50 --limfilter 22 --filter { --check price --match 50 --compare lesseq } -f { --check seller --match \"Creator Ink\" --compare eq } # store --ignore title --ignore thumbnail #");
   expect(cli(parsed)).toBeInstanceOf(Array);
 });
+
+
+stage = "CHANNEL/CHANNELS: ";
+
+test(stage + "No input", () => {
+  let parsed = parse("channel channels");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No such command", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --channels");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Help called 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --help");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Help called 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels -h --limsectionall");
+  expect(cli(parsed)).toBe(1);
+});
+
+baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "channels", "verified", "subscribers");
+
+test(stage + "Bad modifier 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --limsection 8675309");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Bad modifier 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --section Subscriptions --combine --limsection 50");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Reserved section name", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels -sec \"All channels\"");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Modified and excluded 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --section Alts --focussection --excludesection");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Modified and excluded 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --section Alts --excludesection --limsection 75");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Double section call", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --section Friends --section Friends");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Good sections 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --section Friends --limsection 5 --limsectionall 10");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+test(stage + "Good sections 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --section FRENZ --focussection --section \"Cool People\"");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+test(stage + "Behemoth", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --filter { --check subscribers --match 500000 --compare greater } -com # channels -f { --check handle --match @ --compare in --casesensitive } --section Subscriptions --limsection 30 --section Alts --excludesection --limsectionall 10 #");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});

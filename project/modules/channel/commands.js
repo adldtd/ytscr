@@ -8,7 +8,7 @@ const basicFilterableCli = require("../../common/cli_funcs").basicFilterableCli;
 const videos_cmd = require("./videos/commands").cmd;
 const shorts_cmd = require("./shorts/commands").cmd;
 const live_cmd = require("./live/commands").cmd;
-const playlists_cli = require("./playlists/cli").cli;
+const playlists_cmd = require("./playlists/commands").cmd;
 const community_cmd = require("./community/commands").cmd;
 const store_cmd = require("./store/commands").cmd;
 const channels_cmd = require("./channels/commands").cmd;
@@ -80,7 +80,20 @@ const cmd = {
       simpleDescription: "Submodule for the channel's playlists",
       description: "A submodule that focuses on the channel's public playlists.",
       examples: ["playlists [argument1] [argument2] ... #"],
-      cli: playlists_cli,
+      cli: (args, currentState, settings) => {
+        let result = basicFilterableCli(playlists_cmd, "channel", "playlists", args, currentState, settings);
+        if (result === -1 || result === 1) return result;
+
+        if (settings.playlists.focusmode) { //Warns that unfocused or unexcluded sections will be automatically ignored
+          for (let section in currentState.playlists.unwarnedSections) {
+            let sectionData = currentState.playlists.unwarnedSections[section];
+            if (sectionData.focussection === null)
+              console.log("WARNING: Section \"" + section + "\" was not specified to be focused, but another was; the section will be automatically excluded.");
+            delete currentState.playlists.unwarnedSections[section];
+          }
+        }
+        return 0;
+      },
       scrape: playlists_scrape
     },
 
