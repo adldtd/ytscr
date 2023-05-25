@@ -22,6 +22,10 @@ const attributes = {
     type: "str",
     simpleDescription: "The channel's profile picture"
   },
+  verified: {
+    type: "str",
+    simpleDescription: "Whether the channel is verified"
+  },
   handle: {
     type: "str",
     simpleDescription: "The channel's handle"
