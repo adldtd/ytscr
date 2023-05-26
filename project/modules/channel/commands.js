@@ -3,7 +3,7 @@ const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
-const basicFilterableCli = require("../../common/cli_funcs").basicFilterableCli;
+const { basicFilterableCli, basicUnfilterableCli } = require("../../common/cli_funcs");
 
 const videos_cmd = require("./videos/commands").cmd;
 const shorts_cmd = require("./shorts/commands").cmd;
@@ -12,6 +12,7 @@ const playlists_cmd = require("./playlists/commands").cmd;
 const community_cmd = require("./community/commands").cmd;
 const store_cmd = require("./store/commands").cmd;
 const channels_cmd = require("./channels/commands").cmd;
+const about_cmd = require("./about/commands").cmd;
 
 const videos_scrape = require("./videos/videos-scraper").scrape;
 const shorts_scrape = require("./shorts/shorts-scraper").scrape;
@@ -151,6 +152,16 @@ const cmd = {
         return 0;
       },
       scrape: channels_scrape
+    },
+
+    "about": {
+      aliases: ["about"],
+      simpleDescription: "Submodule for the channel's about tab",
+      description: "A submodule that focuses on the channel's \"about\" information.",
+      examples: ["about [argument1] [argument2] ... #"],
+      cli: (args, currentState, settings) =>
+        basicUnfilterableCli(about_cmd, "channel", "about", args, currentState, settings),
+      scrape: null
     }
 
   },

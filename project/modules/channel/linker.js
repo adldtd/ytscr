@@ -20,6 +20,7 @@ settings.community = require("./community/commands").settings;
   settings.community.image = settings.imageAttachments;
 settings.store = require("./store/commands").settings;
 settings.channels = require("./channels/commands").settings;
+settings.about = require("./about/commands").settings;
 
 
 var currentState = {
@@ -38,6 +39,7 @@ currentState.community = require("./community/commands").currentState;
   currentState.imageAttachments = require("./community/attachments/commands").currentStateImage;
 currentState.store = require("./store/commands").currentState;
 currentState.channels = require("./channels/commands").currentState;
+currentState.about = require("./about/commands").currentState;
 
 
 module.exports.settings = settings;

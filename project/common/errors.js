@@ -92,6 +92,9 @@ function errorCodesScope(code, moduleOrCommand) {
     case 3: //Filter unclosed but scope closed
       console.log("Error: Attempt to exit module \"" + moduleOrCommand + "\" while filter is still open");
       break;
+    case 4: //Filter unclosed but new scope opened
+      console.log("Error: Attempt to enter module \"" + moduleOrCommand + "\" while filter is still open");
+      break;
   }
 
   return true;
