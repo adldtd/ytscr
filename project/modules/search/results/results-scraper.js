@@ -107,14 +107,16 @@ async function scrapeResults(settings, config, timeout, searchData) {
 
 				} else if ("shelfRenderer" in result) {
           let section = result.shelfRenderer;
-          if (settings.search.savesections) {
+          if ("verticalListRenderer" in section.content) { //*******************WHAT TYPE OF DATA DOESN'T HAVE THIS?
+            if (settings.search.savesections) {
 
-            collectedResultsHolder = collectedResults;
-            collectedResults = []; //Store the data in the section
-            sectionTitle = section.title.simpleText;
-            inSection = true;
+              collectedResultsHolder = collectedResults;
+              collectedResults = []; //Store the data in the section
+              sectionTitle = section.title.simpleText;
+              inSection = true;
+            }
+            stack.push({list: section.content.verticalListRenderer.items, index: 0}); //We have recieved a new pack of items to go through on the stack
           }
-          stack.push({list: section.content.verticalListRenderer.items, index: 0}); //We have recieved a new pack of items to go through on the stack
           continue;
 
         } else if ("reelItemRenderer" in result) {
@@ -206,7 +208,14 @@ async function scrapeResults(settings, config, timeout, searchData) {
     if (global.verbose >= 3) helpers.clearLastLine();
     global.sendvb(3, "Search results scraped: " + counter);
 
-    if (finished) break;
+    if (finished) {
+      if (inSection) { //If this is true, savesections was specified; append the last section before returning collectedResults
+        let sectionData = {header: sectionTitle, results: collectedResults};
+        collectedResults = collectedResultsHolder;
+        collectedResults.push(sectionData);
+      }
+      break;
+    }
 
     if (hasContinuation) {
       searchData = await helpers.makeRequest(config, timeout, 1, 1);
