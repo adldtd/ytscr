@@ -888,3 +888,41 @@ test(stage + "Behemoth", () => {
   let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --filter { --check subscribers --match 500000 --compare greater } -com # channels -f { --check handle --match @ --compare in --casesensitive } --section Subscriptions --limsection 30 --section Alts --excludesection --limsectionall 10 #");
   expect(cli(parsed)).toBeInstanceOf(Array);
 });
+
+
+stage = "CHANNEL/ABOUT: ";
+
+test(stage + "No input", () => {
+  let parsed = parse("channel about");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No such command", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ about --ignogongonogingo");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Help called 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ about -h");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Help called 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ about --help --ignore");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Invalid ignore", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ about --ignore \"DOESNT EXIST\"");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Successful ignore", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ about --ignore description");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+test(stage + "Multiple ignore", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ about --ignore views --ignore location --ignore linkNames --ignore joined #");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
