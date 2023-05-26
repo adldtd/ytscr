@@ -21,6 +21,7 @@ const playlists_scrape = require("./playlists/playlists-scraper").scrape;
 const community_scrape = require("./community/community-scraper").scrape;
 const store_scrape = require("./store/store-scraper").scrape;
 const channels_scrape = require("./channels/channels-scraper").scrape;
+const about_scrape = require("./about/about-scraper").scrape;
 
 
 const cmd = {
@@ -33,15 +34,6 @@ const cmd = {
       description: "A submodule that focuses on metadata found in the channel. Distinct from the \"about\" " +
       "submodule.",
       examples: ["meta [argument1] [argument2] ... #"],
-      cli: undefined,
-      scrape: undefined
-    },*/
-
-    /*"about": {
-      aliases: ["about"],
-      simpleDescription: "Submodule for the channel's about section",
-      description: "A submodule that focuses on the About section of the channel.",
-      examples: ["about [argument1] [argument2] ... #"],
       cli: undefined,
       scrape: undefined
     },*/
@@ -161,7 +153,7 @@ const cmd = {
       examples: ["about [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) =>
         basicUnfilterableCli(about_cmd, "channel", "about", args, currentState, settings),
-      scrape: null
+      scrape: about_scrape
     }
 
   },
