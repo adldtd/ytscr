@@ -7,6 +7,15 @@
 var settings = {};
 
 settings.channel = require("./commands").settings;
+settings.home = require("./home/commands").settings;
+  settings.videosResults = require("./home/results/commands").settingsVideos;
+  settings.shortsResults = require("./home/results/commands").settingsShorts;
+  settings.playlistsResults = require("./home/results/commands").settingsPlaylists;
+  settings.channelsResults = require("./home/results/commands").settingsChannels;
+  settings.home.videos = settings.videosResults;
+  settings.home.shorts = settings.shortsResults;
+  settings.home.playlists = settings.playlistsResults;
+  settings.home.channels = settings.channelsResults;
 settings.videos = require("./videos/commands").settings;
 settings.shorts = require("./shorts/commands").settings;
 settings.live = require("./live/commands").settings;
@@ -29,6 +38,11 @@ var currentState = {
 };
 
 currentState.channel = require("./commands").currentState;
+currentState.home = require("./home/commands").currentState;
+  currentState.videosResults = require("./home/results/commands").currentStateVideos;
+  currentState.shortsResults = require("./home/results/commands").currentStateShorts;
+  currentState.playlistsResults = require("./home/results/commands").currentStatePlaylists;
+  currentState.channelsResults = require("./home/results/commands").currentStateChannels;
 currentState.videos = require("./videos/commands").currentState;
 currentState.shorts = require("./shorts/commands").currentState;
 currentState.live = require("./live/commands").currentState;

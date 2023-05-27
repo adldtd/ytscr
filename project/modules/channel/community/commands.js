@@ -1,7 +1,7 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"));
 
-const basicFilterableCli = require("../../../common/cli_funcs").basicFilterableCli;
+const basicUnfilterableCli = require("../../../common/cli_funcs").basicUnfilterableCli;
 const subscribeDmoduleFilterable = require("../../../common/subscribe-dmodule-filterable").subscribeDmoduleFilterable;
 const subscribeFilterable = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-filterable")).subscribeFilterable;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-meta")).subscribeMeta;
@@ -53,7 +53,7 @@ const cmd = {
       description: "A submodule that focuses on videos attached to posts.",
       examples: ["video [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => 
-        basicFilterableCli(videoAttachments_cmd, "channel", "videoAttachments", args, currentState, settings),
+        basicUnfilterableCli(videoAttachments_cmd, "channel", "videoAttachments", args, currentState, settings),
       scrape: null
     },
 
@@ -63,7 +63,7 @@ const cmd = {
       description: "A submodule that focuses on polls attached to posts.",
       examples: ["poll [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => 
-        basicFilterableCli(pollAttachments_cmd, "channel", "pollAttachments", args, currentState, settings),
+        basicUnfilterableCli(pollAttachments_cmd, "channel", "pollAttachments", args, currentState, settings),
       scrape: null
     },
 
@@ -73,7 +73,7 @@ const cmd = {
       description: "A submodule that focuses on images attached to posts.",
       examples: ["image [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => 
-        basicFilterableCli(imageAttachments_cmd, "channel", "imageAttachments", args, currentState, settings),
+        basicUnfilterableCli(imageAttachments_cmd, "channel", "imageAttachments", args, currentState, settings),
       scrape: null
     }
 

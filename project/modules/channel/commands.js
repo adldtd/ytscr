@@ -5,6 +5,7 @@ const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "sub
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
 const { basicFilterableCli, basicUnfilterableCli } = require("../../common/cli_funcs");
 
+const home_cmd = require("./home/commands").cmd;
 const videos_cmd = require("./videos/commands").cmd;
 const shorts_cmd = require("./shorts/commands").cmd;
 const live_cmd = require("./live/commands").cmd;
@@ -37,6 +38,16 @@ const cmd = {
       cli: undefined,
       scrape: undefined
     },*/
+
+    "home": {
+      aliases: ["home"],
+      simpleDescription: "Submodule for the channel's homepage",
+      description: "A submodule that focuses on the channel's homepage contents.",
+      examples: ["home [argument1] [argument2] ... #"],
+      cli: (args, currentState, settings) =>
+        basicUnfilterableCli(home_cmd, "channel", "home", args, currentState, settings),
+      scrape: null
+    },
 
     "videos": {
       aliases: ["videos"],
