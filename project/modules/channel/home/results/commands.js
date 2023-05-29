@@ -17,6 +17,14 @@ const attributesVideos = {
     type: "str",
     simpleDescription: "The video title"
   },
+  shortDescription: {
+    type: "str",
+    simpleDescription: "Snippet of the description"
+  },
+  badges: {
+    type: "str",
+    simpleDescription: "A list of items describing the content of the video"
+  },
   views: {
     type: "num",
     simpleDescription: "Num. views"
@@ -40,6 +48,10 @@ const attributesVideos = {
   verified: {
     type: "str",
     simpleDescription: "Whether the uploader is verified"
+  },
+  profilePicture: {
+    type: "str",
+    simpleDescription: "The uploader's profile picture"
   },
   handle: {
     type: "str",
@@ -83,6 +95,14 @@ const attributesPlaylists = {
     type: "num",
     simpleDescription: "Num. videos in the playlist"
   },
+  shortVideos: {
+    type: "str",
+    simpleDescription: "A short info list of the first videos of the playlist"
+  },
+  shortVideoIds: {
+    type: "str",
+    simpleDescription: "The corresponding video IDs for those first videos"
+  },
   updated: {
     type: "str",
     simpleDescription: "Approximate time of the last change made to the list (distance from current date)"
@@ -94,6 +114,10 @@ const attributesPlaylists = {
   uploader: {
     type: "str",
     simpleDescription: "The name of the creator of the playlist"
+  },
+  verified: {
+    type: "str",
+    simpleDescription: "Whether the creator is verified"
   },
   handle: {
     type: "str",
@@ -110,17 +134,21 @@ const attributesChannels = {
     type: "str",
     simpleDescription: "The channel's name"
   },
+  verified: {
+    type: "str",
+    simpleDescription: "Whether the channel is verified"
+  },
   subscribers: {
     type: "num",
     simpleDescription: "Num. subscribers"
   },
+  shortDescription: {
+    type: "str",
+    simpleDescription: "A snippet of the channel's description"
+  },
   profilePicture: {
     type: "str",
     simpleDescription: "The channel's profile picture"
-  },
-  verified: {
-    type: "str",
-    simpleDescription: "Whether the channel is verified"
   },
   handle: {
     type: "str",

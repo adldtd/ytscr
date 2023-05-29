@@ -22,7 +22,7 @@ const cmd = {
     "videos": {
       aliases: ["videos"],
       simpleDescription: "Submodule for the homepage's videos",
-      description: "A submodule that focuses on the homepage's listed videos.",
+      description: "A submodule that focuses on the homepage's listed videos. Part of the greater \"results\" section.",
       examples: ["videos [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => 
         basicFilterableCli(videosResults_cmd, "channel", "videosResults", args, currentState, settings),
@@ -32,7 +32,7 @@ const cmd = {
     "shorts": {
       aliases: ["shorts"],
       simpleDescription: "Submodule for the homepage's shorts",
-      description: "A submodule that focuses on the homepage's listed shorts.",
+      description: "A submodule that focuses on the homepage's listed shorts. Part of the greater \"results\" section.",
       examples: ["shorts [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => 
         basicFilterableCli(shortsResults_cmd, "channel", "shortsResults", args, currentState, settings),
@@ -42,7 +42,7 @@ const cmd = {
     "playlists": {
       aliases: ["playlists"],
       simpleDescription: "Submodule for the homepage's playlists",
-      description: "A submodule that focuses on the homepage's listed playlists.",
+      description: "A submodule that focuses on the homepage's listed playlists. Part of the greater \"results\" section.",
       examples: ["playlists [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => 
         basicFilterableCli(playlistsResults_cmd, "channel", "playlistsResults", args, currentState, settings),
@@ -52,7 +52,7 @@ const cmd = {
     "channels": {
       aliases: ["channels"],
       simpleDescription: "Submodule for the homepage's channels",
-      description: "A submodule that focuses on the homepage's listed channels.",
+      description: "A submodule that focuses on the homepage's listed channels. Part of the greater \"results\" section.",
       examples: ["channels [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => 
         basicFilterableCli(channelsResults_cmd, "channel", "channelsResults", args, currentState, settings),
