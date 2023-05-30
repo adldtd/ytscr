@@ -29,6 +29,22 @@ const attributes = {
   thumbnail: {
     type: "str",
     simpleDescription: "Link to the playlist's thumbnail"
+  },
+  uploader: {
+    type: "str",
+    simpleDescription: "The name of the creator of the playlist"
+  },
+  verified: {
+    type: "str",
+    simpleDescription: "Whether the creator is verified"
+  },
+  handle: {
+    type: "str",
+    simpleDescription: "The creator's channel handle"
+  },
+  channelId: {
+    type: "str",
+    simpleDescription: "The creator's channel ID"
   }
 };
 

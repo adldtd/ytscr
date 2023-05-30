@@ -18,6 +18,10 @@ const attributes = {
     type: "num",
     simpleDescription: "Num. subscribers"
   },
+  videos: {
+    type: "num",
+    simpleDescription: "Num. videos uploaded"
+  },
   profilePicture: {
     type: "str",
     simpleDescription: "The channel's profile picture"

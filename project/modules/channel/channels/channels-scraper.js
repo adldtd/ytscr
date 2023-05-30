@@ -218,6 +218,13 @@ function retrieveChannel(innerChannel, ignore, sectionName) {
       singleChannel.subscribers = "";
   }
 
+  if (!ignore.videos) {
+    if ("videoCountText" in innerChannel)
+      singleChannel.videos = innerChannel.videoCountText.runs[0].text;
+    else
+      singleChannel.videos = "0";
+  }
+
   if (!ignore.profilePicture) {
     let thumbnails = innerChannel.thumbnail.thumbnails;
     singleChannel.profilePicture = thumbnails[thumbnails.length - 1].url;
@@ -258,7 +265,7 @@ function channelMatches(singleChannel, filter) {
   for (let s in filter) {
 
     let condition = filter[s];
-    if (condition.check !== "subscribers") { //String checker
+    if (condition.check !== "subscribers" && condition.check !== "videos") { //String checker
 
       let channelCheck = singleChannel[condition.check];
       let conditionMatch = condition.match;
@@ -275,7 +282,11 @@ function channelMatches(singleChannel, filter) {
     } else { //Num checker
 
       if (singleStore[condition.check] === "") continue; //NULL; matches instantly
-      let channelCheck = filterHelpers.crunchSimpleViews(singleChannel[condition.check]);
+      let channelCheck = null;
+      if (condition.check === "subscribers")
+        channelCheck = filterHelpers.crunchSimpleViews(singleChannel[condition.check]);
+      else //(condition.check === "videos")
+        channelCheck = filterHelpers.commaSeperatedToNumerical(singleChannel[condition.check]);
 
       switch (condition.compare) {
         case "less":

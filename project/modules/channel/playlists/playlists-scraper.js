@@ -40,6 +40,29 @@ async function scrapePlaylists(settings, config, timeout, innerData) {
   let savedPlaylists = (settings.combine) ? [] : {};
   let counters = {counter: 0, matchCounter: 0};
 
+  //Header information for special cases
+  let channelInfo = {};
+  let header = innerData.header.c4TabbedHeaderRenderer;
+
+  channelInfo.uploader = header.title;
+  channelInfo.verified = "false";
+  if ("badges" in header) {
+    for (let badge in header.badges) {
+      badge = header.badges[badge].metadataBadgeRenderer;
+      if (badge.style === "BADGE_STYLE_TYPE_VERIFIED") {
+        channelInfo.verified = "true";
+        break;
+      }
+    }
+  }
+  channelInfo.handle = "/";
+  for (let run in header.channelHandleText.runs)
+    channelInfo.handle += header.channelHandleText.runs[run].text;
+  channelInfo.channelId = header.channelId;
+
+  settings.__channelInfo = channelInfo;
+
+  //Retrieve desired tab
   let sections = null;
   let tabs = innerData.contents.twoColumnBrowseResultsRenderer.tabs;
   let playlistsTab = null;
@@ -214,7 +237,7 @@ async function scrapeSection(settings, config, timeout, innerData, sectionSettin
       else
         continue;
 
-      let singlePlaylist = retrievePlaylist(innerPlaylist, settings.ignore, (settings.combine) ? sectionName : null);
+      let singlePlaylist = retrievePlaylist(innerPlaylist, settings, (settings.combine) ? sectionName : null);
       let match = playlistMatches(singlePlaylist, settings.filter);
       if (match) ++(counters.matchCounter);
 
@@ -260,8 +283,9 @@ async function scrapeSection(settings, config, timeout, innerData, sectionSettin
 }
 
 
-function retrievePlaylist(innerPlaylist, ignore, sectionName) {
+function retrievePlaylist(innerPlaylist, settings, sectionName) {
   let singlePlaylist = {};
+  let ignore = settings.ignore;
 
   if (sectionName !== null)
     singlePlaylist.section = sectionName;
@@ -287,6 +311,71 @@ function retrievePlaylist(innerPlaylist, ignore, sectionName) {
   if (!ignore.thumbnail) {
     let thumbnails = innerPlaylist.thumbnail.thumbnails;
     singlePlaylist.thumbnail = thumbnails[thumbnails.length - 1].url;
+  }
+
+  if ("longBylineText" in innerPlaylist) {
+
+    if (!ignore.uploader) {
+      singlePlaylist.uploader = "";
+      for (let run in innerPlaylist.longBylineText.runs) {
+        run = innerPlaylist.longBylineText.runs[run];
+        if ("navigationEndpoint" in run) {
+          singlePlaylist.uploader = run.text;
+          break;
+        }
+      }
+    }
+
+    if (!ignore.verified) {
+      singlePlaylist.verified = "false";
+      if ("ownerBadges" in innerPlaylist) {
+        for (let badge in innerPlaylist.ownerBadges) {
+          badge = innerPlaylist.ownerBadges[badge].metadataBadgeRenderer;
+          if (badge.style === "BADGE_STYLE_TYPE_VERIFIED") {
+            singlePlaylist.verified = "true";
+            break;
+          }
+        }
+      }
+    }
+
+    if (!ignore.handle) {
+      singlePlaylist.handle = "";
+      for (let run in innerPlaylist.longBylineText.runs) {
+        run = innerPlaylist.longBylineText.runs[run];
+        if ("navigationEndpoint" in run) {
+          let handle = run.navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+          if (handle[1] === "@") singlePlaylist.handle = handle;
+          break;
+        }
+      }
+    }
+
+    if (!ignore.channelId) {
+      singlePlaylist.channelId = "";
+      for (let run in innerPlaylist.longBylineText.runs) {
+        run = innerPlaylist.longBylineText.runs[run];
+        if ("navigationEndpoint" in run) {
+          singlePlaylist.channelId = run.navigationEndpoint.browseEndpoint.browseId;
+          break;
+        }
+      }
+    }
+
+  } else {
+    let channelInfo = settings.__channelInfo;
+
+    if (!ignore.uploader)
+      singlePlaylist.uploader = channelInfo.uploader;
+
+    if (!ignore.verified)
+      singlePlaylist.verified = channelInfo.verified;
+    
+    if (!ignore.handle)
+      singlePlaylist.handle = channelInfo.handle;
+
+    if (!ignore.channelId)
+      singlePlaylist.channelId = channelInfo.channelId;
   }
   
   return singlePlaylist;
@@ -350,6 +439,8 @@ function printPlaylist(singlePlaylist) {
   for (att in singlePlaylist) {
     if (att === "id")
       console.log("link: https://www.youtube.com/playlist?list=" + singlePlaylist[att]);
+    else if (att === "channelId")
+      console.log("channel: https://www.youtube.com/channel/" + singlePlaylist[att]);
     else
       console.log(att + ": " + singlePlaylist[att]);
   }
