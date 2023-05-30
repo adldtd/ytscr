@@ -99,6 +99,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
 
         let match = true;
         let type = "";
+        let cont = false;
 
         //Categorize response piece
 				if ("videoRenderer" in result) {
@@ -107,7 +108,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
 
 				} else if ("shelfRenderer" in result) {
           let section = result.shelfRenderer;
-          if ("verticalListRenderer" in section.content) { //*******************WHAT TYPE OF DATA DOESN'T HAVE THIS?
+          if ("verticalListRenderer" in section.content) { //*************WHAT TYPE OF DATA DOESN'T HAVE THIS?
             if (settings.search.savesections) {
 
               collectedResultsHolder = collectedResults;
@@ -152,10 +153,21 @@ async function scrapeResults(settings, config, timeout, searchData) {
           result = result.movieRenderer;
 
 				} else
-          continue;
+          cont = true;
 
         //Collect data from response (if limit not exceeded or module not focused)
-        if (!settings.search.focus[type] || typeCounter[type] >= settings[type].lim || typeMatchCounter[type] >= settings[type].limfilter) continue;
+        if (cont || !settings.search.focus[type] || typeCounter[type] >= settings[type].lim || typeMatchCounter[type] >= settings[type].limfilter) {
+          if (popped && inSection) {
+            let sectionData = {header: sectionTitle, results: collectedResults};
+            collectedResults = collectedResultsHolder;
+            collectedResultsHolder = null;
+            if (sectionData.results.length !== 0)
+              collectedResults.push(sectionData);
+            inSection = false;
+          }
+          continue;
+        }
+
         let singleResult = retrieveResult(result, settings, type);
         match = resultMatches(singleResult, settings[type].filter, type);
         
@@ -177,7 +189,8 @@ async function scrapeResults(settings, config, timeout, searchData) {
           let sectionData = {header: sectionTitle, results: collectedResults};
           collectedResults = collectedResultsHolder;
           collectedResultsHolder = null;
-          collectedResults.push(sectionData);
+          if (sectionData.results.length !== 0)
+            collectedResults.push(sectionData);
           inSection = false;
         }
 
@@ -212,7 +225,8 @@ async function scrapeResults(settings, config, timeout, searchData) {
       if (inSection) { //If this is true, savesections was specified; append the last section before returning collectedResults
         let sectionData = {header: sectionTitle, results: collectedResults};
         collectedResults = collectedResultsHolder;
-        collectedResults.push(sectionData);
+        if (sectionData.results.length !== 0)
+          collectedResults.push(sectionData);
       }
       break;
     }

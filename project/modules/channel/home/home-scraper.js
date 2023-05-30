@@ -234,20 +234,22 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
         if (!settings[type].savefilter || match) {
           if (settings.seperate && sectionType === null) //Not inside of a section
             savedHome[type].push(singleResult);
-          else
+          else {
             savedHome.push(singleResult);
+            if (sectionType !== null) sectionType = type; //sectionType is only not equal to "" when savedHome.length !== 0
+          }
         }
-
-        if (sectionType !== null) sectionType = type;
 
         //Append section data
         if (popped && sectionType !== null) {
           sectionData.results = savedHome;
           savedHome = savedHomeHolder;
-          if (settings.seperate)
-            savedHome[sectionType].push(sectionData);
-          else
-            savedHome.push(sectionData);
+          if (sectionType !== "") {
+            if (settings.seperate)
+              savedHome[sectionType].push(sectionData);
+            else
+              savedHome.push(sectionData);
+          }
           sectionType = null;
           savedHomeHolder = null;
         }
@@ -281,10 +283,12 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
       if (sectionType !== null) {
         sectionData.results = savedHome;
         savedHome = savedHomeHolder;
-        if (settings.seperate)
-          savedHome[sectionType].push(sectionData);
-        else
-          savedHome.push(sectionData);
+        if (sectionType !== "") {
+          if (settings.seperate)
+            savedHome[sectionType].push(sectionData);
+          else
+            savedHome.push(sectionData);
+        }
       }
     }
 
@@ -696,51 +700,69 @@ function retrievePlaylist(innerResult, settings) {
     singlePlaylist.thumbnail = thumbnails[thumbnails.length - 1].url;
   }
 
-  if (!ignore.uploader) {
-    singlePlaylist.uploader = "";
-    for (let run in innerResult.longBylineText.runs) {
-      run = innerResult.longBylineText.runs[run];
-      if ("navigationEndpoint" in run) { //Uploader found
-        singlePlaylist.uploader = run.text;
-        break;
-      }
-    }
-  }
+  if ("longBylineText" in innerResult) {
 
-  if (!ignore.verified) {
-    singlePlaylist.verified = "false";
-    if ("ownerBadges" in innerResult) {
-      for (let badge in innerResult.ownerBadges) {
-        badge = innerResult.ownerBadges[badge].metadataBadgeRenderer;
-        if (badge.style === "BADGE_STYLE_TYPE_VERIFIED") {
-          singlePlaylist.verified = "true";
+    if (!ignore.uploader) {
+      singlePlaylist.uploader = "";
+      for (let run in innerResult.longBylineText.runs) {
+        run = innerResult.longBylineText.runs[run];
+        if ("navigationEndpoint" in run) { //Uploader found
+          singlePlaylist.uploader = run.text;
           break;
         }
       }
     }
-  }
 
-  if (!ignore.handle) {
-    singlePlaylist.handle = "";
-    for (let run in innerResult.longBylineText.runs) {
-      run = innerResult.longBylineText.runs[run];
-      if ("navigationEndpoint" in run) {
-        let handle = run.navigationEndpoint.browseEndpoint.canonicalBaseUrl;
-        if (handle[1] === "@") singlePlaylist.handle = handle;
-        break;
+    if (!ignore.verified) {
+      singlePlaylist.verified = "false";
+      if ("ownerBadges" in innerResult) {
+        for (let badge in innerResult.ownerBadges) {
+          badge = innerResult.ownerBadges[badge].metadataBadgeRenderer;
+          if (badge.style === "BADGE_STYLE_TYPE_VERIFIED") {
+            singlePlaylist.verified = "true";
+            break;
+          }
+        }
       }
     }
-  }
 
-  if (!ignore.channelId) {
-    singlePlaylist.channelId = "";
-    for (let run in innerResult.longBylineText.runs) {
-      run = innerResult.longBylineText.runs[run];
-      if ("navigationEndpoint" in run) {
-        singlePlaylist.channelId = run.navigationEndpoint.browseEndpoint.browseId;
-        break;
+    if (!ignore.handle) {
+      singlePlaylist.handle = "";
+      for (let run in innerResult.longBylineText.runs) {
+        run = innerResult.longBylineText.runs[run];
+        if ("navigationEndpoint" in run) {
+          let handle = run.navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+          if (handle[1] === "@") singlePlaylist.handle = handle;
+          break;
+        }
       }
     }
+
+    if (!ignore.channelId) {
+      singlePlaylist.channelId = "";
+      for (let run in innerResult.longBylineText.runs) {
+        run = innerResult.longBylineText.runs[run];
+        if ("navigationEndpoint" in run) {
+          singlePlaylist.channelId = run.navigationEndpoint.browseEndpoint.browseId;
+          break;
+        }
+      }
+    }
+
+  } else {
+    let channelInfo = settings.__channelInfo;
+
+    if (!ignore.uploader)
+      singlePlaylist.uploader = channelInfo.uploader;
+
+    if (!ignore.verified)
+      singlePlaylist.verified = channelInfo.verified;
+
+    if (!ignore.handle)
+      singlePlaylist.handle = channelInfo.handle;
+
+    if (!ignore.channelId)
+      singlePlaylist.channelId = channelInfo.channelId;
   }
 
   return singlePlaylist;
