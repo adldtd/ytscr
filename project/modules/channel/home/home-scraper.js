@@ -987,7 +987,7 @@ const numAttributeFunctions = {
     videos: filterHelpers.durationToSec
   },
   size: {
-    playlists: parseInt
+    playlists: filterHelpers.commaSeperatedToNumerical
   },
   subscribers: {
     channels: filterHelpers.crunchSimpleViews

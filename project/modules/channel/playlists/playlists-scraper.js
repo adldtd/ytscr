@@ -1,4 +1,5 @@
 const helpers = require("../../../common/helpers");
+const filterHelpers = require("../../../common/filter_helpers");
 const {getTabData} = require("../channel_helpers");
 const {INFO, HEADER, PROG} = require("../../../common/verbosity_vars");
 
@@ -405,7 +406,7 @@ function playlistMatches(singlePlaylist, filter) {
 
     } else { //Num checker
 
-      let playlistCheck = parseInt(singlePlaylist[condition.check]);
+      let playlistCheck = filterHelpers.commaSeperatedToNumerical(singlePlaylist[condition.check]);
       switch (condition.compare) {
         case "less":
           returnMatch = playlistCheck < parseInt(condition.match);

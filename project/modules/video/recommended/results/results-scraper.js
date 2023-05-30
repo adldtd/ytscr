@@ -2,7 +2,7 @@ const path = require("path");
 const makeRequest = require(path.join(__dirname, "..", "..", "..", "..", "common", "helpers")).makeRequest;
 const clearLastLine = require(path.join(__dirname, "..", "..", "..", "..", "common", "helpers")).clearLastLine;
 const helpers = require(path.join(__dirname, "..", "..", "..", "..", "common", "helpers"));
-const filter_helpers = require(path.join(__dirname, "..", "..", "..", "..", "common", "filter_helpers"));
+const filterHelpers = require("../../../../common/filter_helpers");
 
 
 //*********************************************************************************
@@ -366,11 +366,11 @@ function recommendedMatches(singleRecommended, filter) {
       
       let recommendedCheck;
       if (condition.check === "views")
-        recommendedCheck = filter_helpers.crunchViewCount(singleRecommended["views"]);
+        recommendedCheck = filterHelpers.crunchViewCount(singleRecommended["views"]);
       else if (condition.check === "duration")
-        recommendedCheck = filter_helpers.durationToSec(singleRecommended["duration"]);
+        recommendedCheck = filterHelpers.durationToSec(singleRecommended["duration"]);
       else
-        recommendedCheck = parseInt(singleRecommended["size"]);
+        recommendedCheck = filterHelpers.commaSeperatedToNumerical(singleRecommended["size"]);
 
       switch (condition.compare) {
         case "less":

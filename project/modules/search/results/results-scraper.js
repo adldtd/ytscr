@@ -690,7 +690,7 @@ function retrieveMovie(innerData, settings) {
 const numAttributeFunctions = {views: null,
                                duration: filterHelpers.durationToSec,
                                subscribers: filterHelpers.crunchSimpleViews,
-                               size: parseInt,
+                               size: filterHelpers.commaSeperatedToNumerical,
                                year: parseInt};
 
 function resultMatches(singleResult, filter, type) {
