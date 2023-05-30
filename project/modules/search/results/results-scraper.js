@@ -225,7 +225,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
 
 	}
 
-  return collectedResults;
+  return {savedResults: collectedResults, length: counter};
 
 }
 
@@ -711,19 +711,12 @@ function resultMatches(singleResult, filter, type) {
     }
     else {
       
+      if (singleResult[condition.check] === "") continue;
       let resultCheck = null;
-      if (condition.check === "views") { //Check if the views were scraped from a video or short
-        if (singleResult["views"] !== "")
-          resultCheck = (type === "videos") ? filterHelpers.crunchViewCount(singleResult["views"]) : filterHelpers.crunchSimpleViews(singleResult["views"]);
-        else
-          resultCheck = 0;
-      } else
-        resultCheck = (singleResult[condition.check] !== "") ? numAttributeFunctions[condition.check](singleResult[condition.check]) : 0;
-
-      //if (isNaN(resultCheck)) {
-      //  console.log(condition);
-      //  throw new Error("NaN caught");
-      //}
+      if (condition.check === "views") //Check if the views were scraped from a video or short
+        resultCheck = (type === "videos") ? filterHelpers.crunchViewCount(singleResult["views"]) : filterHelpers.crunchSimpleViews(singleResult["views"]);
+      else
+        resultCheck = numAttributeFunctions[condition.check](singleResult[condition.check]);
 
       switch (condition.compare) {
         case "less":
@@ -758,10 +751,10 @@ function printResult(singleResult, type) {
   console.log("-------------------------------------------------------------------");
   for (att in singleResult) {
     if (att === "id") {
-      if (type === "videos")
+      if (type === "playlists" || type === "mixes")
+        console.log("link: https://www.youtube.com/playlist?list=" + singleResult[att]);
+      else //(type === "videos" || type === "shorts" || type === "movies")
         console.log("link: https://www.youtube.com/watch?v=" + singleResult[att]);
-      else //Playlist
-        console.log("link: https://www.youtube.com/playlist?list=" + singleResult[att])
     }
     else if (att === "channelId")
       console.log("channel: " + "https://www.youtube.com/channel/" + singleResult[att]);
@@ -785,10 +778,13 @@ function printResult(singleResult, type) {
 async function collectResults(settings, config, timeout, initialData) {
 
   global.sendvb(2, "\n");
-  let savedResults = await scrapeResults(settings, config, timeout, initialData);
+  let saved = await scrapeResults(settings, config, timeout, initialData);
   global.sendvb(2, "Complete");
 
-  if (savedResults.length === 0)
+  let savedResults = saved.savedResults;
+  let length = saved.length;
+
+  if (length === 0)
     global.sendvb(2, "No results found.");
 
   return savedResults;
