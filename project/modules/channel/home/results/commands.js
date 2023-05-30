@@ -142,6 +142,10 @@ const attributesChannels = {
     type: "num",
     simpleDescription: "Num. subscribers"
   },
+  videos: {
+    type: "num",
+    simpleDescription: "Num. videos uploaded"
+  },
   shortDescription: {
     type: "str",
     simpleDescription: "A snippet of the channel's description"

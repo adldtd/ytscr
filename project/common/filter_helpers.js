@@ -99,6 +99,7 @@ function priceToNum(price) {
 }
 
 
+module.exports.commaSeperatedToNumerical = commaSeperatedToNumerical;
 module.exports.crunchViewCount = crunchViewCount;
 module.exports.crunchSimpleViews = crunchSimpleViews;
 module.exports.durationToSec = durationToSec;

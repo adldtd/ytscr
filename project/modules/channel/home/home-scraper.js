@@ -108,7 +108,7 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
         let type = "";
         let typeId = 0;
 
-        //Multi-item data
+        //Multi-item data; unexpected to be found inside of a section
         if ("shelfRenderer" in result) {
           result = result.shelfRenderer;
 
@@ -158,6 +158,8 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
           continue;
         }
 
+        let cont = false;
+
         //Singular data
         if ("gridVideoRenderer" in result) { //Standard video
           type = "videos";
@@ -201,11 +203,24 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
           result = result.channelRenderer;
 
         } else
-          continue;
+          cont = true;
 
         //Check limits and focuses before continuing
-        if (!settings.focus[type] || allCounters[type] >= settings[type].lim || allMatchCounters[type] >= settings[type].limfilter)
+        if (cont || !settings.focus[type] || allCounters[type] >= settings[type].lim || allMatchCounters[type] >= settings[type].limfilter) {
+          if (popped && sectionType !== null) { //Section has ended; needs to be handled before moving on
+            sectionData.results = savedHome;
+            savedHome = savedHomeHolder;
+            if (sectionType !== "") { //Section is not empty; otherwise it cannot be pushed
+              if (settings.seperate)
+                savedHome[sectionType].push(sectionData);
+              else
+                savedHome.push(sectionData);
+            }
+            sectionType = null;
+            savedHomeHolder = null;
+          }
           continue;
+        }
 
         let singleResult = retrieveResult(result, settings, type, typeId);
         let match = resultMatches(singleResult, settings[type].filter, type);
@@ -229,7 +244,7 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
         if (popped && sectionType !== null) {
           sectionData.results = savedHome;
           savedHome = savedHomeHolder;
-          if (settings.seperate && sectionType !== "")
+          if (settings.seperate)
             savedHome[sectionType].push(sectionData);
           else
             savedHome.push(sectionData);
@@ -266,7 +281,7 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
       if (sectionType !== null) {
         sectionData.results = savedHome;
         savedHome = savedHomeHolder;
-        if (settings.seperate && sectionType !== "")
+        if (settings.seperate)
           savedHome[sectionType].push(sectionData);
         else
           savedHome.push(sectionData);
@@ -843,8 +858,19 @@ function retrieveChannel(innerResult, settings) {
     }
   }
 
-  if (!ignore.subscribers)
-    singleChannel.subscribers = innerResult.subscriberCountText.simpleText;
+  if (!ignore.subscribers) {
+    if ("subscriberCountText" in innerResult)
+      singleChannel.subscribers = innerResult.subscriberCountText.simpleText;
+    else
+      singleChannel.subscribers = "";
+  }
+
+  if (!ignore.videos) {
+    if ("videoCountText" in innerResult)
+      singleChannel.videos = innerResult.videoCountText.runs[0].text;
+    else
+      singleChannel.videos = "0";
+  }
 
   if (!ignore.shortDescription)
     singleChannel.shortDescription = "";
@@ -891,13 +917,18 @@ function retrieveChannel1(innerResult, settings) {
     }
   }
 
-  if (!ignore.subscribers) { //simpleText is not present if subscribers are replaced with an actual video count
-    if ("videoCountText" in innerResult && "simpleText" in innerResult.videoCountText)
-      singleChannel.subscribers = innerResult.videoCountText.simpleText;
-    else if ("subscriberCountText" in innerResult)
+  if (!ignore.subscribers) {
+    if ("subscriberCountText" in innerResult)
       singleChannel.subscribers = innerResult.subscriberCountText.simpleText;
     else
       singleChannel.subscribers = "";
+  }
+
+  if (!ignore.videos) {
+    if ("videoCountText" in innerResult)
+      singleChannel.videos = innerResult.videoCountText.runs[0].text;
+    else
+      singleChannel.videos = "0";
   }
 
   if (!ignore.shortDescription) {
@@ -938,6 +969,9 @@ const numAttributeFunctions = {
   },
   subscribers: {
     channels: filterHelpers.crunchSimpleViews
+  },
+  videos: {
+    channels: filterHelpers.commaSeperatedToNumerical
   }
 };
 
