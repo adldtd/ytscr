@@ -70,7 +70,7 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
       break;
     }
   }
-  if (innerData === null) return savedHome;
+  if (innerData === null) return {savedHome: savedHome, length: added};
 
   //Information for stacking
   let savedHomeHolder = null;

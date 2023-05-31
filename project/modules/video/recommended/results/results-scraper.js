@@ -30,6 +30,7 @@ function retrieveFirstRecommended(inner_api_key, videoResponse, config) {
 //*********************************************************************************
 async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, config, timeout, settings) {
 
+  let initialData = true;
   let savedRecommended = null;
 	if (settings.seperate) {
 		savedRecommended = {};
@@ -41,6 +42,7 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
 		savedRecommended = [];
   
   let counter = 0;
+  let added = 0;
   let typeCounter = {};
   let typeMatchCounter = {};
 
@@ -74,27 +76,28 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
     hasContinuation = false;
 
     let recommendations;
-    if (counter === 0) { //First request
+    if (initialData) { //First request
+      initialData = false;
 
       let pureData = retrieveFirstRecommended(inner_api_key, videoResponse, config);
-      if (pureData === -1) return savedRecommended;
+      if (pureData === -1) return {savedRecommended: savedRecommended, length: added};
       recommendations = pureData.contents.twoColumnWatchNextResults;
       if (!("secondaryResults" in recommendations)) {
         global.sendvb("Error: Recommendation bar not found.");
-        return savedRecommended;
+        return {savedRecommended: savedRecommended, length: added};
       }
       recommendations = recommendations.secondaryResults.secondaryResults.results;
 
     } else {
       let pureData = await makeRequest(config, timeout, 1, 2);
-      if (pureData === -1) return savedRecommended;
+      if (pureData === -1) return {savedRecommended: savedRecommended, length: added};
 
-      try {
-        recommendations = pureData.data.onResponseReceivedEndpoints[0].appendContinuationItemsAction.continuationItems;
-      } catch {
-        console.log(pureData.data);
-        process.exit(0);
-      }
+      //try {
+      recommendations = pureData.data.onResponseReceivedEndpoints[0].appendContinuationItemsAction.continuationItems;
+      //} catch {
+      //  console.log(pureData.data);
+      //  process.exit(0);
+      //}
     }
 
     //Iterate through videos
@@ -136,6 +139,7 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
       }
 
       if (!settings[type].savefilter || match) {
+        ++added;
         if (!settings.seperate)
           savedRecommended.push(singleRecommended);
         else
@@ -165,7 +169,7 @@ async function scrapeRecommended(inner_api_key, continuation_id, videoResponse, 
 
   }
 
-  return savedRecommended;
+  return {savedRecommended: savedRecommended, length: added};
 
 }
 
@@ -433,10 +437,13 @@ async function collectRecommended(settings, config, timeout, videoResponse) {
   let continuation_id = ""; //Initialized in the scraping function
 
   global.sendvb(2, "\n");
-  let savedRecommended = await scrapeRecommended(inner_api_key, continuation_id, videoResponse, config, timeout, settings);
+  let saved = await scrapeRecommended(inner_api_key, continuation_id, videoResponse, config, timeout, settings);
   global.sendvb(2, "Complete");
 
-  if (savedRecommended.length === 0)
+  let savedRecommended = saved.savedRecommended;
+  let length = saved.length;
+
+  if (length === 0)
     global.sendvb(2, "No recommendations found.");
 
   return savedRecommended;
