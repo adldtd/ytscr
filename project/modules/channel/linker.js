@@ -7,6 +7,7 @@
 var settings = {};
 
 settings.channel = require("./commands").settings;
+settings.meta = require("./meta/commands").settings;
 settings.home = require("./home/commands").settings;
   settings.videosResults = require("./home/results/commands").settingsVideos;
   settings.shortsResults = require("./home/results/commands").settingsShorts;
@@ -38,6 +39,7 @@ var currentState = {
 };
 
 currentState.channel = require("./commands").currentState;
+currentState.meta = require("./meta/commands").currentState;
 currentState.home = require("./home/commands").currentState;
   currentState.videosResults = require("./home/results/commands").currentStateVideos;
   currentState.shortsResults = require("./home/results/commands").currentStateShorts;

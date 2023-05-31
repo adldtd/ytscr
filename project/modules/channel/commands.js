@@ -5,6 +5,7 @@ const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "sub
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
 const { basicFilterableCli, basicUnfilterableCli } = require("../../common/cli_funcs");
 
+const meta_cmd = require("./meta/commands").cmd;
 const home_cmd = require("./home/commands").cmd;
 const videos_cmd = require("./videos/commands").cmd;
 const shorts_cmd = require("./shorts/commands").cmd;
@@ -30,15 +31,16 @@ const cmd = {
   
   modules: {
 
-    /*"meta": {
+    "meta": {
       aliases: ["meta"],
       simpleDescription: "Submodule for channel metadata",
       description: "A submodule that focuses on metadata found in the channel. Distinct from the \"about\" " +
       "submodule.",
       examples: ["meta [argument1] [argument2] ... #"],
-      cli: undefined,
+      cli: (args, currentState, settings) =>
+        basicUnfilterableCli(meta_cmd, "channel", "meta", args, currentState, settings),
       scrape: undefined
-    },*/
+    },
 
     "home": {
       aliases: ["home"],
