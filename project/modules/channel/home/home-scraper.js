@@ -7,6 +7,7 @@ const {INFO, HEADER, PROG} = require("../../../common/verbosity_vars");
 async function scrapeHome(savedHome, settings, config, timeout, innerData) {
 
   let counter = 0; //Stops the scraper when settings.lim is reached
+  let added = 0; //How many items were appended during scraping
   let allCounters = {}; //Counter for each "type" module
   let allMatchCounters = {}; //Match counter for each "type" module
 
@@ -232,6 +233,7 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
         }
 
         if (!settings[type].savefilter || match) {
+          ++added;
           if (settings.seperate && sectionType === null) //Not inside of a section
             savedHome[type].push(singleResult);
           else {
@@ -311,7 +313,7 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
     }
   }
 
-  return {savedHome: savedHome, length: counter};
+  return {savedHome: savedHome, length: added};
 
 }
 
@@ -1013,20 +1015,15 @@ function filterNumCheck(value, target, compare) {
   target = parseInt(target);
   switch (compare) {
     case "less":
-      returnMatch = value < target;
-      break;
+      return value < target;
     case "greater":
-      returnMatch = value > target;
-      break;
+      return value > target;
     case "lesseq":
-      returnMatch = value <= target;
-      break;
+      return value <= target;
     case "greatereq":
-      returnMatch = value >= target;
-      break;
+      return value >= target;
     default: //case "eq":
-      returnMatch = value === target;
-      break;
+      return value === target;
   }
 }
 
@@ -1044,6 +1041,7 @@ function resultMatches(singleResult, filter, type) {
       let casesensitive = "casesensitive" in condition ? condition.casesensitive : false;
 
       if (typeof(resultCheck) !== "string") { //Automatically assumed to be an array
+        returnMatch = false; //Ensures that, if the array is empty, no match is made
         for (let piece in resultCheck) {
           returnMatch = filterStringCheck(resultCheck[piece], conditionMatch, condition.compare, casesensitive);
           if (returnMatch) break; //Only one string in the array needs to match

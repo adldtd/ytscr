@@ -926,3 +926,34 @@ test(stage + "Multiple ignore", () => {
   let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ about --ignore views --ignore location --ignore linkNames --ignore joined #");
   expect(cli(parsed)).toBeInstanceOf(Array);
 });
+
+
+stage = "CHANNEL/HOME: ";
+
+test(stage + "No input", () => {
+  let parsed = parse("channel home");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No such command", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ home -----------------------");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Help called 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ home --help");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Help called 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ home -h -sep");
+  expect(cli(parsed)).toBe(1);
+});
+
+baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "home videos", "profilePicture", "duration");
+
+baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "home shorts", "thumbnail", "views");
+
+baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "home playlists", "shortVideoIds", "size");
+
+baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "home channels", "name", "videos");

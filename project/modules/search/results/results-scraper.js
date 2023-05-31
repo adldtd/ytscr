@@ -19,6 +19,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
 	let hasContinuation = true;
 
   let counter = 0;
+  let added = 0;
   let typeCounter = {};
   let typeMatchCounter = {};
 
@@ -179,6 +180,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
         }
 
         if (!settings[type].savefilter || match) {
+          ++added;
           if (settings.search.seperate)
             collectedResults[type].push(singleResult);
           else
@@ -239,7 +241,7 @@ async function scrapeResults(settings, config, timeout, searchData) {
 
 	}
 
-  return {savedResults: collectedResults, length: counter};
+  return {savedResults: collectedResults, length: added};
 
 }
 
