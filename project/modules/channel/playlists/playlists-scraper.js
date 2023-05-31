@@ -56,9 +56,12 @@ async function scrapePlaylists(settings, config, timeout, innerData) {
       }
     }
   }
-  channelInfo.handle = "/";
-  for (let run in header.channelHandleText.runs)
-    channelInfo.handle += header.channelHandleText.runs[run].text;
+  if ("channelHandleText" in header) {
+    channelInfo.handle = "/";
+    for (let run in header.channelHandleText.runs)
+      channelInfo.handle += header.channelHandleText.runs[run].text;
+  } else
+    channelInfo.handle = "";
   channelInfo.channelId = header.channelId;
 
   settings.__channelInfo = channelInfo;
@@ -72,7 +75,11 @@ async function scrapePlaylists(settings, config, timeout, innerData) {
     tab = tabs[tab].tabRenderer;
     if (tab.selected) {
       playlistsTab = tab;
-      sections = tab.content.sectionListRenderer.subMenu.channelSubMenuRenderer.contentTypeSubMenuItems;
+      sections = tab.content.sectionListRenderer;
+      if ("subMenu" in sections)
+        sections = sections.subMenu.channelSubMenuRenderer.contentTypeSubMenuItems;
+      else
+        sections = null;
       break;
     }
   }

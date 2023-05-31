@@ -957,3 +957,41 @@ baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "home shorts", "th
 baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "home playlists", "shortVideoIds", "size");
 
 baseFilterTests(stage, "UCiTCYv4F4eAz5AsNaJ_BNKQ", "channel", "home channels", "name", "videos");
+
+
+stage = "CHANNEL/META: ";
+
+test(stage + "No input", () => {
+  let parsed = parse("channel meta");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "No such command", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ meta --jjjjjjjjjjjjj");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Help called 1", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ meta --help");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Help called 2", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ meta -h --ignore");
+  expect(cli(parsed)).toBe(1);
+});
+
+test(stage + "Invalid ignore", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ meta --ignore FAKE_ATTRIBUTE");
+  expect(cli(parsed)).toBe(-1);
+});
+
+test(stage + "Successful ignore", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ meta --ignore videos");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});
+
+test(stage + "Multiple ignore", () => {
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ meta --ignore headerLinkNames --ignore headerLinks --ignore headerLinkIcons --ignore channelId --ignore banner");
+  expect(cli(parsed)).toBeInstanceOf(Array);
+});

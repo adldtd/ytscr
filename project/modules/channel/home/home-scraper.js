@@ -53,9 +53,12 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
   }
   { let thumbnails = header.avatar.thumbnails;
   channelInfo.profilePicture = thumbnails[thumbnails.length - 1].url; }
-  channelInfo.handle = "/";
-  for (let run in header.channelHandleText.runs)
-    channelInfo.handle += header.channelHandleText.runs[run].text;
+  if ("channelHandleText" in header) {
+    channelInfo.handle = "/";
+    for (let run in header.channelHandleText.runs)
+      channelInfo.handle += header.channelHandleText.runs[run].text;
+  } else
+    channelInfo.handle = "";
   channelInfo.channelId = header.channelId;
 
   settings.__channelInfo = channelInfo;
@@ -1107,11 +1110,12 @@ async function collectHome(settings, config, timeout, initialData) {
     savedHome = [];
 
   global.sendvb(HEADER, "\n");
-  let tabData = await getTabData(config, timeout, initialData, "Home");
+  /*let tabData = await getTabData(config, timeout, initialData, "Home");
   if (tabData === -1) {
     global.sendvb(HEADER, "No items found.");
     return savedHome;
-  }
+  }*/
+  let tabData = initialData; //The homepage should be automatically selected after the intitial request
 
   let saved = await scrapeHome(savedHome, settings, config, timeout, tabData);
   global.sendvb(HEADER, "Complete");
