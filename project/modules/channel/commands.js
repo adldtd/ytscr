@@ -16,6 +16,7 @@ const store_cmd = require("./store/commands").cmd;
 const channels_cmd = require("./channels/commands").cmd;
 const about_cmd = require("./about/commands").cmd;
 
+const meta_scrape = require("./meta/meta-scraper").scrape;
 const home_scrape = require("./home/home-scraper").scrape;
 const videos_scrape = require("./videos/videos-scraper").scrape;
 const shorts_scrape = require("./shorts/shorts-scraper").scrape;
@@ -39,7 +40,7 @@ const cmd = {
       examples: ["meta [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) =>
         basicUnfilterableCli(meta_cmd, "channel", "meta", args, currentState, settings),
-      scrape: undefined
+      scrape: meta_scrape
     },
 
     "home": {
