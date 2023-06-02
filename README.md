@@ -10,43 +10,48 @@ See the "Springboard" section below for more starting off points.
 
 ## Contents
 
-Currently, the tool contains two implemented modules: `video` and `search`. Listed below are it and other modules, alongside their inner submodules.
+Currently, the tool contains four implemented modules: `video`, `search`, `playlist`, and `channel`. Listed below are it and other modules, alongside their inner submodules.
 
-`video`: Retrieves information from a video link
-
--  `meta`: Gets the video metadata
-
--  `comments`: Gets video comments
-
--  `recommended`: Gets recommendations
-
-    -  `videos`: Deals with video/videolike recommendations
-
-    -  `playlists`: Deals with playlist recommendations
-
-    -  `mixes`: Deals with YouTube Mix recommendations
-
--  `chat`: Gets previous chat messages (if livestream or premiere)
-
-`search`: Retrieves information from a YouTube search
-
--  `meta`: Gets the search metadata
-
--  `videos`: Deals with video/videolike results
-
--  `shorts`: Deals with YouTube shorts
-
--  `channels`: Deals with channel results
-
--  `playlists`: Deals with playlist results
-
--  `mixes`: Deals with YouTube Mix results
-
--  `movies`: Deals with movie results
-
-`channel`: *Under construction.*
-
-`playlist`: *Under construction.*
+```
+ytscr
+├─ video           # Retrieves information from a video link
+│  ├─ meta              # Gets video metadata
+│  ├─ comments          # Gets video comments
+│  ├─ chat              # Gets video chat messages
+│  └─ recommended       # Gets recommendations
+│     ├─ videos             # Deals with video-type recommendations
+│     ├─ playlists          # Deals with playlist recommendations
+│     └─ mixes              # Deals with YouTube Mix recommendations
+├─ search           # Retrieves information from a YouTube search
+│  ├─ meta              # Gets search metadata
+│  ├─ videos            # Deals with video-type results
+│  ├─ shorts            # Deals with YouTube shorts
+│  ├─ channels          # Deals with channel results
+│  ├─ playlists         # Deals with playlist results
+│  ├─ mixes             # Deals with YouTube Mixes
+│  └─ movies            # Deals with movie results
+├─ playlist         # Retrieves information from a playlist link
+│  ├─ meta              # Gets the playlist's metadata
+│  └─ videos            # Gets the playlist's videos
+└─ channel          # Retrieves information from a channel link
+   ├─ meta              # Gets channel metadata
+   ├─ home              # Gets homepage results
+   │  ├─ videos             # Deals with video-type results
+   │  ├─ shorts             # Deals with YouTube shorts
+   │  ├─ playlists          # Deals with playlist results
+   │  └─ channels           # Deals with channel results
+   ├─ videos            # Gets "videos" tab results
+   ├─ shorts            # Gets "shorts" tab results
+   ├─ live              # Gets "live" tab results
+   ├─ playlists         # Gets "playlists" tab results
+   ├─ community         # Gets "community" tab results
+   │  ├─ video              # Deals with video-type post attachments
+   │  ├─ poll               # Deals with poll post attachments
+   │  └─ image              # Deals with image post attachments
+   ├─ store             # Gets "store" tab results
+   ├─ channels          # Gets "channel" tab results
+   └─ about             # Gets "about" tab information
+```
 
 ## Installation
 
