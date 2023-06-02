@@ -90,7 +90,7 @@ const cmd = {
       examples: ["playlists [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => {
         let result = basicFilterableCli(playlists_cmd, "channel", "playlists", args, currentState, settings);
-        if (result === -1 || result === 1) return result;
+        if (result !== 0) return result;
 
         if (settings.playlists.focusmode) { //Warns that unfocused or unexcluded sections will be automatically ignored
           for (let section in currentState.playlists.unwarnedSections) {
@@ -112,7 +112,7 @@ const cmd = {
       examples: ["community [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => {
         let result = basicFilterableCli(community_cmd, "channel", "community", args, currentState, settings);
-        if (result === -1 || result === 1) return result;
+        if (result !== 0) return result;
 
         if (settings.community.noattach) {
           for (let _ in currentState.community.focusList) {
@@ -146,7 +146,7 @@ const cmd = {
       examples: ["channels [argument1] [argument2] ... #"],
       cli: (args, currentState, settings) => {
         let result = basicFilterableCli(channels_cmd, "channel", "channels", args, currentState, settings);
-        if (result === -1 || result === 1) return result;
+        if (result !== 0) return result;
 
         if (settings.channels.focusmode) { //Warns that unfocused or unexcluded sections will be automatically ignored
           for (let section in currentState.channels.unwarnedSections) {

@@ -3,8 +3,6 @@ const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 
 const cmd = require(__dirname + "/commands").cmd;
-const verifyDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).verifyDmodule;
-const verifyFilterable = require(path.join(__dirname, "..", "..", "common", "subscribe-filterable")).verifyFilterable;
 
 const THIS_MODULE = "search";
 

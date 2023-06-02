@@ -3,10 +3,10 @@ const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
-const basicFilterableCli = require("../../common/cli_funcs").basicFilterableCli;
+const { basicFilterableCli, basicUnfilterableCli } = require("../../common/cli_funcs");
 
-const meta_cli = require(path.join(__dirname, "meta", "cli")).cli;
-const comment_cli = require(path.join(__dirname, "comments", "cli")).cli;
+const meta_cmd = require("./meta/commands").cmd;
+const comments_cmd = require("./comments/commands").cmd;
 const chat_cmd = require("./chat/commands").cmd;
 const recommended_cli = require(path.join(__dirname, "recommended", "cli")).cli;
 
@@ -32,17 +32,25 @@ const cmd = {
       description: "The submodule for retrieving inner video information (the title, uploader, description, " +
       "etc).",
       examples: ["meta [argument 1] [argument 2] ... #"],
-      cli: meta_cli,
+      cli: (args, currentState, settings) =>
+        basicUnfilterableCli(meta_cmd, "video", "meta", args, currentState, settings),
       scrape: meta_scraper
     },
 
     "comments": {
       aliases: ["comments"],
       simpleDescription: "Submodule for scraping comments from a YouTube video",
-      description: "The submodule for retrieving comment data inside a YouTube video. Will be ignored if 0 " +
-      "comments are found.",
+      description: "The submodule for retrieving comment data inside a YouTube video.",
       examples: ["comments [argument 1] [argument 2] ... #"],
-      cli: comment_cli,
+      cli: (args, currentState, settings) => {
+        let result = basicFilterableCli(comments_cmd, "video", "comments", args, currentState, settings);
+        if (result !== 0) return result;
+
+        if (!settings.comments.replies && !settings.comments.nrf)
+          console.log("WARNING: -nrf is specified alongside --noreply, making the former redundant (no replies will be saved).");
+
+        return 0;
+      },
       scrape: comment_scraper
     },
 

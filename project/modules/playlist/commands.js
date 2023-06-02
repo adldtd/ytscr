@@ -3,9 +3,9 @@ const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
-const basicFilterableCli = require("../../common/cli_funcs").basicFilterableCli;
+const { basicFilterableCli, basicUnfilterableCli } = require("../../common/cli_funcs");
 
-const meta_cli = require("./meta/cli").cli;
+const meta_cmd = require("./meta/commands").cmd;
 const videos_cmd = require("./videos/commands").cmd;
 
 const meta_scrape = require("./meta/meta-scraper").scrape;
@@ -21,7 +21,8 @@ const cmd = {
       simpleDescription: "Submodule for playlist metadata",
       description: "A submodule that focuses on the metadata inside the playlist.",
       examples: ["meta [argument1] [argument2] ... #"],
-      cli: meta_cli,
+      cli: (args, currentState, settings) =>
+        basicUnfilterableCli(meta_cmd, "playlist", "meta", args, currentState, settings),
       scrape: meta_scrape
     },
 

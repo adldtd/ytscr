@@ -1,12 +1,13 @@
 const path = require("path");
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
 const helpers = require("../../common/helpers");
-const map = helpers.map;
+//const map = helpers.map;
 
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
+const { basicUnfilterableCli } = require("../../common/cli_funcs");
 
-const meta_cli = require("./meta/cli").cli;
+const meta_cmd = require("./meta/commands").cmd;
 const results_cli = require("./results/cli").cli;
 
 
@@ -52,7 +53,8 @@ const cmd = {
       simpleDescription: "Submodule for search metadata",
       description: "A submodule that focuses on the metadata surrounding search results.",
       examples: ["meta [argument1] [argument2] ... #"],
-      cli: meta_cli,
+      cli: (args, currentState, settings, module) =>
+        basicUnfilterableCli(meta_cmd, "search", "meta", args, currentState, settings),
       scrape: undefined
     },
 
