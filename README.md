@@ -12,7 +12,7 @@ See the "Springboard" section below for more starting off points.
 
 Currently, the tool contains four implemented modules: `video`, `search`, `playlist`, and `channel`. Listed below are it and other modules, alongside their inner submodules.
 
-```
+```bash
 ytscr
 ├─ video           # Retrieves information from a video link
 │  ├─ meta              # Gets video metadata
