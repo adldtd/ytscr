@@ -3,8 +3,11 @@ const errors = require(path.join(__dirname, "..", "..", "..", "common", "errors"
 
 const subscribeDmoduleSimple = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-dmodule")).subscribeDmoduleSimple;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "..", "common", "subscribe-meta")).subscribeMeta;
+const { basicFilterableCli } = require("../../../common/cli_funcs");
 
-const results_cli = require("./results/cli").cli;
+const videosRecommended_cmd = require("./results/commands").cmd.videos;
+const playlistsRecommended_cmd = require("./results/commands").cmd.playlists;
+const mixesRecommended_cmd = require("./results/commands").cmd.mixes;
 
 
   /***************************************************/
@@ -21,7 +24,8 @@ const cmd = {
       simpleDescription: "Submodule for dealing with recommended videos",
       description: "A submodule that focuses solely on recommended videos.",
       examples: ["videos [argument1] [argument2] ... #"],
-      cli: results_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(videosRecommended_cmd, "video", "videosRecommended", args, currentState, settings),
       scrape: undefined
     },
 
@@ -30,7 +34,8 @@ const cmd = {
       simpleDescription: "Submodule for dealing with recommended playlists",
       description: "A submodule that focuses solely on recommended playlists.",
       examples: ["playlists [argument1] [argument2] ... #"],
-      cli: results_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(playlistsRecommended_cmd, "video", "playlistsRecommended", args, currentState, settings),
       scrape: undefined
     },
 
@@ -39,7 +44,8 @@ const cmd = {
       simpleDescription: "Submodule for dealing with recommended YouTube Mixes",
       description: "A submodule that focuses solely on recommeded mixes (infinite playlists).",
       examples: ["mixes [argument1] [argument2] .. #"],
-      cli: results_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(mixesRecommended_cmd, "video", "mixesRecommended", args, currentState, settings),
       scrape: undefined
     }
 

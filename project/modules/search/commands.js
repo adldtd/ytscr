@@ -5,10 +5,15 @@ const helpers = require("../../common/helpers");
 
 const subscribeDmodule = require(path.join(__dirname, "..", "..", "common", "subscribe-dmodule")).subscribeDmodule;
 const subscribeMeta = require(path.join(__dirname, "..", "..", "common", "subscribe-meta")).subscribeMeta;
-const { basicUnfilterableCli } = require("../../common/cli_funcs");
+const { basicFilterableCli, basicUnfilterableCli } = require("../../common/cli_funcs");
 
 const meta_cmd = require("./meta/commands").cmd;
-const results_cli = require("./results/cli").cli;
+const videos_cmd = require("./results/commands").cmd.videos;
+const shorts_cmd = require("./results/commands").cmd.shorts;
+const channels_cmd = require("./results/commands").cmd.channels;
+const playlists_cmd = require("./results/commands").cmd.playlists;
+const mixes_cmd = require("./results/commands").cmd.mixes;
+const movies_cmd = require("./results/commands").cmd.movies;
 
 
 const validTimeFrames = {LastHour: "",
@@ -53,7 +58,7 @@ const cmd = {
       simpleDescription: "Submodule for search metadata",
       description: "A submodule that focuses on the metadata surrounding search results.",
       examples: ["meta [argument1] [argument2] ... #"],
-      cli: (args, currentState, settings, module) =>
+      cli: (args, currentState, settings) =>
         basicUnfilterableCli(meta_cmd, "search", "meta", args, currentState, settings),
       scrape: undefined
     },
@@ -63,7 +68,8 @@ const cmd = {
       simpleDescription: "Submodule for working with video results",
       description: "A submodule that focuses on retrieved videos. Part of the greater \"results\" section.",
       examples: ["videos [argument1] [argument2] ... #"],
-      cli: results_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(videos_cmd, "search", "videos", args, currentState, settings),
       scrape: undefined
     },
 
@@ -74,7 +80,8 @@ const cmd = {
       "section. NOTE: Shorts are technically videos, just in this case they tend to have less search information " +
       "- thus they are made seperate.",
       examples: ["shorts [argument1] [argument2] ... #"],
-      cli: results_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(shorts_cmd, "search", "shorts", args, currentState, settings),
       scrape: undefined
     },
 
@@ -83,7 +90,8 @@ const cmd = {
       simpleDescription: "Submodule for working with channel results",
       description: "A submodule that focuses on retrieved channels. Part of the greater \"results\" section.",
       examples: ["channels [argument1] [argument2] ... #"],
-      cli: results_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(channels_cmd, "search", "channels", args, currentState, settings),
       scrape: undefined
     },
 
@@ -92,7 +100,8 @@ const cmd = {
       simpleDescription: "Submodule for working with playlist results",
       description: "A submodule that focuses on retrieved playlists. Part of the greater \"results\" section.",
       examples: ["playlists [argument1] [argument2] ... #"],
-      cli: results_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(playlists_cmd, "search", "playlists", args, currentState, settings),
       scrape: undefined
     },
 
@@ -103,7 +112,8 @@ const cmd = {
       "NOTE: Mixes are considered by YouTube as (infinite) playlists, though they tend to have less information " +
       "alongside them - thus they are made seperate.",
       examples: ["mixes [argument1] [argument2] ... #"],
-      cli: results_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(mixes_cmd, "search", "mixes", args, currentState, settings),
       scrape: undefined
     },
 
@@ -112,7 +122,8 @@ const cmd = {
       simpleDescription: "Submodule for working with movie results",
       description: "A submodule that focuses on retrieved movies. Part of the greater \"results\" section.",
       examples: ["movies [argument1] [argument2] ... #"],
-      cli: results_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(movies_cmd, "search", "movies", args, currentState, settings),
       scrape: undefined
     }
 

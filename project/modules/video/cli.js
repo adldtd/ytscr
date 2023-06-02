@@ -1,6 +1,7 @@
 const path = require("path");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 const errors = require(path.join(__dirname, "..", "..", "common", "errors"));
+const deepCopyVideo = require("../../common/deep_copy").deepCopyVideo;
 
 const cmd = require(__dirname + "/commands").cmd;
 
@@ -15,7 +16,7 @@ function cli(args, index) {
   let settings = require("./linker").settings;
   let currentState = require("./linker").currentState;
   if (global.TESTING) { //If not testing, no need to make copies, as the cli command will only be called once before the program ends
-    settings = helpers.deepCopy(settings);
+    settings = deepCopyVideo(settings);
     currentState = helpers.deepCopy(currentState);
   }
   currentState.index = index;

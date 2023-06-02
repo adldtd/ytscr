@@ -8,7 +8,7 @@ const { basicFilterableCli, basicUnfilterableCli } = require("../../common/cli_f
 const meta_cmd = require("./meta/commands").cmd;
 const comments_cmd = require("./comments/commands").cmd;
 const chat_cmd = require("./chat/commands").cmd;
-const recommended_cli = require(path.join(__dirname, "recommended", "cli")).cli;
+const recommended_cmd = require("./recommended/commands").cmd;
 
 const meta_scraper = require(path.join(__dirname, "meta", "meta-scraper")).scraper;
 const comment_scraper = require(path.join(__dirname, "comments", "comment-scraper")).scraper;
@@ -71,7 +71,8 @@ const cmd = {
       description: "The submodule for retrieving recommended videos. The amount of recommendations heavily depends " +
       "on the video type, its uploader, and the time of access.",
       examples: ["recommended [argument 1] [argument 2] ... #"],
-      cli: recommended_cli,
+      cli: (args, currentState, settings) => 
+        basicFilterableCli(recommended_cmd, "video", "recommended", args, currentState, settings),
       scrape: recommended_scraper
     }
 

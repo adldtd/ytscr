@@ -31,7 +31,7 @@ function cli(args, index) {
     if (parsed.isModule) {
     
       currentState.search.modulesCalled[parsed.command] = "";
-      let result = parsed.commandBox.cli(args, currentState, settings, parsed.command); //Results CLI needs a specific module name
+      let result = parsed.commandBox.cli(args, currentState, settings);
       if (result === -1 || result === 1) return result;
       
     } else {

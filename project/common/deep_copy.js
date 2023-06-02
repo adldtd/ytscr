@@ -1,5 +1,3 @@
-const deepCopyArr = require("./helpers").deepCopyArr;
-
 
 function applySet(obj, path, value) {
   for (let i = 0; i < path.length; i++) {
@@ -19,6 +17,27 @@ function deepCopyArrGeneral(arr, func) { //Helper for deep copy with arrays
     else newArr.push(item);
   }
   return newArr;
+}
+
+
+const videoLinks = {
+  videosRecommended: ["recommended", "videos"],
+  playlistsRecommended: ["recommended", "playlists"],
+  mixesRecommended: ["recommended", "mixes"]
+};
+
+function deepCopyVideo(keys) {
+  let newObj = {};
+  for (let key in keys) {
+    if (Array.isArray(keys[key])) newObj[key] = deepCopyArrGeneral(keys[key], deepCopyVideo);
+    else if (typeof keys[key] === "object") {
+      newObj[key] = deepCopyVideo(keys[key]);
+      if (key in videoLinks)
+        applySet(newObj, videoLinks[key], newObj[key]);
+    }
+    else newObj[key] = keys[key];
+  }
+  return newObj;
 }
 
 
@@ -48,4 +67,5 @@ function deepCopyChannel(keys) {
 }
 
 
+module.exports.deepCopyVideo = deepCopyVideo;
 module.exports.deepCopyChannel = deepCopyChannel;

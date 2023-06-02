@@ -11,9 +11,12 @@ settings.meta = require("./meta/commands").settings;
 settings.comments = require("./comments/commands").settings;
 settings.chat = require("./chat/commands").settings;
 settings.recommended = require("./recommended/commands").settings;
-settings.recommended.videos = require("./recommended/results/commands").videosSettings;
-settings.recommended.playlists = require("./recommended/results/commands").playlistsSettings;
-settings.recommended.mixes = require("./recommended/results/commands").mixesSettings;
+  settings.videosRecommended = require("./recommended/results/commands").videosSettings;
+  settings.playlistsRecommended = require("./recommended/results/commands").playlistsSettings;
+  settings.mixesRecommended = require("./recommended/results/commands").mixesSettings;
+  settings.recommended.videos = settings.videosRecommended;
+  settings.recommended.playlists = settings.playlistsRecommended;
+  settings.recommended.mixes = settings.mixesRecommended;
 
 
 var currentState = {
@@ -26,9 +29,9 @@ currentState.meta = require("./meta/commands").currentState;
 currentState.comments = require("./comments/commands").currentState;
 currentState.chat = require("./chat/commands").currentState;
 currentState.recommended = require("./recommended/commands").currentState;
-currentState.recommended.videos = require("./recommended/results/commands").videosCurrentState;
-currentState.recommended.playlists = require("./recommended/results/commands").playlistsCurrentState;
-currentState.recommended.mixes = require("./recommended/results/commands").mixesCurrentState;
+  currentState.videosRecommended = require("./recommended/results/commands").videosCurrentState;
+  currentState.playlistsRecommended = require("./recommended/results/commands").playlistsCurrentState;
+  currentState.mixesRecommended = require("./recommended/results/commands").mixesCurrentState;
 
 
 module.exports.settings = settings;
