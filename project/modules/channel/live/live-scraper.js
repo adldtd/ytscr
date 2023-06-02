@@ -30,8 +30,13 @@ async function scrapeLive(settings, config, timeout, innerData) {
               global.sendvb(INFO, "Error: \"Popular\" sort button could not be found. Continuing scraping.\n\n");
               contents = tab.content.richGridRenderer.contents;
             }
-          } else
-            contents = tab.content.richGridRenderer.contents;
+          } else {
+            contents = tab.content;
+            if ("richGridRenderer" in contents)
+              contents = contents.richGridRenderer.contents;
+            else
+              contents = null;
+          }
           
           break;
         }

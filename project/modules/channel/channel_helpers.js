@@ -6,7 +6,11 @@ async function getTabData(config, timeout, initialData, tabName) {
 
   let tabs = initialData.contents.twoColumnBrowseResultsRenderer.tabs;
   for (let tab in tabs) {
-    tab = tabs[tab].tabRenderer;
+    tab = tabs[tab];
+    if ("tabRenderer" in tab)
+      tab = tab.tabRenderer;
+    else
+      continue;
 
     if (tab.title === tabName) {
 

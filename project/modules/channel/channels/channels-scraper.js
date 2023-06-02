@@ -33,7 +33,11 @@ async function scrapeChannels(settings, config, timeout, innerData) {
     tab = tabs[tab].tabRenderer;
     if (tab.selected) {
       channelsTab = tab;
-      sections = tab.content.sectionListRenderer.subMenu.channelSubMenuRenderer.contentTypeSubMenuItems;
+      sections = tab.content.sectionListRenderer;
+      if ("subMenu" in sections)
+        sections = sections.subMenu.channelSubMenuRenderer.contentTypeSubMenuItems;
+      else
+        sections = null;
       break;
     }
   }

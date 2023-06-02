@@ -117,6 +117,125 @@ function diagStd(savedModule, ignore, limit) {
 }
 
 //*********************************************************************************
+//Checks if a module (with the possibility of having sections) adheres with given
+//options; expects a stream of data (non "meta-like")
+//*********************************************************************************
+function diagStdSectionStream(savedModule, ignore, limit, hasSections = false) {
+  if (savedModule.length === 0) return;
+
+  let stack = [{stream: savedModule, index: 0}]
+  let counter = 0;
+  while (stack.length !== 0) {
+    let current = stack[stack.length - 1];
+    let item = current.stream[current.index++];
+
+    if (current.index >= current.stream.length)
+      stack.pop();
+
+    if ("results" in item) {
+      if (!hasSections) //Assumed to be a section
+        throw Error("Unexpected section found with item:\n" + JSON.stringify(item, null, 2));
+      stack.push({stream: item.results, index: 0});
+      continue;
+    }
+
+    for (key in ignore) { //1st test
+      if (key in item && ignore[key][0])
+        throw Error("Ignored attribute \"" + key + "\" found in item:\n" + JSON.stringify(item, null, 2));
+      if (!(key in item) && !ignore[key][0])
+        throw Error("Unignored attribute \"" + key + "\" could not be found in item:\n" + JSON.stringify(item, null, 2));
+    }
+
+    ++counter;
+  }
+
+  if (counter > limit)
+    throw Error("Expected limit to be <= to " + limit + ", recieved " + counter);
+}
+
+//*********************************************************************************
+//Checks if a module, whose data might be divided into sections, adheres with given
+//options
+//*********************************************************************************
+function diagStdSections(savedModule, ignore, limit, combine) {
+
+  if (Array.isArray(savedModule) && !combine)
+    throw Error("Expected data to be combined into an array; recieved an object");
+  if (!Array.isArray(savedModule) && combine)
+    throw Error("Expected data to be seperated into sections; recieved an array");
+
+  let sections = [];
+  if (!combine) {
+    for (let section in savedModule)
+      sections.push(savedModule[section]);
+  } else
+    sections.push(savedModule);
+
+  let length = 0;
+  for (let section in sections) {
+    section = sections[section];
+    for (let item in section) {
+      item = section[item];
+
+      for (key in ignore) { //1st test
+        if (key in item && ignore[key][0])
+          throw Error("Ignored attribute \"" + key + "\" found in item:\n" + JSON.stringify(item, null, 2));
+        if (!(key in item) && !ignore[key][0])
+          throw Error("Unignored attribute \"" + key + "\" could not be found in item:\n" + JSON.stringify(item, null, 2));
+      }
+      if (!("section" in item) && combine)
+        throw Error("Expected attribute \"section\" could not be found in item:\n" + JSON.stringify(item, null, 2));
+      if ("section" in item && !combine)
+        throw Error("Unexpected attribute \"section\" found in item:\n" + JSON.stringify(item, null, 2));
+    }
+    length += section.length;
+  }
+
+  if (length > limit) //2nd test
+    throw Error("Expected limit to be <= to " + limit + ", recieved " + length);
+}
+
+//*********************************************************************************
+//Checks if a module, whose settings has both inner modules AND attributes, adheres
+//with given options
+//*********************************************************************************
+function diagStdIgnorableFilterable(savedModule, focus, ignore, limit, hasAttachments, modules = {}) {
+
+  if (savedModule.length > limit) //1st test
+    throw Error("Expected limit to be <= to " + limit + ", recieved " + savedModule.length);
+
+  for (let item in savedModule) {
+    item = savedModule[item];
+
+    for (let key in ignore) { //2nd test
+      if (key in modules) continue;
+
+      if (key in item && ignore[key][0])
+        throw Error("Ignored attribute \"" + key + "\" found in item:\n" + JSON.stringify(item, null, 2));
+      if (!(key in item) && !ignore[key][0])
+        throw Error("Unignored attribute \"" + key + "\" could not be found in item:\n" + JSON.stringify(item, null, 2));
+    }
+    if ("attachment" in item && !hasAttachments)
+      throw Error("Unexpected attribute \"attachment\" found in item:\n" + JSON.stringify(item, null, 2));
+    if (!("attachment" in item) && hasAttachments)
+      throw Error("Expected attribute \"attachment\" could not be found in item:\n" + JSON.stringify(item, null, 2));
+
+    if (hasAttachments && "attachmentType" in item && (item.attachmentType !== "") && focus[item.attachmentType][0]) {
+      let attach = item.attachment;
+      let type = item.attachmentType;
+
+      let innerIgnore = ignore[type][1];
+      for (let key in innerIgnore) { //3rd test
+        if (key in attach && innerIgnore[key][0])
+          throw Error("Ignored attribute \"" + key + "\" found in item:\n" + JSON.stringify(item, null, 2));
+        if (!(key in attach) && !innerIgnore[key][0])
+          throw Error("Unignored attribute \"" + key + "\" could not be found in item:\n" + JSON.stringify(item, null, 2));
+      }
+    }
+  }
+}
+
+//*********************************************************************************
 //Count all comments, including replies to comments
 //*********************************************************************************
 function countComments(savedModule) {
@@ -163,35 +282,54 @@ function diagComments(savedModule, ignore, limit, norp) {
 //Checks if a module in the form of a data "stream" (i.e. search results,
 //recommendations) adheres with given options
 //*********************************************************************************
-function diagStream(savedModule, focus, ignore, limits, overallLimit) {
-
+function diagStream(savedModule, focus, ignore, limits, overallLimit, hasSections = false) {
   let stream = savedModule;
-  let limit = 0;
-  for (let lim in limits) {
-    if (focus[lim][0])
-      limit += limits[lim][0];
-  }
-  
-  if (stream.length > limit) //1st test
-    throw Error("Expected limit to be <= to " + limit + ", recieved " + stream.length);
-  if (stream.length > overallLimit)
-    throw Error("Expected limit to be <= to " + overallLimit + " (for recommended), recieved " + stream.length);
+  if (stream.length === 0) return;
 
-  for (let item in stream) {
-    item = stream[item];
+  let moduleCounters = {}; //For limiting items of each type
+  for (let module in focus)
+    moduleCounters[module] = 0;
 
-    if (!focus[item.type][0]) //2nd test
+  let stack = [{stream: stream, index: 0}];
+  while (stack.length !== 0) {
+    let current = stack[stack.length - 1];
+    let item = current.stream[current.index++]; //Post-increment
+
+    if (current.index >= current.stream.length)
+      stack.pop();
+
+    if ("results" in item) { //Assumed to be a section
+      if (!hasSections)
+        throw Error("Unexpected section found with item:\n" + JSON.stringify(item, null, 2));
+      stack.push({stream: item.results, index: 0});
+      continue;
+    }
+
+    if (!focus[item.type][0]) //1st test
       throw Error("Item with type \"" + item.type + "\" recieved, yet module ignored:\n" + JSON.stringify(item, null, 2));
 
     let moduleIgnore = ignore[item.type][1];
-    for (key in moduleIgnore) { //3rd test
+    for (key in moduleIgnore) { //2nd test
       if (key in item && moduleIgnore[key][0])
         throw Error("Ignored attribute \"" + key + "\" found in item:\n" + JSON.stringify(item, null, 2));
       if (!(key in item) && !moduleIgnore[key][0])
         throw Error("Unignored attribute \"" + key + "\" could not be found in item:\n" + JSON.stringify(item, null, 2));
     }
+
+    ++moduleCounters[item.type];
   }
+
+  let length = 0;
+  for (let module in moduleCounters) {
+    if (moduleCounters[module] > limits[module][0]) //3rd test
+      throw Error("Expected limit for \"" + module + "\" to be <= to " + limits[module][0] + ", recieved " + moduleCounters[module]);
+    length += moduleCounters[module];
+  }
+
+  if (length > overallLimit) //4th test
+    throw Error("Expected limit to be <= to " + overallLimit + ", recieved " + length);
 }
+
 
 //*********************************************************************************
 //Checks if the submodules of the video module adhere with given options
@@ -295,6 +433,56 @@ function testPlaylist(savedData, focus, ignore, limits) {
 
 
 //*********************************************************************************
+//Checks if the submodules of the channel module adhere with given options.
+//Additionally, tests home.seperate, home.nosections, playlists.combine,
+//channels.combine, community.noattach
+//*********************************************************************************
+function testChannel(savedData, focus, ignore, limits, additionalData) {
+
+  for (let module in focus) {
+    if (module in savedData && !focus[module][0]) //1st test
+      throw Error("Unfocused submodule \"" + module + "\" found in saved data:\n" + JSON.stringify(savedData, null, 2));
+    if (!(module in savedData) && focus[module][0])
+      throw Error("Focused submodule \"" + module + "\" could not be found in saved data:\n" + JSON.stringify(savedData, null, 2));
+
+    if (!(module in savedData)) continue;
+
+    if (module === "home") {
+
+      if (additionalData.home.seperate) {
+        if (Array.isArray(savedData[module]))
+          throw Error("Expected submodule \"home\" to be seperated; recieved an array object");
+
+        let innerFocus = focus[module][1];
+        let innerData = savedData[module];
+
+        for (let innerModule in innerFocus) {
+          if (innerModule in innerData && !innerFocus[innerModule][0])
+            throw Error("Unfocused submodule \"" + innerModule + "\" found in inner data:\n" + JSON.stringify(innerData, null, 2));
+          if (!(innerModule in innerData) && innerFocus[innerModule][0])
+            throw Error("Focused submodule \"" + innerModule + "\" could not be found in inner data:\n" + JSON.stringify(innerData, null, 2));
+
+          if (!(innerModule in innerData)) continue;
+          
+          diagStdSectionStream(innerData[innerModule], ignore[module][1][innerModule][1], limits[module][1][innerModule][0], !additionalData.home.nosections);
+        }
+      } else
+        diagStream(savedData[module], focus[module][1], ignore[module][1], limits[module][1], limits[module][0], !additionalData.home.nosections)
+
+    } else if (module === "playlists" || module === "channels") {
+      diagStdSections(savedData[module], ignore[module][1], limits[module][0], additionalData[module].combine);
+
+    } else if (module === "community") {
+      let modules = {video: "", poll: "", image: ""};
+      diagStdIgnorableFilterable(savedData[module], focus[module][1], ignore[module][1], limits[module][0], !additionalData.community.noattach, modules);
+
+    } else
+      diagStd(savedData[module], ignore[module][1], limits[module][0]);
+  }
+}
+
+
+//*********************************************************************************
 //Maps a specified value to modules, its submodules, and their attributes; makes
 //assumptions on the structure of "settings"
 //*********************************************************************************
@@ -302,26 +490,31 @@ function mapVal(module, settings, val) {
   let mappedSettings = {};
   if (typeof(settings) !== "object") return mappedSettings; //Base case; "module" is actually an attribute
 
+  let found = false;
   if ("focus" in settings) { //Assumes that the key "focus" indicates a module
 
     for (let sub in settings.focus)
       mappedSettings[sub] = [val, mapVal(sub, settings[sub], val)];
-    return mappedSettings;
+    found = true;
 
-  } else if ("ignore" in settings) { //Assumes that the key "ignore" (for attributes) indicates a submodule
-
-    for (let att in settings.ignore)
-      mappedSettings[att] = [val, mapVal(att, settings.ignore[att], val)];
-    return mappedSettings;
-
-  } else if ("focus" in settings[module]) {
+  } else if (module in settings && "focus" in settings[module]) {
 
     for (let sub in settings[module].focus)
       mappedSettings[sub] = [val, mapVal(sub, settings[sub], val)];
-    return mappedSettings;
+    found = true;
+
+  }
+  
+  if ("ignore" in settings) { //Assumes that the key "ignore" (for attributes) indicates a submodule
+
+    for (let att in settings.ignore)
+      mappedSettings[att] = [val, mapVal(att, settings.ignore[att], val)];
+    found = true;
 
   }
 
+  if (found)
+    return mappedSettings;
   throw Error("Unexpected construct in module \"" + module + "\"");
 }
 
@@ -347,5 +540,6 @@ module.exports.diagStream = diagStream;
 module.exports.testVideo = testVideo;
 module.exports.testSearch = testSearch;
 module.exports.testPlaylist = testPlaylist;
+module.exports.testChannel = testChannel;
 module.exports.mapVal = mapVal;
 module.exports.printMapped = printMapped;

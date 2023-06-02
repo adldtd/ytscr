@@ -1,6 +1,6 @@
 const helpers = require("../../../common/helpers");
 const filterHelpers = require("../../../common/filter_helpers");
-const {getTabData} = require("../channel_helpers");
+//const {getTabData} = require("../channel_helpers");
 const {INFO, HEADER, PROG} = require("../../../common/verbosity_vars");
 
 
