@@ -7,8 +7,9 @@
 
 const commands = {
 
+  ".": {redirect: "#"},
   "#": {
-    aliases: ["#"],
+    aliases: ["#", "."],
     simpleDescription: "META COMMAND: Exits the \"scope\" of a module",
     description: "When typed, exits a module previously specified. By default, the user must specify a module " +
     "to scrape as the first argument to the command line. This module cannot be exited; however, a module's " +

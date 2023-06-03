@@ -23,7 +23,7 @@ function basicFilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, settin
         return -1;
       }
 
-    } else if (parsed.command === "#") {
+    } else if (parsed.command === "." || parsed.command === "#") {
 
       if (currentState[THIS_MODULE].inFilter) {
         currentState.error = errors.errorCodesScope(3, THIS_MODULE);
@@ -81,7 +81,7 @@ function basicUnfilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, sett
       let result = parsed.commandBox.cli(args, currentState, settings);
       if (result === -1 || result === 1) return result;
 
-    } else if (parsed.command === "#") {
+    } else if (parsed.command === "." || parsed.command === "#") {
       return 0; //Exit scope safely
 
     } else if (parsed.command === "--help" || parsed.command === "-h") {
@@ -132,7 +132,7 @@ function basicEntranceCli(cmd, THIS_MODULE, args, currentState, settings) {
       
     } else {
 
-      if (parsed.command === "#")
+      if (parsed.command === "." || parsed.command === "#")
         currentState.error = errors.errorCodesScope(0, THIS_MODULE); //To help avoid user confusion
       else if (parsed.command === "--help" || parsed.command === "-h") {
         
