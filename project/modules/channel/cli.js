@@ -17,7 +17,16 @@ function cli(args, index) {
   }
   currentState.index = index;
 
-  return basicEntranceCli(cmd, "channel", args, currentState, settings);
+  let result = basicEntranceCli(cmd, "channel", args, currentState, settings);
+  if (result === -1 || result === 1) return result;
+
+  if (settings.channel.output === "") { //Default destination
+    let id = helpers.safeSplit(settings.channel.input, "/", 1, true)[1];
+    let filename = "channel_" + id + ".json";
+    settings.channel.output = path.join(__dirname, "..", "..", "SAVES", filename);
+  }
+
+  return result;
 }
 
 

@@ -115,7 +115,7 @@ function basicUnfilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, sett
 }
 
 
-//Works with exactly one input and exactly one output (expected to be implemented in settings)
+//Works with exactly one input (expected to be implemented in settings)
 function basicEntranceCli(cmd, THIS_MODULE, args, currentState, settings) {
 
   while (currentState.index < args.length) {
@@ -168,11 +168,6 @@ function basicEntranceCli(cmd, THIS_MODULE, args, currentState, settings) {
 
   if (currentState.error)
     return -1;
-
-  if (settings[THIS_MODULE].output === "") { //Default destination
-    let filename = THIS_MODULE + "_" + settings[THIS_MODULE].input.split("?v=", 2)[1] + ".json";
-    settings[THIS_MODULE].output = path.join(__dirname, "..", "..", "SAVES", filename);
-  }
 
   return settings;
 }

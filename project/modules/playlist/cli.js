@@ -16,7 +16,16 @@ function cli(args, index) {
   }
   currentState.index = index;
   
-  return basicEntranceCli(cmd, "playlist", args, currentState, settings);
+  let result = basicEntranceCli(cmd, "playlist", args, currentState, settings);
+  if (result === -1 || result === 1) return result;
+
+  if (settings.playlist.output === "") { //Default destination
+    let id = settings.playlist.input.split("?list=")[1];
+    let filename = "playlist_" + id + ".json";
+    settings.playlist.output = path.join(__dirname, "..", "..", "SAVES", filename);
+  }
+
+  return result;
 }
 
 

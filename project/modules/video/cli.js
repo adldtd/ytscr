@@ -20,7 +20,15 @@ function cli(args, index) {
   }
   currentState.index = index;
 
-  return basicEntranceCli(cmd, "video", args, currentState, settings);
+  let result = basicEntranceCli(cmd, "video", args, currentState, settings);
+  if (result === -1 || result === 1) return result;
+
+  if (settings.video.output === "") { //Default destination
+    let filename = "video_" + settings.video.input.split("?v=", 2)[1] + ".json";
+    settings.video.output = path.join(__dirname, "..", "..", "SAVES", filename);
+  }
+
+  return result;
 }
 
 

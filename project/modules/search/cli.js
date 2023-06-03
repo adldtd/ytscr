@@ -19,7 +19,15 @@ function cli(args, index) {
   }
   currentState.index = index;
   
-  return basicEntranceCli(cmd, "search", args, currentState, settings);
+  let result = basicEntranceCli(cmd, "search", args, currentState, settings);
+  if (result === -1 || result === 1) return result;
+
+  if (settings.search.output === "") { //Default destination
+    let filename = "search_" + settings.search.input + ".json";
+    settings.search.output = path.join(__dirname, "..", "..", "SAVES", filename);
+  }
+
+  return result;
 }
 
 
