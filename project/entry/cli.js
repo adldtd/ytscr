@@ -1,6 +1,6 @@
 const path = require("path");
 const helpers = require(path.join(__dirname, "..", "common", "helpers"));
-const errors = require(path.join(__dirname, "..", "common", "errors"));
+//const errors = require(path.join(__dirname, "..", "common", "errors"));
 
 const cmd = require(__dirname + "/commands").cmd;
 

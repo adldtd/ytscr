@@ -1,5 +1,6 @@
 const helpers = require("./helpers");
 const errors = require("./errors");
+const path = require("path");
 
 
 function basicFilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, settings) {
@@ -47,6 +48,16 @@ function basicFilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, settin
       return -1;
   }
 
+  if ("modulesCalled" in currentState[THIS_MODULE]) {
+    for (md in currentState[THIS_MODULE].modulesCalled) { //Catches an error where a module is called but not focused
+      if (!settings[THIS_MODULE].focus[md]) {
+        console.log("Error: Module \"" + md + "\" is modified, but is either ignored or not focused");
+        currentState.error = true;
+        return -1;
+      }
+    }
+  }
+
   if (currentState[THIS_MODULE].inFilter) {
     currentState.error = errors.errorCodesScope(2, "--filter");
     return -1;
@@ -90,9 +101,83 @@ function basicUnfilterableCli(cmd, CALLER, THIS_MODULE, args, currentState, sett
       return -1;
   }
 
+  if ("modulesCalled" in currentState[THIS_MODULE]) {
+    for (md in currentState[THIS_MODULE].modulesCalled) { //Catches an error where a module is called but not focused
+      if (!settings[THIS_MODULE].focus[md]) {
+        console.log("Error: Module \"" + md + "\" is modified, but is either ignored or not focused");
+        currentState.error = true;
+        return -1;
+      }
+    }
+  }
+
   return 0; //No errors and no stopping commands called
+}
+
+
+//Works with exactly one input and exactly one output (expected to be implemented in settings)
+function basicEntranceCli(cmd, THIS_MODULE, args, currentState, settings) {
+
+  while (currentState.index < args.length) {
+
+    let parsed = helpers.parseArgs(args, currentState.index, cmd, currentState);
+    if (currentState.error) return -1;
+    currentState.index = parsed.currentIndex;
+
+    if (parsed.isModule) {
+    
+      currentState[THIS_MODULE].modulesCalled[parsed.command] = "";
+      let result = parsed.commandBox.cli(args, currentState, settings);
+      if (result === -1 || result === 1) return result;
+      
+    } else {
+
+      if (parsed.command === "#")
+        currentState.error = errors.errorCodesScope(0, THIS_MODULE); //To help avoid user confusion
+      else if (parsed.command === "--help" || parsed.command === "-h") {
+        
+        if (parsed.args.length === 0) {
+          helpers.outputHelpAll(cmd);
+          return 1;
+        } else {
+          let result = helpers.parseHelp(cmd, currentState, parsed);
+          return result;
+        }
+
+      } else //Default; non-meta commands
+        parsed.commandBox.call(parsed, currentState, currentState[THIS_MODULE], settings, settings[THIS_MODULE]);
+    }
+
+    if (currentState.error)
+      return -1;
+  }
+
+  //Check for required inputs/errors after the fact
+  if (settings[THIS_MODULE].input === "")
+    currentState.error = errors.errorCodesNums(4, "--input", 1, 0);
+  else {
+
+    for (md in currentState[THIS_MODULE].modulesCalled) { //Catches an error where a module is called but not focused
+      if (!settings[THIS_MODULE].focus[md]) {
+        console.log("Error: Module \"" + md + "\" is modified, but is either ignored or not focused");
+        currentState.error = true;
+        break;
+      }
+    }
+  }
+
+  if (currentState.error)
+    return -1;
+
+  if (settings[THIS_MODULE].output === "") { //Default destination
+    let filename = THIS_MODULE + "_" + settings[THIS_MODULE].input.split("?v=", 2)[1] + ".json";
+    settings[THIS_MODULE].output = path.join(__dirname, "..", "..", "SAVES", filename);
+  }
+
+  return settings;
 }
 
 
 module.exports.basicFilterableCli = basicFilterableCli;
 module.exports.basicUnfilterableCli = basicUnfilterableCli;
+module.exports.basicEntranceCli = basicEntranceCli;
