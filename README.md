@@ -57,9 +57,9 @@ ytscr
 
 To clone the project, run `git clone https://github.com/adldtd/ytscr`
 
-Make sure you have NodeJS and npm installed on your computer (recommended: Node 16.16.0, npm 8.1.0). Then, using your terminal, navigate to the cloned folder, then to `./project` and run `npm install` inside. This should install all required dependencies in a folder called node_modules, and it should link the CLI to the terminal. From there, run `ytscr` (or `node ytscr`) to get started.
+Make sure you have NodeJS and npm installed on your computer (recommended: Node 16.16.0, npm 8.1.0). Then, using your terminal, navigate to the cloned folder, then to `./project` and run `npm install` inside. This should install all required dependencies in a folder called node_modules, and (for Windows users) it should link the CLI to the terminal. From there, run `ytscr` to get started.
 
-NOTE: If the CLI command fails to link, alternatively you can navigate to `./project/entry` and run the script directly (substitute `ytscr` for `node ytscr.js`, with your arguments in front).
+NOTE: If the CLI command fails to link, or if you are on Linux, simply navigate to `./project/entry` and run `./ytscr` (for Windows users, `node ytscr`).
 
 ## Springboard
 
