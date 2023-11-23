@@ -1,11 +1,11 @@
 /project/node_modules
 /project/todo.txt
+/project/next_structure.txt
 /project/planner.txt
 /project/_DEBUG
 /project/SAVES/*
 !/project/SAVES/stub.txt
-/project/console-tracker.js
-/project/package-lock.json
+/project/common/console-tracker.js
 /project/tests/scratchboard.js
 .vscode
 livestream rules.txt
