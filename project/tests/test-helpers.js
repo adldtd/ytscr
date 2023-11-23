@@ -522,7 +522,7 @@ function mapVal(module, settings, val) {
 //Meant for printing out the output given by mapVal
 //*********************************************************************************
 function printMapped(mappedSettings, spaces = 2, adder = 2) {
-  if (mappedSettings === {})
+  if (Object.keys(mappedSettings).length === 0)
     return;
 
   for (let sub in mappedSettings) {

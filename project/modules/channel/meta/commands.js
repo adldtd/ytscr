@@ -30,17 +30,9 @@ const attributes = {
     type: "num",
     simpleDescription: "Num. videos uploaded"
   },
-  headerLinkNames: {
+  firstLink: {
     type: "str",
-    simpleDescription: "Listed header links' names"
-  },
-  headerLinks: {
-    type: "str",
-    simpleDescription: "Listed header links"
-  },
-  headerLinkIcons: {
-    type: "str",
-    simpleDescription: "Listed header links' icons"
+    simpleDescription: "One of the channel's listed links"
   },
   profilePicture: {
     type: "str",

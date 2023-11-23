@@ -1,7 +1,7 @@
 const {INFO, HEADER, PROG} = require("../../../common/verbosity_vars");
 
 
-function scrapeMeta(settings, config, timeout, innerData) {
+async function scrapeMeta(settings, config, timeout, innerData) {
 
   let savedMeta = {};
   innerData = innerData.header.c4TabbedHeaderRenderer;
@@ -40,46 +40,52 @@ function scrapeMeta(settings, config, timeout, innerData) {
       savedMeta.videos = "0";
   }
 
-  if (!ignore.headerLinkNames) {
-    savedMeta.headerLinkNames = [];
-    if ("headerLinks" in innerData) {
-      let headerLinks = innerData.headerLinks.channelHeaderLinksRenderer;
-      for (let header in headerLinks.primaryLinks)
-        savedMeta.headerLinkNames.push(headerLinks.primaryLinks[header].title.simpleText);
-      for (let header in headerLinks.secondaryLinks)
-        savedMeta.headerLinkNames.push(headerLinks.secondaryLinks[header].title.simpleText);
-    }
+  if (!ignore.firstLink) {
+    savedMeta.firstLink = "";
+    if ("headerLinks" in innerData)
+      savedMeta.firstLink = innerData.headerLinks.channelHeaderLinksViewModel.firstLink.content;
   }
 
-  if (!ignore.headerLinks) {
-    savedMeta.headerLinks = [];
-    if ("headerLinks" in innerData) {
-      let headerLinks = innerData.headerLinks.channelHeaderLinksRenderer;
-      for (let header in headerLinks.primaryLinks) {
-        let link = headerLinks.primaryLinks[header].navigationEndpoint.commandMetadata.webCommandMetadata.url;
-        savedMeta.headerLinks.push(link);
-      }
-      for (let header in headerLinks.secondaryLinks) {
-        let link = headerLinks.secondaryLinks[header].navigationEndpoint.commandMetadata.webCommandMetadata.url;
-        savedMeta.headerLinks.push(link);
-      }
-    }
-  }
+  // if (!ignore.headerLinkNames) {
+  //   savedMeta.headerLinkNames = [];
+  //   if ("headerLinks" in innerData) {
+  //     let headerLinks = innerData.headerLinks.channelHeaderLinksRenderer;
+  //     for (let header in headerLinks.primaryLinks)
+  //       savedMeta.headerLinkNames.push(headerLinks.primaryLinks[header].title.simpleText);
+  //     for (let header in headerLinks.secondaryLinks)
+  //       savedMeta.headerLinkNames.push(headerLinks.secondaryLinks[header].title.simpleText);
+  //   }
+  // }
 
-  if (!ignore.headerLinkIcons) {
-    savedMeta.headerLinkIcons = [];
-    if ("headerLinks" in innerData) {
-      let headerLinks = innerData.headerLinks.channelHeaderLinksRenderer;
-      for (let header in headerLinks.primaryLinks) {
-        let icons = headerLinks.primaryLinks[header].icon.thumbnails;
-        savedMeta.headerLinkIcons.push(icons[icons.length - 1].url);
-      }
-      for (let header in headerLinks.secondaryLinks) {
-        let icons = headerLinks.secondaryLinks[header].icon.thumbnails;
-        savedMeta.headerLinkIcons.push(icons[icons.length - 1].url);
-      }
-    }
-  }
+  // if (!ignore.headerLinks) {
+  //   savedMeta.headerLinks = [];
+  //   if ("headerLinks" in innerData) {
+  //     let headerLinks = innerData.headerLinks.channelHeaderLinksRenderer;
+  //     for (let header in headerLinks.primaryLinks) {
+  //       let link = headerLinks.primaryLinks[header].navigationEndpoint.commandMetadata.webCommandMetadata.url;
+  //       savedMeta.headerLinks.push(link);
+  //     }
+  //     for (let header in headerLinks.secondaryLinks) {
+  //       let link = headerLinks.secondaryLinks[header].navigationEndpoint.commandMetadata.webCommandMetadata.url;
+  //       savedMeta.headerLinks.push(link);
+  //     }
+  //   }
+  // }
+
+  // if (!ignore.headerLinkIcons) {
+  //   savedMeta.headerLinkIcons = [];
+  //   if ("headerLinks" in innerData) {
+  //     let headerLinks = innerData.headerLinks.channelHeaderLinksRenderer;
+  //     for (let header in headerLinks.primaryLinks) {
+  //       let icons = headerLinks.primaryLinks[header].icon.thumbnails;
+  //       savedMeta.headerLinkIcons.push(icons[icons.length - 1].url);
+  //     }
+  //     for (let header in headerLinks.secondaryLinks) {
+  //       let icons = headerLinks.secondaryLinks[header].icon.thumbnails;
+  //       savedMeta.headerLinkIcons.push(icons[icons.length - 1].url);
+  //     }
+  //   }
+  // }
 
   if (!ignore.profilePicture) {
     let thumbnails = innerData.avatar.thumbnails;
@@ -117,7 +123,7 @@ function scrapeMeta(settings, config, timeout, innerData) {
 async function collectMeta(settings, config, timeout, initialData) {
 
   global.sendvb(HEADER, "\n");
-  let savedMeta = scrapeMeta(settings, config, timeout, initialData);
+  let savedMeta = await scrapeMeta(settings, config, timeout, initialData);
   global.sendvb(HEADER, "Complete");
 
   return savedMeta;
