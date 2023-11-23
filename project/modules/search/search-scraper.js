@@ -1,5 +1,4 @@
 const path = require("path");
-const fs = require("fs");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 
 const meta_scraper = require("./meta/meta-scraper").scrape;
@@ -170,32 +169,19 @@ async function scrapeSearchModule(settings) {
 
   let savedData = {};
   let innerSettings = settings.search;
-
-  //Data to be passed in the request
-  let config = {
-    url: "__________",
-    authority: "www.youtube.com",
-    method: "GET", //Needs to be changed to POST later on
-    headers:
-    {
-      "user-agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
-      referer: "https://www.google.com/"
-    },
-    validateStatus: () => true
-  };
-
-  let timeout = innerSettings.timeout;
-  let url = "https://www.youtube.com/results?search_query=" + encodeURI(innerSettings.input); //Allows the user to pass Unicode strings
-  config.url = url;
   global.sendvb(1, "\nScraping from search query \"" + innerSettings.input + "\".");
 
+  let config = helpers.retrieveConfig();
+
+  let url = "https://www.youtube.com/results?search_query=" + encodeURI(innerSettings.input); //Allows the user to pass Unicode strings
+  config.url = url;
+  config.headers.referer = "https://www.google.com/";
+  config.data.context.client.originalUrl = url;
+  config.data.context.client.mainAppWebInfo.graftUrl = "/results?search_query=" + encodeURI(innerSettings.input);
+
+  let timeout = innerSettings.timeout;
   let response = await helpers.makeRequest(config, timeout, 1, 1);
   if (response == -1) return -1;
-
-  config.data = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "common", "config_data.json")));
-  config.data.context.client.originalUrl = url;
-  config.data.context.client.mainAppWebInfo.graftUrl = "/results?search_query=" + innerSettings.input;
-  config.data.query = innerSettings.input;
 
   let innerData = retrieveInitialResp(config, response);
   innerData = await applyFilters(config, innerData, innerSettings, timeout);

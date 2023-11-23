@@ -1,6 +1,5 @@
 const cmd = require(__dirname + "/commands").cmd;
 const path = require("path");
-const fs = require("fs");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 
 
@@ -51,26 +50,13 @@ function verifyResponse(resp) {
 
 async function scrapeVideoModule(settings) {
 
+  global.sendvb(1, "\nScraping video \"" + settings.video.input + "\"."); //Custom defined printing function
   let savedData = {};
 
-  //Data to be passed in the request
-  let config = {
-    url: "__________",
-    authority: "www.youtube.com",
-    method: "GET", //Needs to be changed to POST later on
-    headers:
-    {
-      "user-agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
-      referer: "__________"
-    },
-    validateStatus: () => true
-  };
+  let config = helpers.retrieveConfig();
 
   config.url = settings.video.input;
   config.headers.referer = settings.video.input;
-  global.sendvb(1, "\nScraping video \"" + settings.video.input + "\"."); //Custom defined printing function
-
-  config.data = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "common", "config_data.json")));
   config.data.context.client.originalUrl = config.headers.referer;
   config.data.context.client.mainAppWebInfo.graftUrl = config.headers.referer;
 

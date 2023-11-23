@@ -1,8 +1,9 @@
 const axios = require("axios").default;
+const {HeaderGenerator} = require("header-generator");
 const fs = require("fs");
-//const path = require("path");
 const readline = require("readline");
 const process = require("node:process");
+const path = require("path");
 
 const errors = require(__dirname + "/errors");
 
@@ -383,6 +384,29 @@ function unencodeURL(link) {
   return link;
 }
 
+//*********************************************************************************
+//Function for getting the default "configuration" at the start of each scraping
+//module
+//*********************************************************************************
+function retrieveConfig() {
+  let generator = new HeaderGenerator({operatingSystems: ["windows", "macos", "linux"], locales: ["en-US"]});
+  let fakeHeaders = generator.getHeaders(); //Generate information for a session
+
+  //Data to be passed in the request
+  let config = {
+    url: "__________",
+    authority: "www.youtube.com",
+    method: "GET", //Needs to be changed to POST later on
+    headers: {"user-agent": fakeHeaders["user-agent"]},
+    validateStatus: () => true
+  };
+
+  config.data = JSON.parse(fs.readFileSync(path.join(__dirname, "config_data.json")));
+  config.data["user-agent"] = config.headers["user-agent"];
+
+  return config;
+}
+
 
 function map(keys, val) { //Simple map function for objects
   let newObj = {};
@@ -432,6 +456,7 @@ module.exports.handleSaveJSON = handleSaveJSON;
 module.exports.safeSplit = safeSplit;
 module.exports.retrieveJSON = retrieveJSON;
 module.exports.unencodeURL = unencodeURL;
+module.exports.retrieveConfig = retrieveConfig;
 module.exports.map = map;
 module.exports.deepCopy = deepCopy;
 module.exports.deepCopyArr = deepCopyArr;

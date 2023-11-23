@@ -1,7 +1,6 @@
 const cmd = require(__dirname + "/commands").cmd;
 const {INFO, HEADER, PROG} = require("../../common/verbosity_vars");
 const path = require("path");
-const fs = require("fs");
 const helpers = require(path.join(__dirname, "..", "..", "common", "helpers"));
 
 
@@ -43,34 +42,21 @@ function verifyResponse(config, channelResp) {
 
 async function scrapeChannelModule(settings) {
 
+  global.sendvb(INFO, "\nScraping channel \"" + settings.channel.input + "\".");
   let savedData = {};
 
-  //Data to be passed in the request
-  let config = {
-    url: "__________",
-    authority: "www.youtube.com",
-    method: "GET", //Needs to be changed to POST later on
-    headers:
-    {
-      "user-agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
-      referer: "__________"
-    },
-    validateStatus: () => true
-  };
+  let config = helpers.retrieveConfig();
 
   config.url = settings.channel.input;
   config.headers.referer = settings.channel.input;
-  global.sendvb(INFO, "\nScraping channel \"" + settings.channel.input + "\".");
+  config.data.context.client.originalUrl = config.headers.referer;
+  config.data.context.client.mainAppWebInfo.graftUrl = config.headers.referer;
 
   let channelResp = await helpers.makeRequest(config, settings.channel.timeout, 1, 1);
   if (channelResp === -1) {
     global.sendvb(INFO, "No save made.");
     return -1;
   }
-
-  config.data = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "common", "config_data.json")));
-  config.data.context.client.originalUrl = config.headers.referer;
-  config.data.context.client.mainAppWebInfo.graftUrl = config.headers.referer;
 
   let innerData = verifyResponse(config, channelResp);
   if (innerData === -1) {
