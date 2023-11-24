@@ -992,6 +992,6 @@ test(stage + "Successful ignore", () => {
 });
 
 test(stage + "Multiple ignore", () => {
-  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ meta --ignore headerLinkNames --ignore headerLinks --ignore headerLinkIcons --ignore channelId --ignore banner");
+  let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ meta --ignore profilePicture --ignore firstLink --ignore subscribers --ignore channelId --ignore banner");
   expect(cli(parsed)).toBeInstanceOf(Array);
 });
