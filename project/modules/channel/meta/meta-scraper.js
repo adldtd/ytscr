@@ -1,7 +1,7 @@
 const {INFO, HEADER, PROG} = require("../../../common/verbosity_vars");
 
 
-async function scrapeMeta(settings, config, timeout, innerData) {
+function scrapeMeta(settings, config, timeout, innerData) {
 
   let savedMeta = {};
   innerData = innerData.header.c4TabbedHeaderRenderer;
@@ -123,7 +123,7 @@ async function scrapeMeta(settings, config, timeout, innerData) {
 async function collectMeta(settings, config, timeout, initialData) {
 
   global.sendvb(HEADER, "\n");
-  let savedMeta = await scrapeMeta(settings, config, timeout, initialData);
+  let savedMeta = scrapeMeta(settings, config, timeout, initialData);
   global.sendvb(HEADER, "Complete");
 
   return savedMeta;
