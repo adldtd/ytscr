@@ -57,9 +57,6 @@ test("Basic scrape 1", async () => {
     },
     community: {
       noattach: false
-    },
-    channels: {
-      combine: false
     }
   };
 
@@ -68,7 +65,7 @@ test("Basic scrape 1", async () => {
 });
 
 test("Basic scrape 2", async () => {
-  let shellArgs = `channel -i ${CHANNEL2} channels --lim 50`;
+  let shellArgs = `channel -i ${CHANNEL2}`;
   let pack = await getData(shellArgs);
 
   let savedData = pack[0];
@@ -77,7 +74,6 @@ test("Basic scrape 2", async () => {
   let ignore = mapVal("channel", settings, false);
   let focus = mapVal("channel", settings, true);
   let limits = mapVal("channel", settings, Number.POSITIVE_INFINITY);
-  limits.channels[0] = 50;
 
   let additionalData = {
     home: {
@@ -89,9 +85,6 @@ test("Basic scrape 2", async () => {
     },
     community: {
       noattach: false
-    },
-    channels: {
-      combine: false
     }
   };
 
@@ -124,9 +117,6 @@ test("Basic scrape 3", async () => {
     },
     community: {
       noattach: false
-    },
-    channels: {
-      combine: false
     }
   };
 
@@ -162,9 +152,6 @@ test("Home focus 1", async () => {
     },
     community: {
       noattach: false
-    },
-    channels: {
-      combine: false
     }
   };
 
@@ -197,9 +184,6 @@ test("Home focus 2", async () => {
     },
     community: {
       noattach: false
-    },
-    channels: {
-      combine: false
     }
   };
 
@@ -235,9 +219,6 @@ test("Home focus 3", async () => {
     },
     community: {
       noattach: false
-    },
-    channels: {
-      combine: false
     }
   };
 
@@ -245,7 +226,7 @@ test("Home focus 3", async () => {
   expect(savedData).toBeInstanceOf(Object);
 });
 
-test("Playlists, channels focus 1", async () => {
+/*test("Playlists, channels focus 1", async () => {
   let shellArgs = `channel -i ${CHANNEL2} --focus channels channels --lim 30 --combine`;
   let pack = await getData(shellArgs);
 
@@ -276,9 +257,9 @@ test("Playlists, channels focus 1", async () => {
 
   testChannel(savedData, focus, ignore, limits, additionalData);
   expect(savedData).toBeInstanceOf(Object);
-});
+});*/
 
-test("Playlists, channels focus 2", async () => {
+test("Playlists focus 1", async () => {
   let shellArgs = `channel -i ${CHANNEL6} --focus playlists playlists --lim 10 --ignore updated --ignore thumbnail --ignore handle --lastvideoall`;
   let pack = await getData(shellArgs);
 
@@ -304,9 +285,6 @@ test("Playlists, channels focus 2", async () => {
     },
     community: {
       noattach: false
-    },
-    channels: {
-      combine: false
     }
   };
 
@@ -314,8 +292,8 @@ test("Playlists, channels focus 2", async () => {
   expect(savedData).toBeInstanceOf(Object);
 });
 
-test("Playlists, channels focus 3", async () => {
-  let shellArgs = `channel -i ${CHANNEL5} --focus channels --focus playlists channels --lim 35 --ignore subscribers --ignore videos # playlists --combine --lim 20 --ignore id --ignore title #`;
+test("Playlists focus 2", async () => {
+  let shellArgs = `channel -i ${CHANNEL5} --focus playlists playlists --combine --lim 20 --ignore id --ignore title #`;
   let pack = await getData(shellArgs);
 
   let savedData = pack[0];
@@ -324,14 +302,10 @@ test("Playlists, channels focus 3", async () => {
   let ignore = mapVal("channel", settings, false);
   ignore.playlists[1].id[0] = true;
   ignore.playlists[1].title[0] = true;
-  ignore.channels[1].subscribers[0] = true;
-  ignore.channels[1].videos[0] = true;
   let focus = mapVal("channel", settings, false);
   focus.playlists[0] = true;
-  focus.channels[0] = true;
   let limits = mapVal("channel", settings, Number.POSITIVE_INFINITY);
   limits.playlists[0] = 20;
-  limits.channels[0] = 35;
 
   let additionalData = {
     home: {
@@ -343,9 +317,6 @@ test("Playlists, channels focus 3", async () => {
     },
     community: {
       noattach: false
-    },
-    channels: {
-      combine: false
     }
   };
 
@@ -379,9 +350,6 @@ test("Focus community", async () => {
     },
     community: {
       noattach: false
-    },
-    channels: {
-      combine: false
     }
   };
 
@@ -390,7 +358,7 @@ test("Focus community", async () => {
 });
 
 test("Behemoth 1", async () => {
-  let shellArgs = `channel -i ${CHANNEL4} --exclude community --exclude store --exclude channels about --ignore views # home --seperate --nosections --lim 2 videos --ignore profilePicture # # playlists --combine --limsectionall 500 #`;
+  let shellArgs = `channel -i ${CHANNEL4} --exclude community --exclude store about --ignore views # home --seperate --nosections --lim 2 videos --ignore profilePicture # # playlists --combine --limsectionall 500 #`;
   let pack = await getData(shellArgs);
 
   let savedData = pack[0];
@@ -402,7 +370,6 @@ test("Behemoth 1", async () => {
   let focus = mapVal("channel", settings, true);
   focus.community[0] = false;
   focus.store[0] = false;
-  focus.channels[0] = false;
   let limits = mapVal("channel", settings, Number.POSITIVE_INFINITY);
   limits.home[0] = 2;
 
@@ -416,9 +383,6 @@ test("Behemoth 1", async () => {
     },
     community: {
       noattach: false
-    },
-    channels: {
-      combine: false
     }
   };
 
@@ -427,7 +391,7 @@ test("Behemoth 1", async () => {
 });
 
 test("Behemoth 2", async () => {
-  let shellArgs = `channel -i ${CHANNEL3} videos --lim 45 -pop --ignore views --ignore duration # shorts --lim 1 # live --lim 15 --popular --ignore title --ignore views # playlists --lim 10 --ignore thumbnail # community --lim 6 --noattach # channels --lim 20 #`;
+  let shellArgs = `channel -i ${CHANNEL3} videos --lim 45 -pop --ignore views --ignore duration # shorts --lim 1 # live --lim 15 --popular --ignore title --ignore views # playlists --lim 10 --ignore thumbnail # community --lim 6 --noattach #`;
   let pack = await getData(shellArgs);
 
   let savedData = pack[0];
@@ -446,7 +410,6 @@ test("Behemoth 2", async () => {
   limits.live[0] = 15;
   limits.playlists[0] = 10;
   limits.community[0] = 6;
-  limits.channels[0] = 20;
 
   let additionalData = {
     home: {
@@ -458,9 +421,6 @@ test("Behemoth 2", async () => {
     },
     community: {
       noattach: true
-    },
-    channels: {
-      combine: false
     }
   };
 

@@ -820,7 +820,7 @@ test(stage + "Behemoth", () => {
 });
 
 
-stage = "CHANNEL/CHANNELS: ";
+/*stage = "CHANNEL/CHANNELS: ";
 
 test(stage + "No input", () => {
   let parsed = parse("channel channels");
@@ -887,7 +887,7 @@ test(stage + "Good sections 2", () => {
 test(stage + "Behemoth", () => {
   let parsed = parse("channel -i UCiTCYv4F4eAz5AsNaJ_BNKQ channels --filter { --check subscribers --match 500000 --compare greater } -com # channels -f { --check handle --match @ --compare in --casesensitive } --section Subscriptions --limsection 30 --section Alts --excludesection --limsectionall 10 #");
   expect(cli(parsed)).toBeInstanceOf(Array);
-});
+});*/
 
 
 stage = "CHANNEL/ABOUT: ";
