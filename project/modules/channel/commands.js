@@ -13,7 +13,6 @@ const live_cmd = require("./live/commands").cmd;
 const playlists_cmd = require("./playlists/commands").cmd;
 const community_cmd = require("./community/commands").cmd;
 const store_cmd = require("./store/commands").cmd;
-const channels_cmd = require("./channels/commands").cmd;
 const about_cmd = require("./about/commands").cmd;
 
 const meta_scrape = require("./meta/meta-scraper").scrape;
@@ -24,7 +23,6 @@ const live_scrape = require("./live/live-scraper").scrape;
 const playlists_scrape = require("./playlists/playlists-scraper").scrape;
 const community_scrape = require("./community/community-scraper").scrape;
 const store_scrape = require("./store/store-scraper").scrape;
-const channels_scrape = require("./channels/channels-scraper").scrape;
 const about_scrape = require("./about/about-scraper").scrape;
 
 
@@ -139,7 +137,7 @@ const cmd = {
       scrape: store_scrape
     },
 
-    "channels": {
+    /*"channels": {
       aliases: ["channels"],
       simpleDescription: "Submodule for the channel's channels tab",
       description: "A submodule that focuses on the channel's listed channels.",
@@ -159,7 +157,7 @@ const cmd = {
         return 0;
       },
       scrape: channels_scrape
-    },
+    },*/
 
     "about": {
       aliases: ["about"],
