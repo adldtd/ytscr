@@ -75,6 +75,9 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
   }
   if (innerData === null) return {savedHome: savedHome, length: added};
 
+  if ("channelOwnerEmptyStateRenderer" in innerData[0]) //Home is completely empty
+    return {savedHome: savedHome, length: added};
+
   //Information for stacking
   let savedHomeHolder = null;
   let sectionData = null;
@@ -88,8 +91,7 @@ async function scrapeHome(savedHome, settings, config, timeout, innerData) {
     hasContinuation = false;
     let contents = innerData;
 
-    for (let item in contents) {
-      item = contents[item];
+    for (let item of contents) {
 
       if ("continuationItemRenderer" in item) {
         config.data.continuation = item.continuationItemRenderer.continuationEndpoint.continuationCommand.token;
@@ -927,6 +929,10 @@ function retrieveChannel1(innerResult, settings) {
     singleChannel.type = "channels";
   let ignore = settings.channels.ignore;
 
+  let hasVideoCount = true;
+  if ("subscriberCountText" in innerResult && innerResult.subscriberCountText.simpleText[0] === "@")
+    hasVideoCount = false; //Means the video count does not exist; values are "shifted" in the JSON
+
   if (!ignore.name)
     singleChannel.name = innerResult.title.simpleText;
   
@@ -945,16 +951,23 @@ function retrieveChannel1(innerResult, settings) {
   }
 
   if (!ignore.subscribers) {
-    if ("subscriberCountText" in innerResult)
-      singleChannel.subscribers = innerResult.subscriberCountText.simpleText;
-    else
-      singleChannel.subscribers = "";
+    if (hasVideoCount) {
+      if ("subscriberCountText" in innerResult)
+        singleChannel.subscribers = innerResult.subscriberCountText.simpleText;
+      else
+        singleChannel.subscribers = "";
+    } else {
+      if ("videoCountText" in innerResult) //Subscribers are shifted to the video count section
+        singleChannel.subscribers = innerResult.videoCountText.simpleText;
+      else
+        singleChannel.subscribers = "";
+    }
   }
 
   if (!ignore.videos) {
-    if ("videoCountText" in innerResult)
-      singleChannel.videos = innerResult.videoCountText.runs[0].text;
-    else
+    if (("videoCountText" in innerResult) && hasVideoCount) {
+      singleChannel.videos = innerResult.videoCountText.simpleText;
+    } else
       singleChannel.videos = "0";
   }
 
