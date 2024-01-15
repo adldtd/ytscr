@@ -49,7 +49,6 @@ ytscr
    │  ├─ poll               # Deals with poll post attachments
    │  └─ image              # Deals with image post attachments
    ├─ store             # Gets "store" tab results
-   ├─ channels          # Gets "channel" tab results
    └─ about             # Gets "about" tab information
 ```
 
