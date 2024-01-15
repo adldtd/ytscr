@@ -199,7 +199,7 @@ function outputHelpAll(cmd) {
       let text = "";
       if (typeof(section[c]) === "string")
         text = section[c];
-      else if ("simpleDescription" in section[c])
+      else if ("simpleDescription" in section[c]) //If this is not present, the argument is either a redirect or hidden
         text = section[c].simpleDescription;
       else
         continue;

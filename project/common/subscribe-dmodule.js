@@ -62,11 +62,21 @@ const commands = {
   "--nosave":
   {
     aliases: ["--nosave"],
-    simpleDescription: "If the contents retrieved should be saved",
+    //simpleDescription: "If the contents retrieved should be saved",
     description: "When present, the program will not save any scraped results. This may be useful when simply " +
     "testing requests and/or custom configurations.",
     call: nosaveCall,
     numArgs: 0
+  },
+
+  "--timeout":
+  {
+    aliases: ["--timeout"],
+    //simpleDescription: "Time between requests (in ms)",
+    description: "Specifies how much time (in milliseconds) the program will wait in between YouTube requests. " +
+    "Set at 1000 (1 second) by default. WARNING: Numbers lower than 1000 may result in rate limiting.",
+    call: timeoutCall,
+    numArgs: 1
   },
 
   "--verbose":
@@ -183,6 +193,18 @@ function outputCall(parsed, currentState, innerState, settings, innerSettings) {
 
 function nosaveCall(parsed, currentState, innerState, settings, innerSettings) {
   innerSettings.save = false;
+}
+
+function timeoutCall(parsed, currentState, innerState, settings, innerSettings) {
+  let c = parsed.command; let a = parsed.args[0];
+
+  let t = parseInt(a);
+  if (isNaN(a))
+    return currentState.error = errors.errorCodes(16, c, a);
+  if (t <= 0)
+    return currentState.error = errors.errorCodes(15, c, a);
+
+  innerSettings.timeout = t;
 }
 
 function verboseCall(parsed, currentState, innerState, settings, innerSettings) {

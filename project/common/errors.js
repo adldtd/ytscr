@@ -136,17 +136,17 @@ function errorCodes(code, arg, value = "") {
   
   switch (code) {
 
-    case -5:
+    case -5: //Bad channel link
       console.log("Error: Invalid channel link \"" + value + "\"");
       break;
-    case -4:
+    case -4: //Bad playlist link
       console.log("Error: Invalid playlist link \"" + value + "\"");
       break;
     case -3: //Bad search query
       console.log("Error: Bad search query \"" + value + "\"");
       break;
-    case -2: //Bad link
-      console.log("Error: Invalid YouTube link \"" + value + "\"");
+    case -2: //Bad video link
+      console.log("Error: Invalid video link \"" + value + "\"");
       break;
     case -1: //Multiple inputs
       console.log("Error: Must specify only one value for command \"" + arg + "\"");
