@@ -110,7 +110,7 @@ async function applyFilters(config, innerData, innerSettings, timeout) {
       filterFound = false;
 
       //Inner filter groups
-      let groups = innerData.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.subMenu.searchSubMenuRenderer.groups;
+      let groups = innerData.header.searchHeaderRenderer.searchFilterButton.buttonRenderer.command.openPopupAction.popup.searchFilterOptionsDialogRenderer.groups;
       for (let group in groups) {
         group = groups[group].searchFilterGroupRenderer;
         if (group.title.simpleText !== filterToGroup[filter]) continue;

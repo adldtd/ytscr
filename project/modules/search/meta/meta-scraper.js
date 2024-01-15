@@ -28,7 +28,7 @@ async function scrapeMetadata(settings, config, timeout, initialData) {
       validateStatus: () => true
     };
 
-    newConfig.url += settings.search.input + "&xhr=t&xssi=t";
+    newConfig.url += encodeURI(settings.search.input) + "&xhr=t&xssi=t";
     let response = await helpers.makeRequest(newConfig, timeout, 1, 1);
     if (response === -1) return collectedMeta;
 
