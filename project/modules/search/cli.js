@@ -31,4 +31,4 @@ function cli(args, index) {
 }
 
 
-  module.exports.cli = cli;
+module.exports.cli = cli;

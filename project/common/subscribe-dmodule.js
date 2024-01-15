@@ -59,6 +59,16 @@ const commands = {
     numArgs: 1
   },
 
+  "--nosave":
+  {
+    aliases: ["--nosave"],
+    simpleDescription: "If the contents retrieved should be saved",
+    description: "When present, the program will not save any scraped results. This may be useful when simply " +
+    "testing requests and/or custom configurations.",
+    call: nosaveCall,
+    numArgs: 0
+  },
+
   "--verbose":
   {
     aliases: ["--verbose"],
@@ -169,6 +179,10 @@ function outputCall(parsed, currentState, innerState, settings, innerSettings) {
     filename += ".json"; //Force the filetype
 
   innerSettings.output = filepath + (forwardSlashSplit ? "/" : "\\") + filename;
+}
+
+function nosaveCall(parsed, currentState, innerState, settings, innerSettings) {
+  innerSettings.save = false;
 }
 
 function verboseCall(parsed, currentState, innerState, settings, innerSettings) {

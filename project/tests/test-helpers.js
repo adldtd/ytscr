@@ -85,7 +85,7 @@ async function getData(shellArgs, onlySettings = false) {
   let scrape = pack[0];
   let settings = pack[1];
 
-  settings[module].save = false;
+  settings[module].save = false; //We do not want to bloat our computer during testing
   return [(!onlySettings) ? await scrape(settings) : null, settings];
 }
 
